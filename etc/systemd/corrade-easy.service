@@ -1,0 +1,40 @@
+# This file should be copied to the SystemD system directly, ie:
+# cp corrade.service /etc/systemd/system/corrade-resident.service
+# after which the service files must be reloaded:
+# systemctl daemon-reload
+# To start the bot, issue:
+# systemctl start corrade-resident
+# where "corrade-resident" is the name given to the system file.
+# In order to make Corrade start on boot, issue:
+# systemctl enable corrade-resident
+# This file can be copied as many times necessary in order to create multiple bots.
+
+# Tip: for SystemD files, folder names and others, it is a good idea to use the avatar name
+# as the identifier or name since individual bots will be easy to locate for debugging.
+
+[Unit]
+# A descriptive name for your bot.
+Description=Easy Islay
+After=network.target
+
+[Service]
+# This has to point to the Corrade binary from the zip file.
+ExecStart=/opt/corrade/Easy_Islay/Corrade
+Restart=always
+RestartSec=10
+# Redirect all output and errors to the Linux syslog.
+StandardOutput=syslog
+StandardError=syslog
+# Error messages will be printed to the standard Linux syslog using the following identifier.
+SyslogIdentifier=corrade-resident
+# Please do not run Corrade as root: create a separate user for Corrade. Change this to the
+# user that the Corrade binary runs under. The folder where the Corrade binary resides, and
+# where the zip file has been unpaked must be owned by the user defined here.
+User=corrade
+Group=corrade
+Environment=PATH=/usr/bin/:/usr/local/bin/
+# The working directly has to be set to the directory where the zip file has been unpacked.
+WorkingDirectory=/opt/corrade/Easy_Islay
+
+[Install]
+WantedBy=multi-user.target

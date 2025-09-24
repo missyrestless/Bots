@@ -1,0 +1,32 @@
+server {
+    server_name stream.neoman.dev;
+    listen 80;
+    listen 8000;
+    if ($host = stream.neoman.dev) {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    server_name stream.neoman.dev;
+    listen 443 ssl;
+
+    ssl_certificate /etc/letsencrypt/live/stream.neoman.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/stream.neoman.dev/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # log files
+    access_log /var/log/nginx/stream.neoman.dev.access.log;
+    error_log /var/log/nginx/stream.neoman.dev.error.log;
+
+    location / {
+        proxy_pass http://stream.neoman.dev:8443; # Replace with your Shoutcast server's internal IP and port
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off; # Important for streaming to prevent buffering delays
+    }
+
+}
