@@ -11,6 +11,11 @@ communication protocols. Corrade's target audience consists of programmers
 that will use Corrade as a building block and then create an end-product.
 
 The scripts in this repository are original scripting by Truth & Beauty Lab
-or modified versions of scripts distributed under an Open Source license found at:
+along with modified versions of scripts distributed under an Open Source
+license found at:
 
 https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
+
+Current development centers around the
+[Corrade HUD](https://github.com/missyrestless/Bots/blob/main/HUD/README.md),
+an in-world heads-up display that can be used to control a Corrade scripted agent.

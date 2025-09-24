@@ -35,7 +35,16 @@ https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world/movmeme
 
 ## Marketplace Item
 
+The HUD in its original form is available for no cost on the Second Life Marketplace.
+Alternately, the HUD can be built from the scripts in this repository. See the section
+[Building the HUD](#building-the-hud) below for info on building your own HUD.
+
+To obtain the original HUD, visit the Marketplace at:
+
 [Corrade Movement Heads-Up Display (Drone)](https://marketplace.secondlife.com/p/WaS-Corrade-Movement-Heads-Up-Display-Drone-HUD/8809096)
+
+After obtaining the HUD from the Marketplace it may be desirable to replace the
+scripts in each of the linked prims with the updated scripts here.
 
 ## Setting Up
 
