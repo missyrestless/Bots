@@ -1,0 +1,15 @@
+[Unit]
+Description=Shoutcast DNAS Server
+After=network.target
+
+[Service]
+Type=simple
+User=shoutcast
+Group=shoutcast
+WorkingDirectory=/opt/shoutcast
+ExecStart=/opt/shoutcast/sc_serv /opt/shoutcast/sc_serv.conf
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
