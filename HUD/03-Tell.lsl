@@ -5,8 +5,8 @@
 //  https://creativecommons.org/licenses/by/2.0/     //
 ///////////////////////////////////////////////////////
 //
-// This script is able to send messages to avatars, groups or talk in local
-// using Corrade.
+// This script is able to send messages to avatars,
+// groups or talk in local using Corrade.
 //
 // For more information on Corrade, please see:
 //     http://grimore.org/secondlife/scripted_agents/corrade

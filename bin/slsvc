@@ -1,14 +1,18 @@
 #!/bin/bash
 #
+# Name of the service for the first bot
+bot_1="corrade-anya"
+# Name of the service for the second bot
+bot_2="corrade-easy"
 # Adjust this list of services for your custom deployment
-all_services="corrade-anya corrade-easy nginx shoutcast"
-services=
+all_services="${bot_1} ${bot_2} nginx shoutcast"
 
+services=
 usage() {
   printf "\nUsage: slsvc [-a] [-e] [-n] [-s] [-S service] [-u] [action]"
   printf "\nWhere:"
-  printf "\n\t-a indicates perform action on corrade-anya service"
-  printf "\n\t-e indicates perform action on corrade-easy service"
+  printf "\n\t-a indicates perform action on ${bot_1} service"
+  printf "\n\t-e indicates perform action on ${bot_2} service"
   printf "\n\t-n indicates perform action on nginx service"
   printf "\n\t-s indicates perform action on shoutcast service"
   printf "\n\t-S service specifies a service to perform action on"
@@ -23,10 +27,10 @@ usage() {
 while getopts ":aensS:u" flag; do
   case $flag in
     a)
-      services="${services} corrade-anya"
+      services="${services} ${bot_1}"
       ;;
     e)
-      services="${services} corrade-easy"
+      services="${services} ${bot_2}"
       ;;
     n)
       services="${services} nginx"
