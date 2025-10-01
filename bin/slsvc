@@ -4,13 +4,16 @@
 bot_1="corrade-anya"
 # Name of the service for the second bot
 bot_2="corrade-easy"
+# Name of the service for the third bot
+bot_3="corrade-angelus"
 # Adjust this list of services for your custom deployment
-all_services="${bot_1} ${bot_2} nginx shoutcast"
+all_services="${bot_1} ${bot_2} ${bot_3} nginx shoutcast"
 
 services=
 usage() {
-  printf "\nUsage: slsvc [-a] [-e] [-n] [-s] [-S service] [-u] [action]"
+  printf "\nUsage: slsvc [-A] [-a] [-e] [-n] [-s] [-S service] [-u] [action]"
   printf "\nWhere:"
+  printf "\n\t-A indicates perform action on ${bot_3} service"
   printf "\n\t-a indicates perform action on ${bot_1} service"
   printf "\n\t-e indicates perform action on ${bot_2} service"
   printf "\n\t-n indicates perform action on nginx service"
@@ -24,8 +27,11 @@ usage() {
   exit 1
 }
 
-while getopts ":aensS:u" flag; do
+while getopts ":AaensS:u" flag; do
   case $flag in
+    A)
+      services="${services} ${bot_3}"
+      ;;
     a)
       services="${services} ${bot_1}"
       ;;
