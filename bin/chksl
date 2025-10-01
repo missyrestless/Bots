@@ -10,12 +10,16 @@ do
   systemctl is-enabled ${script}.service >/dev/null 2>&1 && \
     enabled="enabled " || enabled="disabled"
   if [ "${script}" == "shoutcast" ]; then
-    printf "\n\t${script}    is:\t${active} and ${enabled}"
+    printf "\n\t${script}       is:\t${active} and ${enabled}"
   else
     if [ "${script}" == "nginx" ]; then
-      printf "\n\t${script}        is:\t${active} and ${enabled}"
+      printf "\n\t${script}           is:\t${active} and ${enabled}"
     else
-      printf "\n\t${script} is:\t${active} and ${enabled}"
+      if [ "${script}" != "corrade-angelus" ]; then
+        printf "\n\t${script}    is:\t${active} and ${enabled}"
+      else
+        printf "\n\t${script} is:\t${active} and ${enabled}"
+      fi
     fi
   fi
 done
