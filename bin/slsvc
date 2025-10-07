@@ -3,19 +3,22 @@
 # Name of the service for the first bot
 bot_1="corrade-anya"
 # Name of the service for the second bot
-bot_2="corrade-easy"
+bot_2="corrade-angelus"
 # Name of the service for the third bot
-bot_3="corrade-angelus"
+bot_3="corrade-easy"
+all_bots="${bot_1} ${bot_2} ${bot_3}"
 # Adjust this list of services for your custom deployment
-all_services="${bot_1} ${bot_2} ${bot_3} nginx shoutcast"
+all_services="${all_bots} nginx shoutcast"
 
 services=
+allbots=
 usage() {
-  printf "\nUsage: slsvc [-A] [-a] [-e] [-n] [-s] [-S service] [-u] [action]"
+  printf "\nUsage: slsvc [-A] [-a] [-b] [-e] [-n] [-s] [-S service] [-u] [action]"
   printf "\nWhere:"
-  printf "\n\t-A indicates perform action on ${bot_3} service"
+  printf "\n\t-A indicates perform action on all bots services"
   printf "\n\t-a indicates perform action on ${bot_1} service"
-  printf "\n\t-e indicates perform action on ${bot_2} service"
+  printf "\n\t-b indicates perform action on ${bot_2} service"
+  printf "\n\t-e indicates perform action on ${bot_3} service"
   printf "\n\t-n indicates perform action on nginx service"
   printf "\n\t-s indicates perform action on shoutcast service"
   printf "\n\t-S service specifies a service to perform action on"
@@ -27,16 +30,19 @@ usage() {
   exit 1
 }
 
-while getopts ":AaensS:u" flag; do
+while getopts ":AabensS:u" flag; do
   case $flag in
     A)
-      services="${services} ${bot_3}"
+      services="${all_bots}"
       ;;
     a)
       services="${services} ${bot_1}"
       ;;
-    e)
+    b)
       services="${services} ${bot_2}"
+      ;;
+    e)
+      services="${services} ${bot_3}"
       ;;
     n)
       services="${services} nginx"
