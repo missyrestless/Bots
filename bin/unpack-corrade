@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+CORRADE_HOME=/opt/corrade
+CORRADE_DIST=${CORRADE_HOME}/Dist
+[ -d ${CORRADE_DIST} ] || {
+  echo "Corrade distribution folder ${CORRADE_DIST} does not exist. Exiting."
+  exit 1
+}
+
+have_zip=$(type -p unzip)
+[ "${have_zip}" ] || {
+  echo "Cannot locate unzip. Exiting."
+  exit 1
+}
+have_file=$(type -p file)
+[ "${have_file}" ] || {
+  echo "Cannot locate file utility. Exiting."
+  exit 1
+}
+
+if [[ $EUID -eq 0 ]]
+then
+  SUDO=
+else
+  SUDO=sudo
+fi
+
+usage() {
+  printf "\nUsage: unpack-corrade <corrade-release-linux-x64.zip> ...\n"
+  printf "\nAlternately, only specify the release number. For example:"
+  printf "\n\tunpack-corrade 13.0.458.11\n"
+  printf "\nCorrade distribution zip archives should be placed in ${CORRADE_DIST}\n\n"
+  exit 1
+}
+
+[ $# -eq 0 ] && usage
+
+cd ${CORRADE_DIST}
+for zc in $*
+do
+  dist=
+  if [ -f ${zc} ]; then
+    dist="${zc}"
+  else
+    if [ -f Corrade-${zc}-linux-x64.zip ]; then
+      dist="Corrade-${zc}-linux-x64.zip"
+    else
+      echo "Cannot locate ${zc}. Skipping."
+      continue
+    fi
+  fi
+  file ${dist} | grep Zip >/dev/null || {
+    echo "${dist} does not appear to be a Zip archive. Skipping."
+    continue
+  }
+  folder=$(echo ${dist} | sed -e "s/-linux-x64.zip//")
+  [ -d ${CORRADE_HOME}/${folder} ] && {
+    echo "${CORRADE_HOME}/${folder} already exists. Skipping"
+    continue
+  }
+  ${SUDO} mkdir ${CORRADE_HOME}/${folder}
+  cd ${CORRADE_HOME}/${folder}
+  ${SUDO} unzip ${CORRADE_DIST}/${dist}
+  cd ..
+  ${SUDO} chown -R corrade:corrade ${folder}
+done
