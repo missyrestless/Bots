@@ -1,0 +1,135 @@
+#!/bin/bash
+#
+CORRADE_HOME=/opt/corrade
+CORRADE_DIST=${CORRADE_HOME}/Dist
+CORRADE_DURL="https://corrade.grimore.org/download/corrade/linux-x64"
+CORRADE_LATE="LATEST.zip"
+
+have_zip=$(type -p unzip)
+[ "${have_zip}" ] || {
+  echo "Cannot locate unzip. Exiting."
+  exit 1
+}
+have_file=$(type -p file)
+[ "${have_file}" ] || {
+  echo "Cannot locate file utility. Exiting."
+  exit 1
+}
+
+if [[ $EUID -eq 0 ]]
+then
+  SUDO=
+else
+  SUDO=sudo
+fi
+
+usage() {
+  printf "\nUsage: unpack-corrade [-d] [-l] [-u] <corrade-release-linux-x64.zip> ..."
+  printf "\nWhere:"
+  printf "\n\t-d indicates download specified zip archive from Corrade"
+  printf "\n\t-l indicates download latest zip archive from Corrade"
+  printf "\n\t-u displays this usage message and exits\n"
+  printf "\nAlternately, only specify the release number. For example:"
+  printf "\n\tunpack-corrade 13.0.458.11\n"
+  printf "\nCorrade distribution zip archives should be placed in ${CORRADE_DIST}\n\n"
+  exit 1
+}
+
+unpack() {
+  arch="$1"
+  file ${arch} | grep Zip >/dev/null || {
+    echo "${arch} does not appear to be a Zip archive. Skipping."
+    return
+  }
+  folder=$(echo ${arch} | sed -e "s/-linux-x64//" -e "s/.zip//")
+  [ -d ${CORRADE_HOME}/${folder} ] && {
+    if [ "${latest}" ]; then
+      ${SUDO} rm -rf ${CORRADE_HOME}/${folder}
+    else
+      echo "${CORRADE_HOME}/${folder} already exists. Skipping"
+      return
+    fi
+  }
+  ${SUDO} mkdir ${CORRADE_HOME}/${folder}
+  cd ${CORRADE_HOME}/${folder}
+  ${SUDO} unzip ${CORRADE_DIST}/${arch}
+  cd ..
+  ${SUDO} chown -R corrade:corrade ${folder}
+  cd ${CORRADE_DIST}
+}
+
+[ $# -eq 0 ] && usage
+
+download=
+latest=
+while getopts ":dlu" flag; do
+  case $flag in
+    d)
+      download=1
+      ;;
+    l)
+      download=1
+      latest=1
+      ;;
+    u)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[ -d ${CORRADE_DIST} ] || {
+  if [ "${download}" ]; then
+    ${SUDO} mkdir -p ${CORRADE_DIST}
+  else
+    echo "Corrade distribution folder ${CORRADE_DIST} does not exist. Exiting."
+    exit 1
+  fi
+}
+
+cd ${CORRADE_DIST}
+if [ "${download}" ]; then
+  have_wget=$(type -p wget)
+  [ "${have_wget}" ] || {
+    echo "Cannot locate wget utility. Exiting."
+    exit 1
+  }
+  if [ "${latest}" ]; then
+    ${SUDO} wget -q ${CORRADE_DURL}/${CORRADE_LATE}
+    unpack ${CORRADE_LATE}
+  else
+    for zc in $*
+    do
+      dist=
+      echo "${zc}" | grep Corrade- | grep linux-x64 >/dev/null && dist="${zc}"
+      [ "${dist}" ] || dist="Corrade-${zc}-linux-x64.zip"
+      if [ -f ${dist} ]; then
+        echo "${CORRADE_DIST}/${dist} already exists. Skipping download."
+        continue
+      else
+        ${SUDO} wget -q ${CORRADE_DURL}/${dist}
+        unpack ${dist}
+      fi
+    done
+  fi
+else
+  for zc in $*
+  do
+    dist=
+    if [ -f ${zc} ]; then
+      dist="${zc}"
+    else
+      if [ -f Corrade-${zc}-linux-x64.zip ]; then
+        dist="Corrade-${zc}-linux-x64.zip"
+      else
+        echo "Cannot locate ${zc}. Skipping."
+        continue
+      fi
+    fi
+    unpack ${dist}
+  done
+fi
