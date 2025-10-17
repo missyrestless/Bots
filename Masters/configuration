@@ -1,0 +1,17 @@
+####################### START CONFIGURATION ##################################
+
+# All these settings must correspond to the settings in Corrade.ini.
+
+# This is the UUID of the Corrade bot.
+corrade = "060caef5-2125-4378-b1b9-3f21ebba0b73"
+
+# The name of the group - it can also be the UUID of the group.
+group = "MyGroup"
+
+# The password for the group.
+password = "mypassword"
+
+# The notification tag to use.
+tag = "951bf6bb-e1e3-4777-b7f2-88169a3def01"
+
+####################### END CONFIGURATION ###################################
