@@ -52,7 +52,8 @@ unpack() {
   }
   ${SUDO} mkdir ${CORRADE_HOME}/${folder}
   cd ${CORRADE_HOME}/${folder}
-  ${SUDO} unzip ${CORRADE_DIST}/${arch}
+  echo "Extracting ${arch} into ${CORRADE_HOME}/${folder}"
+  ${SUDO} unzip -q ${CORRADE_DIST}/${arch}
   cd ..
   ${SUDO} chown -R corrade:corrade ${folder}
   cd ${CORRADE_DIST}
