@@ -1,0 +1,83 @@
+# STEP 1 - Set Title for the TIPJAR
+BOARDTITLE= PLAY WITH ME
+
+# STEP 2 - Set color for the board title
+BOARDCOLOR=1,1,1
+
+# STEP 3 - Set Title for the HEAD SITTER
+#EX .HEADTITLE=TOUCH MY HEAD OR MY BOARD\nTO FORCE ME TO SIT
+# IF THIS IS EMPTY NOTHING WILL APPEAR ABOVE HEAD.
+HEADTITLE=
+
+# STEP 4 - Set color for the HEAD SITTER title
+# EX. HEADCOLOR=1, 0, 1
+HEADCOLOR=1,1,1
+
+# STEP 3-Set the price for one session ($L)
+PAY=250
+
+# STEP 5- Set the time for  session (minutes) or 0 (zero) for session without a limit (minutes)
+TIME=15
+
+# STEP 6- Set MAX time for  session (seconds) or 0 (zero) for session without a limit (minutes)
+# 900=15 minutes 3600=1 Hour etc.
+MAXTIME=0
+
+# STEP 7 - Set Owner Commission. set 0-100%
+OWNER_COMMISSION=0
+
+* STEP 8 - This message will appear after the thank you for your donation...
+MSG=Thank you for your tip. Let's have fun!
+
+# STEP 9 - information on top of the tip jar
+# 0=donor name + tip + total
+# 1=last tip
+# 2=last tip + total
+# 3=total only
+# 4= nothing
+INFO=4
+
+# STEP 10 - Choose access: OWNER/GROUP/ALL/ALLGROUP/RESERVED
+ACCESS=RESERVED
+#ACCESS=ALL
+
+# STEP 11- Name of the avatar user for whom the tipjar is reserved
+# Example AV_RESERVED =WallaGo Dingson
+#I MPORTANT - TO ACTIVE THIS FEATURE CHANGE THE ACCESS TO RESERVED
+AV_RESERVED=Angelus Portal
+#AV_RESERVED=
+
+# STEP 11a - ALLOW AUTO LOGIN (YES/NO)
+# IMPORTANT - AUTO LOGIN IS POSSIBLE ONLY IF 
+# ACCESS=RESERVED AND AV_RESERVED IS SET
+# YES - AUTO LOGIN IS ENABLED
+AUTO_LOGIN=YES
+#AUTO_LOGIN=NO
+
+# STEP 12
+# Send message when tip is received
+IM_OWNERS=YES
+
+# STEP 13 - AUTO LOG OUT IF LEAVE SIM OR LOG OFF
+AUTO_LOGOUT=YES
+
+# STEP 14 - Auto Return [Yes/No] Return  doll to the first object.
+AUTO_RETURN_HOME=YES
+
+# STEP 15 CAN THE USER SET DIFFERENT PRICES AND TIME SETTINGS
+ALLOW_CHANGE=YES
+
+# STEP 16 SEND IM TO LOCAL CHAT [YES/NO] IF NO IT WILL SEND PRIVATE IM TO TIPPER
+USE_LOCALCHAT=YES
+
+# STEP 17 - ALLOW OTHER GROUP MEMBERS TO MOVE OTHERS WITHOUT PAYING [YES/NO]
+# THIS FEATURE IS ACTIVE ONLY IF GROUP MOVE IS USED. STEP 10 SET ACCESS=GROUP
+GROUP_ADMIN=NO
+
+# STEP 18 - OBJECT UUID
+#Name=Dance Pole
+OBJECTUUID=b9608dcf-ce26-12ff-caa8-0dd582ac7d60
+# Dance Pole Bench
+OBJECTUUID=31b2646f-fba8-d5b9-5969-33c89de3982b
+#Name=Couch
+OBJECTUUID=c8bad4e6-89d0-8d32-0499-6b095596111b
