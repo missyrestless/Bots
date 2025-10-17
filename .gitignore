@@ -4,6 +4,9 @@ tmp/
 *.swp
 *~.nib
 
+# Corrade release archives
+Dist/
+
 # Private scripts, do not add or commit
 Private/
 
