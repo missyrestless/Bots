@@ -16,17 +16,20 @@ license found at:
 
 https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
 
+## Repository Contents
+
+- `Avatars`: Specifications for free male and female avatars
+- `bin`: convenience scripts to manage services on the server-side
+- `etc`: Corrade, Nginx, and Shoutcast configuration and systemd units
+- `Examples`: some simple examples of how to use the Corrade system
+- `HUD`: the Corrade HUD, control bots in-world with this heads-up display
+- `Pay2Play`: WDC Tipjar settings examples
+- `Select_Dialog_Option`: a dialog menu selector for the Corrade bot
+- `Sit_Animate`: example sit on object and animate a Corrade bot
+- `Toggle_Vista_AO`: example script turning on/off the Vista AO of a bot
+
 ## Corrade HUD
 
 Current development centers around the
 [Corrade HUD](https://github.com/missyrestless/Bots/blob/main/HUD/README.md),
 an in-world heads-up display that can be used to control a Corrade scripted agent.
-
-## Contents
-
-- `bin`: convenience scripts to manage services on the server-side
-- `Examples`: some simple examples of how to use the Corrade system
-- `HUD`: the Corrade HUD, control bots in-world with this heads-up display
-- `Select_Dialog_Option`: a dialog menu selector for the Corrade bot
-- `Sit_Animate`: example sit on object and animate a Corrade bot
-- `Toggle_Vista_AO`: example script turning on/off the Vista AO of a bot
