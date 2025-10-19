@@ -7,6 +7,9 @@ tmp/
 # Corrade release archives
 Dist/
 
+# Configuration notecards with sensitive data
+Evade_Region_Restart/configuration-*
+
 # Private scripts, do not add or commit
 Private/
 
