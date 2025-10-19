@@ -1,5 +1,5 @@
 # STEP 1 - Set Title for the TIPJAR
-BOARDTITLE= PLAY WITH ME
+BOARDTITLE= PLAY WITH ME\nPAY BOARD, SIT IN CHAIR
 
 # STEP 2 - Set color for the board title
 BOARDCOLOR=1,1,1
@@ -35,7 +35,7 @@ MSG=Thank you for your tip. Let's have fun!
 # 2=last tip + total
 # 3=total only
 # 4= nothing
-INFO=4
+INFO=3
 
 # STEP 10 - Choose access: OWNER/GROUP/ALL/ALLGROUP/RESERVED
 ACCESS=RESERVED
@@ -78,6 +78,8 @@ GROUP_ADMIN=NO
 #Name=Dance Pole
 OBJECTUUID=dd159ab2-750f-41f2-3605-81dfa55f7ac8
 # Dance Pole Chair
-OBJECTUUID=96dd8204-a50e-c196-6397-6af764210d74
+#OBJECTUUID=96dd8204-a50e-c196-6397-6af764210d74
 #Name=Couch
 OBJECTUUID=ffbcd9c4-1a2d-7219-8622-69012bad57dc
+# Body Shot Bar
+OBJECTUUID=939d8821-4348-8fb8-ed9d-9fda302e25a7
