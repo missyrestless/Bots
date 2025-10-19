@@ -166,6 +166,9 @@ list tuples = [];
 // regions will be stored here
 list regions = [];
 string region = "";
+string position = "";
+string note_line = "";
+list lineItems = [];
  
 default {
     state_entry() {
@@ -427,7 +430,14 @@ state teleport {
         llSensorRepeat("", NULL_KEY, AGENT, 0.1, 0.1, 5);
  
         // Shuffle the regions and grab the next region.
-        region = llList2String(regions, 0);
+        note_line = llList2String(regions, 0);
+        lineItems = llParseString2List(note_line, ["|"], []);
+        if (llGetListLength(lineItems) >= 2) {
+            region = llList2String(lineItems, 0);
+            position = llList2String(lineItems, 1);
+        } else {
+            llOwnerSay("Invalid line format: " + note_line);
+        }
         regions = llDeleteSubList(regions, 0, 0);
         regions += region;
  
@@ -436,6 +446,14 @@ state teleport {
             // DEBUG
             llOwnerSay("Already on current region " + region + ", trying the next region.");
             region = llList2String(regions, 0);
+            note_line = llList2String(regions, 0);
+            lineItems = llParseString2List(note_line, ["|"], []);
+            if (llGetListLength(lineItems) >= 2) {
+                region = llList2String(lineItems, 0);
+                position = llList2String(lineItems, 1);
+            } else {
+                llOwnerSay("Invalid line format: " + note_line);
+            }
             regions = llDeleteSubList(regions, 0, 0);
             regions += region;
         }
@@ -452,7 +470,7 @@ state teleport {
                     "password", wasURLEscape(PASSWORD),
                     "entity", "region",
                     "region", wasURLEscape(region),
-                    "position", wasURLEscape((string)<128, 128, 50>),
+                    "position", wasURLEscape(position),
                     "callback", wasURLEscape(callback)
                 ]
             )
