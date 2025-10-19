@@ -8,8 +8,8 @@
 // Second Life / OpenSim bot. You can find more details about the bot
 // by following the URL: http://was.fm/secondlife/scripted_agents/corrade
 //
-// The sit script works together with a "Configuration" notecard and an
-// animation that must both be placed in the same primitive as this script. 
+// The sit script works together with a "Corrade-Configuration" notecard and
+// an animation that must both be placed in the same primitive as this script. 
 // The purpose of this script is to demonstrate sitting with Corrade and 
 // you are free to use, change, and commercialize it under the GNU/GPLv3 
 // license at: http://www.gnu.org/licenses/gpl.html
@@ -82,19 +82,19 @@ list tuples = [];
  
 default {
     state_entry() {
-        if(llGetInventoryType("Configuration") != INVENTORY_NOTECARD) {
+        if(llGetInventoryType("Corrade-Configuration") != INVENTORY_NOTECARD) {
             llOwnerSay("Sorry, could not find an inventory notecard.");
             return;
         }
         // DEBUG
-        llOwnerSay("Reading Configuration file...");
-        llGetNotecardLine("Configuration", line);
+        llOwnerSay("Reading Corrade-Configuration file...");
+        llGetNotecardLine("Corrade-Configuration", line);
     }
     dataserver(key id, string data) {
         if(data == EOF) {
             // invariant, length(tuples) % 2 == 0
             if(llGetListLength(tuples) % 2 != 0) {
-                llOwnerSay("Error in Configuration notecard.");
+                llOwnerSay("Error in Corrade-Configuration notecard.");
                 return;
             }
             CORRADE = llList2String(
@@ -107,7 +107,7 @@ default {
                           )
                       +1);
             if(CORRADE == "") {
-                llOwnerSay("Error in Configuration notecard: corrade");
+                llOwnerSay("Error in Corrade-Configuration notecard: corrade");
                 return;
             }
             GROUP = llList2String(
@@ -120,7 +120,7 @@ default {
                           )
                       +1);
             if(GROUP == "") {
-                llOwnerSay("Error in Configuration notecard: group");
+                llOwnerSay("Error in Corrade-Configuration notecard: group");
                 return;
             }
             PASSWORD = llList2String(
@@ -133,11 +133,11 @@ default {
                           )
                       +1);
             if(PASSWORD == "") {
-                llOwnerSay("Error in Configuration notecard: password");
+                llOwnerSay("Error in Corrade-Configuration notecard: password");
                 return;
             }
             // DEBUG
-            llOwnerSay("Read Configuration file...");
+            llOwnerSay("Read Corrade-Configuration file...");
             state url;
         }
         if(data == "") jump continue;
@@ -169,7 +169,7 @@ default {
         tuples += k;
         tuples += v;
 @continue;
-        llGetNotecardLine("Configuration", ++line);
+        llGetNotecardLine("Corrade-Configuration", ++line);
     }
     on_rez(integer num) {
         llResetScript();
