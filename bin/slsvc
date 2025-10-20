@@ -6,19 +6,22 @@ bot_1="corrade-anya"
 bot_2="corrade-angelus"
 # Name of the service for the third bot
 bot_3="corrade-easy"
-all_bots="${bot_1} ${bot_2} ${bot_3}"
+# Name of the service for the fourth bot
+bot_4="corrade-pandora"
+all_bots="${bot_1} ${bot_2} ${bot_3} ${bot_4}"
 # Adjust this list of services for your custom deployment
 all_services="${all_bots} nginx shoutcast"
 
 services=
 allbots=
 usage() {
-  printf "\nUsage: slsvc [-A] [-a] [-b] [-e] [-n] [-s] [-S service] [-u] [action]"
+  printf "\nUsage: slsvc [-A] [-a] [-b] [-e] [-n] [-p] [-s] [-S service] [-u] [action]"
   printf "\nWhere:"
   printf "\n\t-A indicates perform action on all bots services"
   printf "\n\t-a indicates perform action on ${bot_1} service"
   printf "\n\t-b indicates perform action on ${bot_2} service"
   printf "\n\t-e indicates perform action on ${bot_3} service"
+  printf "\n\t-p indicates perform action on ${bot_4} service"
   printf "\n\t-n indicates perform action on nginx service"
   printf "\n\t-s indicates perform action on shoutcast service"
   printf "\n\t-S service specifies a service to perform action on"
@@ -30,7 +33,7 @@ usage() {
   exit 1
 }
 
-while getopts ":AabensS:u" flag; do
+while getopts ":AabenpsS:u" flag; do
   case $flag in
     A)
       services="${all_bots}"
@@ -43,6 +46,9 @@ while getopts ":AabensS:u" flag; do
       ;;
     e)
       services="${services} ${bot_3}"
+      ;;
+    p)
+      services="${services} ${bot_4}"
       ;;
     n)
       services="${services} nginx"
@@ -89,7 +95,7 @@ if [ "${action}" == "status" ] && [ "${services}" == "${all_services}" ]; then
       if [ "${script}" == "nginx" ]; then
         printf "\n\t${script}           is:\t${active} and ${enabled}"
       else
-        if [ "${script}" != "corrade-angelus" ]; then
+        if [ "${script}" != "corrade-angelus" ] && [ "${script}" != "corrade-pandora" ]; then
           printf "\n\t${script}    is:\t${active} and ${enabled}"
         else
           printf "\n\t${script} is:\t${active} and ${enabled}"
