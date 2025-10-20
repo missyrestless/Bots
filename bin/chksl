@@ -3,7 +3,7 @@
 printf "\nChecking Nginx, Shoutcast, and Corrade bots service status:"
 
 # Adjust this list of services for your custom deployment
-for script in corrade-angelus corrade-anya corrade-easy nginx shoutcast
+for script in corrade-angelus corrade-anya corrade-easy corrade-pandora nginx shoutcast
 do
   systemctl is-active ${script}.service >/dev/null 2>&1 && \
     active="active" || active="inactive"
@@ -15,7 +15,7 @@ do
     if [ "${script}" == "nginx" ]; then
       printf "\n\t${script}           is:\t${active} and ${enabled}"
     else
-      if [ "${script}" != "corrade-angelus" ]; then
+      if [ "${script}" != "corrade-angelus" ] && [ "${script}" != "corrade-pandora" ]; then
         printf "\n\t${script}    is:\t${active} and ${enabled}"
       else
         printf "\n\t${script} is:\t${active} and ${enabled}"
