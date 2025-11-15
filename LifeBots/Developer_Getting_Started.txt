@@ -1,0 +1,51 @@
+API Endpoint:
+  POST https://api.lifebots.cloud/api/bot.html
+
+All requests must use Content-Type:
+  application/json or application/x-www-form-urlencoded header
+
+API Documentation: https://lifebots.cloud/developer/documentation
+
+Authentication
+--------------
+Include your API key and bot credentials in every request:
+
+Content-Type: application/json
+
+{
+  "action": "status",
+  "apikey": "lbk_0cRHs5cmDUiOOfDhxGfQuED4M6bUmNjy",
+  "botname": "Your Bot Name",
+  "secret": "your-bot-secret"
+}
+
+Example Response
+----------------
+All responses return JSON with a result field:
+
+{
+  "result": "OK",
+  "status": "ONLINE",
+  "online": "1",
+  "slname": "Your Bot Name",
+  "uuid": "bot-uuid-here",
+  "location": "Region/128/128/30"
+}
+
+OAuth Base URLs
+---------------
+OAuth Authorization:
+  https://lifebots.cloud/oauth/authorize
+Token Exchange:
+  https://lifebots.cloud/oauth/token
+API Base:
+  https://api.lifebots.cloud/api/v1
+
+Best Practices
+--------------
+- Always check the result field in responses
+- Store API keys securely (use environment variables)
+- Implement error handling for network failures
+- Respect rate limits (100 requests/minute)
+- Use HTTPS for all API calls
+- For LSL: Be aware of the 2048 byte response limit

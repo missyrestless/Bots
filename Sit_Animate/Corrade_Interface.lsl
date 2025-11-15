@@ -4,12 +4,11 @@
 //  License: GNU GPLv3                               //
 ///////////////////////////////////////////////////////
 //
-// This is an automatic teleporter, sitter and animator for the Corrade
+// This is an automatic teleporter, and sitter for the Corrade
 // Second Life / OpenSim bot. You can find more details about the bot
 // by following the URL: http://was.fm/secondlife/scripted_agents/corrade
 //
-// The sit script works together with a "Corrade-Configuration" notecard and
-// an animation that must both be placed in the same primitive as this script. 
+// The sit script works together with a "Corrade-Configuration" notecard
 // The purpose of this script is to demonstrate sitting with Corrade and 
 // you are free to use, change, and commercialize it under the GNU/GPLv3 
 // license at: http://www.gnu.org/licenses/gpl.html
@@ -66,10 +65,21 @@ string wasURLEscape(string i) {
     return o;
 }
 
-// corrade data
+// Corrade data
 string CORRADE = "";
 string GROUP = "";
 string PASSWORD = "";
+string LOCK = "";
+string DEBUG = "";
+
+// Whether the notification bind has been performed
+integer bound = FALSE;
+// whether to output debug messages to the owner
+integer debug = FALSE;
+// whether the avatar has been seated
+integer seated = FALSE;
+// whether the avatar should be locked to the seat
+integer unlocked = TRUE;
 
 // for holding the callback URL
 string callback = "";
@@ -83,11 +93,12 @@ list tuples = [];
 default {
     state_entry() {
         if(llGetInventoryType("Corrade-Configuration") != INVENTORY_NOTECARD) {
-            llOwnerSay("Sorry, could not find an inventory notecard.");
+            llOwnerSay("ERROR: Could not find an inventory notecard.");
             return;
         }
-        // DEBUG
-        llOwnerSay("Reading Corrade-Configuration file...");
+        if (debug) {
+            llOwnerSay("Reading Corrade-Configuration file...");
+        }
         llGetNotecardLine("Corrade-Configuration", line);
     }
     dataserver(key id, string data) {
@@ -136,8 +147,41 @@ default {
                 llOwnerSay("Error in Corrade-Configuration notecard: password");
                 return;
             }
-            // DEBUG
-            llOwnerSay("Read Corrade-Configuration file...");
+            LOCK = llList2String(
+                          tuples,
+                          llListFindList(
+                              tuples, 
+                              [
+                                  "lock"
+                              ]
+                          )
+                      +1);
+            if(LOCK == "") {
+                // default to release after first sit
+                LOCK = "no";
+            }
+            if(LOCK == "yes" || LOCK == "YES") {
+                unlocked = FALSE;
+            }
+            DEBUG = llList2String(
+                          tuples,
+                          llListFindList(
+                              tuples, 
+                              [
+                                  "debug"
+                              ]
+                          )
+                      +1);
+            if(DEBUG == "") {
+                // default: no debug messages
+                DEBUG = "no";
+            }
+            if(DEBUG == "yes" || DEBUG == "YES") {
+                debug = TRUE;
+            }
+            if (debug) {
+                llOwnerSay("Read Corrade-Configuration file...");
+            }
             state url;
         }
         if(data == "") jump continue;
@@ -183,15 +227,17 @@ default {
  
 state url {
     state_entry() {
-        // DEBUG
-        llOwnerSay("Requesting URL...");
+        if (debug) {
+            llOwnerSay("Requesting URL...");
+        }
         llRequestURL();
     }
     http_request(key id, string method, string body) {
         if(method != URL_REQUEST_GRANTED) return;
         callback = body;
-        // DEBUG
-        llOwnerSay("Got URL...");
+        if (debug) {
+            llOwnerSay("Got URL...");
+        }
         state detect;
     }
     on_rez(integer num) {
@@ -206,53 +252,72 @@ state url {
  
 state detect {
     state_entry() {
-        // DEBUG
-        llOwnerSay("Detecting if Corrade is online...");
-        llSetTimerEvent(5);
+        if (debug) {
+            if (seated) {
+                llOwnerSay("Detecting if Corrade goes offline...");
+            } else {
+                llOwnerSay("Detecting if Corrade is online...");
+            }
+        }
+        llSetTimerEvent(30);
     }
     timer() {
         llRequestAgentData((key)CORRADE, DATA_ONLINE);
     }
     dataserver(key id, string data) {
         if(data != "1") {
-            // DEBUG
-            llOwnerSay("Corrade is not online, sleeping...");
-            llSetTimerEvent(30);
+            if (debug) {
+                llOwnerSay("Corrade is not online, sleeping...");
+            }
+            seated = FALSE;
+            bound = FALSE;
+            llSetTimerEvent(60);
             return;
         }
         llSensorRepeat("", (key)CORRADE, AGENT, 10, TWO_PI, 1);
     }
     no_sensor() {
-        // DEBUG
-        llOwnerSay("Teleporting Corrade...");
-        llInstantMessage((key)CORRADE, 
-            wasKeyValueEncode(
-                [
-                    "command", "teleport",
-                    "group", wasURLEscape(GROUP),
-                    "password", wasURLEscape(PASSWORD),
-                    "entity", "region",
-                    "region", wasURLEscape(llGetRegionName()),
-                    "position", wasURLEscape(
-                        (string)(
-                            llGetPos() + wasCirclePoint(1)
-                        )
-                    ),
-                    "callback", callback
-                ]
-            )
-        );
+        if (seated && unlocked) {
+            llSetTimerEvent(0);
+            state main;
+        } else {
+            if (debug) {
+                llOwnerSay("Teleporting Corrade...");
+            }
+            llInstantMessage((key)CORRADE, 
+                wasKeyValueEncode(
+                    [
+                        "command", "teleport",
+                        "group", wasURLEscape(GROUP),
+                        "password", wasURLEscape(PASSWORD),
+                        "entity", "region",
+                        "region", wasURLEscape(llGetRegionName()),
+                        "position", wasURLEscape(
+                            (string)(
+                                llGetPos() + wasCirclePoint(1)
+                            )
+                        ),
+                        "callback", callback
+                    ]
+                )
+            );
+        }
     }
     sensor(integer num) {
         llSetTimerEvent(0);
-        state notify;
+        if (bound) {
+            state main;
+        } else {
+            state notify;
+        }
     }
     http_request(key id, string method, string body) {
         llHTTPResponse(id, 200, "OK");
         if(wasKeyValueGet("command", body) != "teleport" ||
             wasKeyValueGet("success", body) != "True") {
-            // DEBUG
-            llOwnerSay("Teleport failed...");
+            if (debug) {
+                llOwnerSay("Teleport failed...");
+            }
             return;
         }
         llSetTimerEvent(0);
@@ -270,8 +335,9 @@ state detect {
  
 state notify {
     state_entry() {
-        // DEBUG
-        llOwnerSay("Binding to the permission Corrade notification...");
+        if (debug) {
+            llOwnerSay("Binding to the permission Corrade notification...");
+        }
         llInstantMessage(
             (key)CORRADE, 
             wasKeyValueEncode(
@@ -292,19 +358,23 @@ state notify {
         llHTTPResponse(id, 200, "OK");
         if(wasKeyValueGet("command", body) != "notify" ||
             wasKeyValueGet("success", body) != "True") {
-            // DEBUG
-            llOwnerSay("Failed to bind to the permission notification...");
+            if (debug) {
+                llOwnerSay("Failed to bind to the permission notification...");
+            }
             state detect;
         }
-        // DEBUG
-        llOwnerSay("Permission notification installed...");
+        if (debug) {
+            llOwnerSay("Permission notification installed...");
+        }
+        bound = TRUE;
         llSetTimerEvent(0);
         state main;
     }
     timer() {
         llSetTimerEvent(0);
-        // DEBUG
-        llOwnerSay("Timeout binding to permission notification...");
+        if (debug) {
+            llOwnerSay("Timeout binding to permission notification...");
+        }
         state detect;
     }
     on_rez(integer num) {
@@ -319,30 +389,40 @@ state notify {
  
 state main {
     state_entry() {
-        // DEBUG
-        llOwnerSay("Waiting...");
+        if (debug) {
+            llOwnerSay("Waiting...");
+        }
         llSensorRepeat("", (key)CORRADE, AGENT, 10, TWO_PI, 1);
         llSetTimerEvent(60);
     }
     sensor(integer num) {
-        // Corrade is already sitting. Do nothing.
-        if(llAvatarOnSitTarget() == (key)CORRADE) return;
-        // DEBUG
-        llOwnerSay("Sending sit command...");
-        llInstantMessage((key)CORRADE, 
-            wasKeyValueEncode(
-                [
-                    "command", "sit",
-                    "group", wasURLEscape(GROUP),
-                    "password", wasURLEscape(PASSWORD),
-                    "item", wasURLEscape(
-                        llGetKey()
-                    ),
-                    "range", 10
-                ]
-            )
-        );
-        llSensorRepeat("", (key)CORRADE, AGENT, 10, TWO_PI, 10);
+        // Corrade is already sitting. Detect when offline.
+        if(llAvatarOnSitTarget() == (key)CORRADE) {
+            seated = TRUE;
+            return;
+        }
+        if (seated && unlocked) {
+            return;
+        } else {
+            if (debug) {
+                llOwnerSay("Sending sit command...");
+            }
+            llInstantMessage((key)CORRADE, 
+                wasKeyValueEncode(
+                    [
+                        "command", "sit",
+                        "group", wasURLEscape(GROUP),
+                        "password", wasURLEscape(PASSWORD),
+                        "item", wasURLEscape(
+                            llGetKey()
+                        ),
+                        "range", 10
+                    ]
+                )
+            );
+            seated = TRUE;
+            llSensorRepeat("", (key)CORRADE, AGENT, 10, TWO_PI, 10);
+        }
     }
     no_sensor() {
         llSensorRemove();
@@ -352,8 +432,9 @@ state main {
         llHTTPResponse(id, 200, "OK");
         if(wasKeyValueGet("type", body) != "permission" ||
             wasKeyValueGet("permissions", body) != "TriggerAnimation") return;
-        // DEBUG
-        llOwnerSay("Corrade received the permission request to trigger an animation, replying...");
+        if (debug) {
+            llOwnerSay("Corrade received the permission request to trigger an animation, replying...");
+        }
         llInstantMessage((key)CORRADE, 
             wasKeyValueEncode(
                 [
@@ -370,9 +451,13 @@ state main {
         );
     }
     timer() {
-        if(llAvatarOnSitTarget() == (key)CORRADE) return;
-        // DEBUG
-        llOwnerSay("Timeout during sit... Restarting...");
+        if(llAvatarOnSitTarget() == (key)CORRADE) {
+            seated = TRUE;
+            return;
+        }
+        if (debug) {
+            llOwnerSay("Timeout during sit... Restarting...");
+        }
         state detect;
     }
     on_rez(integer num) {
