@@ -9,4 +9,10 @@ group = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 # The password for the group.
 password = "<the password for the group>"
 
+# Whether to lock the avatar to the object or release after first sit
+lock = "no"
+
+# Whether to output debug messages to the owner
+debug = "no"
+
 ####################### END CONFIGURATION ###################################
