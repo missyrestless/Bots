@@ -38,8 +38,31 @@ LOCATION="Last location"
 UUID=
 
 usage() {
-  printf "\nUsage: lifebot [-a action] [-l location] [-n name]"
-  printf "\n\t[-k apikey] [-s secret] [-u uuid] [-d] [-h]\n\n"
+  printf "\nUsage: lifebot [-a action] [-l location] [-n name] [-k apikey] [-s secret] [-u uuid] [-d] [-h]"
+  printf "\nWhere:"
+  printf "\n\t-a action specifies the API action (sit, teleport, login, ...)"
+  printf "\n\t\tSupported actions: login, logout, status (default), location, stand, sit, teleport"
+  printf "\n\t-l location specifies a location for login and teleport actions"
+  printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
+  printf "\n\t-n name specifies a Bot name, Default: Easy Islay"
+  printf "\n\t-k apikey specifies an API Key, use environment instead"
+  printf "\n\t-s secret specifies a Bot secret, use environment instead"
+  printf "\n\t-u uuid specifies a UUID for use with actions that require one (e.g. sit)"
+  printf "\n\t-d indicates dryrun mode - tell me what you would do without doing anything"
+  printf "\n\t-h displays this usage message and exits"
+  printf "\nEnvironment:"
+  printf "\n  Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries"
+  printf "\n  of the form LB_SECRET_BOT_NAME in order to support multiple bots"
+  printf "\n  Entries can specify a Slurl alias. For example:"
+  printf "\n    export SLURL_club='http://maps.secondlife.com/secondlife/Scylla/226/32/78'"
+  printf "\n  A Slurl alias can be used with the -l command line argument, e.g. -l club"
+  printf "\n  Entries can also specify a UUID alias. For example:"
+  printf "\n    export UUID_couch='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'"
+  printf "\n  A UUID alias can be used with the -u command line argument, e.g. -u couch"
+  printf "\nExamples:"
+  printf "\n  lifebot  # Displays the status of the default Bot"
+  printf "\n  lifebot -a login -l Home # Default Bot login to Home location"
+  printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots\n"
   exit 1
 }
 
@@ -191,13 +214,15 @@ shift $(( OPTIND - 1 ))
 
 # Check for location alias in ~/.lifebots
 [ "${LOCATION}" ] && {
-  envloc="SLURL_${LOCATION}"
+  botloc=$(echo "${LOCATION}" | sed -e "s/ /_/g")
+  envloc="SLURL_${botloc}"
   [ "${!envloc}" ] && LOCATION="${!envloc}"
 }
 
 # Check for UUID alias in ~/.lifebots
 [ "${UUID}" ] && {
-  envuuid="UUID_${UUID}"
+  botuuid=$(echo "${UUID}" | sed -e "s/ /_/g")
+  envuuid="UUID_${botuuid}"
   [ "${!envuuid}" ] && UUID="${!envuuid}"
 }
 
@@ -227,7 +252,6 @@ case "${ACTION}" in
       echo "The sit action requires a UUID specified with -u uuid"
       usage
     }
-    send_request "stand"
     send_request "sit"
     ;;
   stand|Stand)
@@ -244,6 +268,9 @@ case "${ACTION}" in
     ;;
   location|Location|loc|Loc)
     send_request "bot_location"
+    ;;
+  get_outfit|GetOutfit|getoutfit)
+    send_request "get_outfit"
     ;;
   *)
     echo "Action ${ACTION} not yet supported"
