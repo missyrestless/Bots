@@ -1,0 +1,14 @@
+# Configure API credentials for each bot and copy the file to ${HOME}/.lifebots
+# For security make the file accessible by owner only:
+#   chmod 600 ${HOME}/.lifebots
+#
+export LB_API_KEY='your-api-key'
+export LB_SECRET='your-bot-secret'  # Also referred to in the doc as an access code
+
+# If you have more than one bot you can set each bot's secret like this
+export LB_SECRET_BOT1_NAME='your-first-bot-secret'
+export LB_SECRET_BOT2_NAME='your-second-bot-secret'
+export LB_SECRET_BOT3_NAME='your-third-bot-secret'
+# Replace spaces in the Bot's name with "_"
+# For example, if the Bot's name is "John Doe" then the entry would be:
+export LB_SECRET_John_Doe='john-doe-bot-secret'
