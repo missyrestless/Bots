@@ -12,3 +12,17 @@ export LB_SECRET_BOT3_NAME='your-third-bot-secret'
 # Replace spaces in the Bot's name with "_"
 # For example, if the Bot's name is "John Doe" then the entry would be:
 export LB_SECRET_John_Doe='john-doe-bot-secret'
+
+# The following convenience entries are supported to allow specifying
+# an alias on the command line rather than a SLURL or UUID
+#
+# SLURL aliases can be set for use with the location option, -l location
+# For example, the following 2 SLURL aliases could be used with -l beach or -l club
+# to teleport the bot to the beach or the club specified in these SLURLs
+export SLURL_beach="http://maps.secondlife.com/secondlife/Brightbrook%20Isle/18/127/21"
+export SLURL_club="http://maps.secondlife.com/secondlife/Scylla/226/32/78"
+
+# UUID aliases can be set for use with the UUID option, -u uuid
+# For example, the following UUID alias could be used with -u dancepole
+# to seat the bot on the specified object
+export UUID_dancepole="dd159ab2-750f-41f2-3605-81dfa55f7ac8"
