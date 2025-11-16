@@ -7,7 +7,10 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, location, stand, sit, teleport, listinventory, touch
+#   login, logout, status, location, walkto, sit, teleport, listinventory, touch
+#
+# TODO: stand action not working yet, no stand API endpoint
+# TODO: get bot details not working yet, need to generate an access token
 #
 # ----------------- $HOME/.lifebots Format ----------------------
 # Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
@@ -48,7 +51,7 @@ usage() {
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\t  Supported actions: login, logout, status (default), location,"
-  printf "\n\t                     stand, sit, teleport, listinventory, touch"
+  printf "\n\t                     walkto, sit, teleport, listinventory, touch"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
@@ -88,6 +91,20 @@ is_valid_slurl() {
       return 0 # Valid SLURL
     else
       return 1 # Invalid SLURL
+    fi
+  fi
+}
+
+# Validate coordinates provided with -l coords are in supported format, X,Y,Z or X/Y/Z.
+is_valid_coords() {
+  local coords="$1"
+  if [[ "${coords}" =~ ^[[:digit:]]+,[[:digit:]]+,[[:digit:]]+$ ]]; then
+    return 0 # Valid Coordinates
+  else
+    if [[ "${coords}" =~ ^[[:digit:]]+/[[:digit:]]+/[[:digit:]]+$ ]]; then
+      return 0 # Valid Coordinates
+    else
+      return 1 # Invalid Coordinates
     fi
   fi
 }
@@ -189,6 +206,31 @@ send_request() {
           \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
           \"location\": \"${LOCATION}\"
+        }"
+      fi
+      ;;
+    walkto)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          \"action\": \"${act}\",
+          \"apikey\": \"${LB_API_KEY}\",
+          \"botname\": \"${LB_BOT_NAME}\",
+          \"secret\": \"${LB_SECRET}\",
+          \"coords\": \"${LOCATION}\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          \"action\": \"${act}\",
+          \"apikey\": \"${LB_API_KEY}\",
+          \"botname\": \"${LB_BOT_NAME}\",
+          \"secret\": \"${LB_SECRET}\",
+          \"coords\": \"${LOCATION}\"
         }"
       fi
       ;;
@@ -300,6 +342,21 @@ shift $(( OPTIND - 1 ))
 }
 
 case "${ACTION}" in
+  walkto|walk|Walkto|Walk)
+    [ "${LOCATION}" ] || {
+      echo "The ${ACTION} action requires coordinates specified with -l coords"
+      usage
+    }
+    [ "${LOCATION}" == "Last location" ] && {
+      echo "The ${ACTION} action requires coordinates specified with -l coords"
+      usage
+    }
+    if is_valid_coords "${LOCATION}"; then
+      send_request "walkto"
+    else
+      echo "${LOCATION} is NOT valid Coordinates."
+    fi
+    ;;
   touch|Touch|touch_prim|touchprim)
     [ "${UUID}" ] || {
       echo "The ${ACTION} action requires a UUID specified with -u uuid"
@@ -353,6 +410,6 @@ case "${ACTION}" in
   *)
     echo "Action ${ACTION} not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, location, stand, sit, teleport, listinventory, touch"
+    echo "  login, logout, status, location, walkto, sit, teleport, listinventory, touch"
     ;;
 esac
