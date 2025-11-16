@@ -1,6 +1,7 @@
 # LifeBots configuration notecard for use with LSL scripts
 #
 # Configure API credentials for each bot and copy the file to root prim Contents
+# This notecard contains sensitive information and should be accessible only by the owner
 #
 # LifeBots Developer API Key
 LB_API_KEY='your-api-key'
@@ -16,7 +17,10 @@ LB_SECRET_John_Doe='john-doe-bot-secret'
 
 # Default Bot Name and ID
 LB_BOT_NAME='your-default-bot-name'
-LB_BOT_ID_Bot_Name='your-default-bot-id'
+# LifeBots Bot ID
+LB_BOT_ID_Bot_Name='lifebots-bot-id'
+# Second Life Bot ID
+SL_BOT_ID_Bot_Name='secondlife-bot-id'
 
 # OAuth Applications
 # If you have configured OAuth applications then the client id and secret can be set here
