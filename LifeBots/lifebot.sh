@@ -7,7 +7,7 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, location, stand, sit, teleport
+#   login, logout, status, location, stand, sit, teleport, listinventory
 #
 # ----------------- $HOME/.lifebots Format ----------------------
 # Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
@@ -41,7 +41,8 @@ usage() {
   printf "\nUsage: lifebot [-a action] [-l location] [-n name] [-k apikey] [-s secret] [-u uuid] [-d] [-h]"
   printf "\nWhere:"
   printf "\n\t-a action specifies the API action (sit, teleport, login, ...)"
-  printf "\n\t\tSupported actions: login, logout, status (default), location, stand, sit, teleport"
+  printf "\n\t  Supported actions: login, logout, status (default), location,"
+  printf "\n\t                     stand, sit, teleport, listinventory"
   printf "\n\t-l location specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t-n name specifies a Bot name, Default: Easy Islay"
@@ -90,29 +91,53 @@ send_request() {
     usage
   }
   case "${act}" in
-    sit)
+    listinventory|sit)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
-          \"uuid\": \"${UUID}\"
-        }\""
+        if [ "${UUID}" ]; then
+          echo "curl -s -X POST ${ENDPOINT} \
+            -H \"Accept: application/json\" \
+            -H \"Content-Type: application/json\" \
+            -d \"{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\",
+            \"uuid\": \"${UUID}\"
+          }\""
+        else
+          echo "curl -s -X POST ${ENDPOINT} \
+            -H \"Accept: application/json\" \
+            -H \"Content-Type: application/json\" \
+            -d \"{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\"
+          }\""
+        fi
       else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
-          \"uuid\": \"${UUID}\"
-        }"
+        if [ "${UUID}" ]; then
+          curl -s -X POST ${ENDPOINT} \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d "{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\",
+            \"uuid\": \"${UUID}\"
+          }"
+        else
+          curl -s -X POST ${ENDPOINT} \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d "{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\"
+          }"
+        fi
       fi
       ;;
     login|teleport)
@@ -260,6 +285,9 @@ case "${ACTION}" in
   status|Status)
     send_request "status"
     ;;
+  listinventory|Listinventory|inventory)
+    send_request "listinventory"
+    ;;
   login|Login)
     send_request "login"
     ;;
@@ -275,6 +303,6 @@ case "${ACTION}" in
   *)
     echo "Action ${ACTION} not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, location, stand, sit, teleport"
+    echo "  login, logout, status, location, stand, sit, teleport, listinventory"
     ;;
 esac
