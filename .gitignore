@@ -10,6 +10,7 @@ Dist/
 
 # LifeBots scripts
 LifeBots/MyScripts/
+LifeBots/OAuth/Easy/
 
 # Configuration notecards with sensitive data
 Evade_Region_Restart/configuration-*
