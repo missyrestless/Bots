@@ -7,7 +7,7 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, location, stand, sit, teleport, listinventory
+#   login, logout, status, location, stand, sit, teleport, listinventory, touch
 #
 # ----------------- $HOME/.lifebots Format ----------------------
 # Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
@@ -26,43 +26,51 @@
 # NOTE: command line arguments are stored in the shell history
 #       environment variables are preferable over command line arguments
 #
-# Set the default Bot name, can be specified with -n name
-BOT_NAME="Easy Islay"
+# Set the default Bot name
+# Setting in .lifebots overrides, setting on command line with -n name overrides all
+LB_BOT_NAME="Easy Islay"
 # Set the default action, can be specified with -a action
 ACTION="status"
 # LifeBots API endpoint
-ENDPOINT="https://api.lifebots.cloud/api/bot.html"
+APIURL="https://api.lifebots.cloud/api"
+ENDPOINT="${APIURL}/bot.html"
 # Set the default login location
 LOCATION="Last location"
 # No default UUID
 UUID=
 
+BOLD=$(tput bold 2> /dev/null)
+NORM=$(tput sgr0 2> /dev/null)
+LINE=$(tput smul 2> /dev/null)
+
 usage() {
-  printf "\nUsage: lifebot [-a action] [-l location] [-n name] [-k apikey] [-s secret] [-u uuid] [-d] [-h]"
-  printf "\nWhere:"
-  printf "\n\t-a action specifies the API action (sit, teleport, login, ...)"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-a action] [-l location] [-n name] [-k apikey] [-s secret] [-u uuid] [-dih]${NORM}"
+  printf "\n${BOLD}${LINE}Where:${NORM}"
+  printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\t  Supported actions: login, logout, status (default), location,"
-  printf "\n\t                     stand, sit, teleport, listinventory"
-  printf "\n\t-l location specifies a location for login and teleport actions"
+  printf "\n\t                     stand, sit, teleport, listinventory, touch"
+  printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
-  printf "\n\t-n name specifies a Bot name, Default: Easy Islay"
-  printf "\n\t-k apikey specifies an API Key, use environment instead"
-  printf "\n\t-s secret specifies a Bot secret, use environment instead"
-  printf "\n\t-u uuid specifies a UUID for use with actions that require one (e.g. sit)"
-  printf "\n\t-d indicates dryrun mode - tell me what you would do without doing anything"
-  printf "\n\t-h displays this usage message and exits"
-  printf "\nEnvironment:"
+  printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
+  printf "\n\t${BOLD}${LINE}-k apikey${NORM} specifies an API Key, use environment instead"
+  printf "\n\t${BOLD}${LINE}-s secret${NORM} specifies a Bot secret, use environment instead"
+  printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with actions that require one (e.g. sit)"
+  printf "\n\t${BOLD}${LINE}-d${NORM} indicates dryrun mode - tell me what you would do without doing anything"
+  printf "\n\t${BOLD}${LINE}-i${NORM} retrieves Bot details"
+  printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits"
+  printf "\n${BOLD}${LINE}Environment:${NORM}"
   printf "\n  Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries"
   printf "\n  of the form LB_SECRET_BOT_NAME in order to support multiple bots"
   printf "\n  Entries can specify a Slurl alias. For example:"
   printf "\n    export SLURL_club='http://maps.secondlife.com/secondlife/Scylla/226/32/78'"
   printf "\n  A Slurl alias can be used with the -l command line argument, e.g. -l club"
   printf "\n  Entries can also specify a UUID alias. For example:"
-  printf "\n    export UUID_couch='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'"
-  printf "\n  A UUID alias can be used with the -u command line argument, e.g. -u couch"
-  printf "\nExamples:"
+  printf "\n    export UUID_Mover='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'"
+  printf "\n  A UUID alias can be used with the -u command line argument, e.g. -u Mover"
+  printf "\n${BOLD}${LINE}Examples:${NORM}"
   printf "\n  lifebot  # Displays the status of the default Bot"
   printf "\n  lifebot -a login -l Home # Default Bot login to Home location"
+  printf "\n  lifebot -a touch -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID"
   printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots\n"
   exit 1
 }
@@ -84,6 +92,25 @@ is_valid_slurl() {
   fi
 }
 
+get_details() {
+  local access_token="${LB_SECRET}"
+  [ "${LB_BOT_ID}" ] || {
+    echo "No Bot ID set in .lifebots"
+    usage
+  }
+  if [ "${dryrun}" ]; then
+    echo "curl -s GET ${APIURL}/v1/bots/${LB_BOT_ID} \
+      -H \"Authorization: Bearer ${access_token}\" \
+      -H \"Accept: application/json\" \
+      -H \"Content-Type: application/json\""
+  else
+    curl -s GET ${APIURL}/v1/bots/${LB_BOT_ID} \
+      -H "Authorization: Bearer ${access_token}" \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json"
+  fi
+}
+
 send_request() {
   local act="$1"
   [ "${act}" ] || {
@@ -91,7 +118,7 @@ send_request() {
     usage
   }
   case "${act}" in
-    listinventory|sit)
+    listinventory|sit|touch_prim)
       if [ "${dryrun}" ]; then
         if [ "${UUID}" ]; then
           echo "curl -s -X POST ${ENDPOINT} \
@@ -100,7 +127,7 @@ send_request() {
             -d \"{
             \"action\": \"${act}\",
             \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${BOT_NAME}\",
+            \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\",
             \"uuid\": \"${UUID}\"
           }\""
@@ -111,7 +138,7 @@ send_request() {
             -d \"{
             \"action\": \"${act}\",
             \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${BOT_NAME}\",
+            \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\"
           }\""
         fi
@@ -123,7 +150,7 @@ send_request() {
             -d "{
             \"action\": \"${act}\",
             \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${BOT_NAME}\",
+            \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\",
             \"uuid\": \"${UUID}\"
           }"
@@ -134,7 +161,7 @@ send_request() {
             -d "{
             \"action\": \"${act}\",
             \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${BOT_NAME}\",
+            \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\"
           }"
         fi
@@ -148,7 +175,7 @@ send_request() {
           -d \"{
           \"action\": \"${act}\",
           \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${BOT_NAME}\",
+          \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
           \"location\": \"${LOCATION}\"
         }\""
@@ -159,7 +186,7 @@ send_request() {
           -d "{
           \"action\": \"${act}\",
           \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${BOT_NAME}\",
+          \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
           \"location\": \"${LOCATION}\"
         }"
@@ -173,7 +200,7 @@ send_request() {
           -d \"{
           \"action\": \"${act}\",
           \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${BOT_NAME}\",
+          \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\"
         }\""
       else
@@ -183,7 +210,7 @@ send_request() {
           -d "{
           \"action\": \"${act}\",
           \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${BOT_NAME}\",
+          \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\"
         }"
       fi
@@ -194,8 +221,9 @@ send_request() {
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
 command_line_secret=
+details=
 dryrun=
-while getopts ":a:dl:n:k:s:u:h" flag; do
+while getopts ":a:dil:n:k:s:u:h" flag; do
   case $flag in
     a)
       ACTION="${OPTARG}"
@@ -203,11 +231,14 @@ while getopts ":a:dl:n:k:s:u:h" flag; do
     d)
       dryrun=1
       ;;
+    i)
+      details=1
+      ;;
     l)
       LOCATION="${OPTARG}"
       ;;
     n)
-      BOT_NAME="${OPTARG}"
+      LB_BOT_NAME="${OPTARG}"
       ;;
     k)
       LB_API_KEY="${OPTARG}"
@@ -232,9 +263,16 @@ shift $(( OPTIND - 1 ))
 
 # Check for a bot specific secret
 [ "${command_line_secret}" ] || {
-  botname=$(echo "${BOT_NAME}" | sed -e "s/ /_/g")
+  botname=$(echo "${LB_BOT_NAME}" | sed -e "s/ /_/g")
   envsecret="LB_SECRET_${botname}"
   [ "${!envsecret}" ] && LB_SECRET="${!envsecret}"
+}
+
+# Check for Bot ID alias in ~/.lifebots
+[ "${LB_BOT_ID}" ] && {
+  botid=$(echo "${LB_BOT_ID}" | sed -e "s/ /_/g")
+  envid="LB_BOT_ID_${botid}"
+  [ "${!envid}" ] && LB_BOT_ID="${!envid}"
 }
 
 # Check for location alias in ~/.lifebots
@@ -256,7 +294,19 @@ shift $(( OPTIND - 1 ))
   exit 1
 }
 
+[ "${details}" ] && {
+  get_details
+  exit 0
+}
+
 case "${ACTION}" in
+  touch|Touch|touch_prim|touchprim)
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires a UUID specified with -u uuid"
+      usage
+    }
+    send_request "touch_prim"
+    ;;
   teleport|Teleport|tp|TP)
     [ "${LOCATION}" ] || {
       echo "The teleport action requires a location specified with -l location"
@@ -303,6 +353,6 @@ case "${ACTION}" in
   *)
     echo "Action ${ACTION} not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, location, stand, sit, teleport, listinventory"
+    echo "  login, logout, status, location, stand, sit, teleport, listinventory, touch"
     ;;
 esac
