@@ -39,7 +39,8 @@ APIURL="https://api.lifebots.cloud/api"
 ENDPOINT="${APIURL}/bot.html"
 # Set the default login location
 LOCATION="Last location"
-# No default UUID
+
+BOT_NAME=
 UUID=
 
 BOLD=$(tput bold 2> /dev/null)
@@ -329,7 +330,7 @@ while getopts ":a:dil:n:k:s:u:h" flag; do
       LOCATION="${OPTARG}"
       ;;
     n)
-      LB_BOT_NAME="${OPTARG}"
+      BOT_NAME="${OPTARG}"
       ;;
     k)
       LB_API_KEY="${OPTARG}"
@@ -351,6 +352,13 @@ while getopts ":a:dil:n:k:s:u:h" flag; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+# Check for Name alias in ~/.lifebots
+[ "${BOT_NAME}" ] && {
+  botname=$(echo "${BOT_NAME}" | sed -e "s/ /_/g")
+  envname="BOT_NAME_${botname}"
+  [ "${!envname}" ] && LB_BOT_NAME="${!envname}"
+}
 
 # Check for a bot specific secret
 [ "${command_line_secret}" ] || {
