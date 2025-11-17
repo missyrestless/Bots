@@ -7,7 +7,7 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, location, walkto, sit, teleport, listinventory, touch
+#   login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch
 #
 # TODO: stand action not working yet, no stand API endpoint
 # TODO: get bot details not working yet, need to generate an access token
@@ -51,7 +51,7 @@ usage() {
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\t  Supported actions: login, logout, status (default), location,"
-  printf "\n\t                     walkto, sit, teleport, listinventory, touch"
+  printf "\n\t                     walkto, sit, teleport, listalias, listinventory, touch"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
@@ -109,6 +109,7 @@ is_valid_coords() {
   fi
 }
 
+# TODO: not yet working
 get_details() {
   local access_token="${LB_SECRET}"
   [ "${LB_BOT_ID}" ] || {
@@ -128,8 +129,6 @@ get_details() {
   fi
 }
 
-#SLURL_club=http://maps.secondlife.com/secondlife/Scylla/226/32/78
-#UUID_mmover=f11781d0-763f-52f9-4e23-3a2b97759fa2
 list_aliases() {
   printf "\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
   if env | grep ^SLURL_ >/dev/null; then
@@ -188,6 +187,7 @@ send_request() {
             \"apikey\": \"${LB_API_KEY}\",
             \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\",
+            \"dataType\": \"json\",
             \"uuid\": \"${UUID}\"
           }\""
         else
@@ -198,6 +198,7 @@ send_request() {
             \"action\": \"${act}\",
             \"apikey\": \"${LB_API_KEY}\",
             \"botname\": \"${LB_BOT_NAME}\",
+            \"dataType\": \"json\",
             \"secret\": \"${LB_SECRET}\"
           }\""
         fi
@@ -211,6 +212,7 @@ send_request() {
             \"apikey\": \"${LB_API_KEY}\",
             \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\",
+            \"dataType\": \"json\",
             \"uuid\": \"${UUID}\"
           }"
         else
@@ -221,6 +223,7 @@ send_request() {
             \"action\": \"${act}\",
             \"apikey\": \"${LB_API_KEY}\",
             \"botname\": \"${LB_BOT_NAME}\",
+            \"dataType\": \"json\",
             \"secret\": \"${LB_SECRET}\"
           }"
         fi
@@ -236,6 +239,7 @@ send_request() {
           \"apikey\": \"${LB_API_KEY}\",
           \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
+          \"dataType\": \"json\",
           \"location\": \"${LOCATION}\"
         }\""
       else
@@ -247,6 +251,7 @@ send_request() {
           \"apikey\": \"${LB_API_KEY}\",
           \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
+          \"dataType\": \"json\",
           \"location\": \"${LOCATION}\"
         }"
       fi
@@ -261,6 +266,7 @@ send_request() {
           \"apikey\": \"${LB_API_KEY}\",
           \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
+          \"dataType\": \"json\",
           \"coords\": \"${LOCATION}\"
         }\""
       else
@@ -272,6 +278,7 @@ send_request() {
           \"apikey\": \"${LB_API_KEY}\",
           \"botname\": \"${LB_BOT_NAME}\",
           \"secret\": \"${LB_SECRET}\",
+          \"dataType\": \"json\",
           \"coords\": \"${LOCATION}\"
         }"
       fi
@@ -285,6 +292,7 @@ send_request() {
           \"action\": \"${act}\",
           \"apikey\": \"${LB_API_KEY}\",
           \"botname\": \"${LB_BOT_NAME}\",
+          \"dataType\": \"json\",
           \"secret\": \"${LB_SECRET}\"
         }\""
       else
@@ -295,6 +303,7 @@ send_request() {
           \"action\": \"${act}\",
           \"apikey\": \"${LB_API_KEY}\",
           \"botname\": \"${LB_BOT_NAME}\",
+          \"dataType\": \"json\",
           \"secret\": \"${LB_SECRET}\"
         }"
       fi
@@ -303,6 +312,9 @@ send_request() {
 }
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
+
+# Use jq to format JSON return if it is available
+have_jq=$(type -p jq)
 
 command_line_secret=
 details=
@@ -314,6 +326,7 @@ while getopts ":a:dil:n:k:s:u:h" flag; do
       ;;
     d)
       dryrun=1
+      have_jq=
       ;;
     i)
       details=1
@@ -394,7 +407,11 @@ case "${ACTION}" in
       usage
     }
     if is_valid_coords "${LOCATION}"; then
-      send_request "walkto"
+      if [ "${have_jq}" ]; then
+        send_request "walkto" | jq -r .
+      else
+        send_request "walkto"
+      fi
     else
       echo "${LOCATION} is NOT valid Coordinates."
     fi
@@ -404,7 +421,11 @@ case "${ACTION}" in
       echo "The ${ACTION} action requires a UUID specified with -u uuid"
       usage
     }
-    send_request "touch_prim"
+    if [ "${have_jq}" ]; then
+      send_request "touch_prim" | jq -r .
+    else
+      send_request "touch_prim"
+    fi
     ;;
   teleport|Teleport|tp|TP)
     [ "${LOCATION}" ] || {
@@ -416,7 +437,11 @@ case "${ACTION}" in
       usage
     }
     if is_valid_slurl "${LOCATION}"; then
-      send_request "teleport"
+      if [ "${have_jq}" ]; then
+        send_request "teleport" | jq -r .
+      else
+        send_request "teleport"
+      fi
     else
       echo "${LOCATION} is NOT a valid SLURL."
     fi
@@ -426,35 +451,67 @@ case "${ACTION}" in
       echo "The sit action requires a UUID specified with -u uuid"
       usage
     }
-    send_request "sit"
+    if [ "${have_jq}" ]; then
+      send_request "sit" | jq -r .
+    else
+      send_request "sit"
+    fi
     ;;
   stand|Stand)
-    send_request "stand"
+    if [ "${have_jq}" ]; then
+      send_request "stand" | jq -r .
+    else
+      send_request "stand"
+    fi
     ;;
   status|Status)
-    send_request "status"
+    if [ "${have_jq}" ]; then
+      send_request "status" | jq -r .
+    else
+      send_request "status"
+    fi
     ;;
   listinventory|Listinventory|inventory)
-    send_request "listinventory"
+    if [ "${have_jq}" ]; then
+      send_request "listinventory" | jq -r .
+    else
+      send_request "listinventory"
+    fi
     ;;
   listalias*|Listalias*|alias*|Alias*)
     list_aliases
     ;;
   login|Login)
-    send_request "login"
+    if [ "${have_jq}" ]; then
+      send_request "login" | jq -r .
+    else
+      send_request "login"
+    fi
     ;;
   logout|Logout)
-    send_request "logout"
+    if [ "${have_jq}" ]; then
+      send_request "logout" | jq -r .
+    else
+      send_request "logout"
+    fi
     ;;
   location|Location|loc|Loc)
-    send_request "bot_location"
+    if [ "${have_jq}" ]; then
+      send_request "bot_location" | jq -r .
+    else
+      send_request "bot_location"
+    fi
     ;;
   get_outfit|GetOutfit|getoutfit)
-    send_request "get_outfit"
+    if [ "${have_jq}" ]; then
+      send_request "get_outfit" | jq -r .
+    else
+      send_request "get_outfit"
+    fi
     ;;
   *)
-    echo "Action ${ACTION} not yet supported"
+    echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, location, walkto, sit, teleport, listinventory, touch"
+    echo "  login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch"
     ;;
 esac
