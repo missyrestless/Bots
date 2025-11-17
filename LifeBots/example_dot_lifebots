@@ -30,8 +30,14 @@ export LB_CLIENT_SECRET_app_name='your-oauth-app-client-secret'
 
 # The following optional convenience entries are supported to allow
 # specifying an alias on the command line rather than a SLURL or UUID
+# All configured aliases can be listed with the command "lifebot -a alias"
 #
-## Slurl Aliases
+## Bot name aliases for use with the "-n name" command line option
+export BOT_NAME_bot1="Bot1 Name"
+export BOT_NAME_bot2="Bot2 Name"
+export BOT_NAME_bot3="Bot3 Name"
+
+## Slurl aliases for use with the "-l location" command line option
 # SLURL aliases can be set for use with the location option, -l location
 # For example, the following 2 SLURL aliases could be used with -l beach or -l club
 # to teleport the bot to the beach or the club specified in these SLURLs
@@ -39,7 +45,7 @@ export SLURL_beach="http://maps.secondlife.com/secondlife/BEACH_REGION_NAME/X/Y/
 # Urlencode spaces in the region name by using %20 instead of space
 export SLURL_club="http://maps.secondlife.com/secondlife/CLUB_REGION%20NAME/X/Y/Z"
 
-## UUID Aliases
+## UUID aliases for use with the "-u uuid" command line option
 # UUID aliases can be set for use with the UUID option, -u uuid
 # For example, the following UUID aliases could be used with -u dancepole
 # or -u couch to seat the bot on the specified object

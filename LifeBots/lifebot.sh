@@ -109,7 +109,7 @@ is_valid_coords() {
   fi
 }
 
-# TODO: not yet working
+# TODO: get_details not yet working
 get_details() {
   local access_token="${LB_SECRET}"
   [ "${LB_BOT_ID}" ] || {
@@ -129,43 +129,37 @@ get_details() {
   fi
 }
 
+show_alias() {
+  local astr="$1"
+  local argl="$2"
+  if env | grep ^${astr}_ >/dev/null; then
+    env | grep ^${astr}_ | while read entr
+    do
+      [ "${entr}" ] && {
+        alias=$(echo "${entr}" | awk -F '=' '{ print $1 }' | sed -e "s/${astr}_//")
+        along=$(echo "${entr}" | awk -F '=' '{ print $2 }')
+        alen=${#alias}
+        if [ ${alen} -lt 5 ]; then
+          printf "\n${BOLD}${LINE}-%s %s${NORM}\t\talias for: ${BOLD}-%s %s${NORM}" \
+                 "${argl}" "${alias}" "${argl}" "${along}"
+        else
+          printf "\n${BOLD}${LINE}-%s %s${NORM}\talias for: ${BOLD}-%s %s${NORM}" \
+                 "${argl}" "${alias}" "${argl}" "${along}"
+        fi
+      }
+    done
+  else
+    printf "\nNo ${astr} aliases defined in ${HOME}/.lifebots"
+  fi
+}
+
 list_aliases() {
-  printf "\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
-  if env | grep ^SLURL_ >/dev/null; then
-    env | grep ^SLURL_ | while read slurl
-    do
-      [ "${slurl}" ] && {
-        alias=$(echo "${slurl}" | awk -F '=' '{ print $1 }' | sed -e "s/SLURL_//")
-        url=$(echo "${slurl}" | awk -F '=' '{ print $2 }')
-        alen=${#alias}
-        if [ ${alen} -lt 5 ]; then
-          printf "\n${BOLD}${LINE}-l %s${NORM}\t\talias for: ${BOLD}${LINE}-l %s${NORM}" "${alias}" "${url}"
-        else
-          printf "\n${BOLD}${LINE}-l %s${NORM}\talias for: ${BOLD}${LINE}-l %s${NORM}" "${alias}" "${url}"
-        fi
-      }
-    done
-  else
-    printf "\nNo Slurl aliases defined in ${HOME}/.lifebots"
-  fi
+  printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
+  show_alias BOT_NAME n
+  printf "\n\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
+  show_alias SLURL l
   printf "\n\n${BOLD}${LINE}UUID Aliases${NORM}\n"
-  if env | grep ^UUID_ >/dev/null; then
-    env | grep ^UUID_ | while read uuid
-    do
-      [ "${uuid}" ] && {
-        alias=$(echo "${uuid}" | awk -F '=' '{ print $1 }' | sed -e "s/UUID_//")
-        uid=$(echo "${uuid}" | awk -F '=' '{ print $2 }')
-        alen=${#alias}
-        if [ ${alen} -lt 5 ]; then
-          printf "\n${BOLD}${LINE}-u %s${NORM}\t\talias for: ${BOLD}${LINE}-u %s${NORM}" "${alias}" "${uid}"
-        else
-          printf "\n${BOLD}${LINE}-u %s${NORM}\talias for: ${BOLD}${LINE}-u %s${NORM}" "${alias}" "${uid}"
-        fi
-      }
-    done
-  else
-    printf "\nNo UUID aliases defined in ${HOME}/.lifebots"
-  fi
+  show_alias UUID u
   echo ""
 }
 
