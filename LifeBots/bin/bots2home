@@ -1,0 +1,44 @@
+#!/bin/bash
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Bots are online and if not, login
+needsleep=
+for bot in Angel Anya Easy
+do
+  lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
+    lifebot -a login -n ${bot} -l club
+    needsleep=1
+  }
+done
+[ "${needsleep}" ] && sleep 20
+
+# Send Angelus to his dance pole
+lifebot -a teleport -n Angel -l club
+sleep 7
+lifebot -a sit -n Angel -u rpole
+
+# Send Anya to her couch
+lifebot -a teleport -n Anya -l club
+sleep 7
+lifebot -a sit -n Anya -u lcouch
+
+# Send Easy to her dance pole
+lifebot -a teleport -n Easy -l club
+sleep 7
+lifebot -a sit -n Easy -u dancepole
