@@ -21,6 +21,8 @@ LB_BOT_NAME='your-default-bot-name'
 LB_BOT_ID_Bot_Name='lifebots-bot-id'
 # Second Life Bot ID
 SL_BOT_ID_Bot_Name='secondlife-bot-id'
+# Login siton UUID
+LOGIN_SITON_Bot_Name="uuid-of-siton-object"
 
 # OAuth Applications
 # If you have configured OAuth applications then the client id and secret can be set here
