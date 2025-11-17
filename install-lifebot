@@ -1,0 +1,49 @@
+#!/bin/bash
+
+if [[ $EUID -eq 0 ]]
+then
+  SUDO=
+else
+  SUDO=sudo
+fi
+
+SCRIPT_PATH="$(
+  cd "$(dirname "$0")"
+  pwd -P
+)"
+have_real=$(type -p realpath)
+[ "${have_real}" ] && SCRIPT_PATH="$(realpath $SCRIPT_PATH)"
+
+cd "${SCRIPT_PATH}"
+[ -f LifeBots/lifebot.sh ] || {
+  echo "ERROR: cannot locate LifeBots/lifebot.sh. Exiting."
+  exit 1
+}
+
+[ -d /usr/local/bin ] || ${SUDO} mkdir -p /usr/local/bin
+
+${SUDO} cp LifeBots/lifebot.sh /usr/local/bin/lifebot
+${SUDO} chmod 755 /usr/local/bin/lifebot
+
+[ -d LifeBots/bin ] || {
+  echo "ERROR: cannot locate LifeBots/bin/. Exiting."
+  exit 1
+}
+
+[ -d /usr/local/LifeBots ] || ${SUDO} mkdir -p /usr/local/LifeBots
+
+${SUDO} cp LifeBots/bin/* /usr/local/LifeBots
+${SUDO} chmod 755 /usr/local/LifeBots/*
+for scr in /usr/local/LifeBots/*
+do
+  [ "${scr}" == "/usr/local/LifeBots/*" ] && continue
+  bas=$(basename "${scr}")
+  ${SUDO} rm -f /usr/local/bin/${bas}
+  ${SUDO} ln -s ${scr} /usr/local/bin/${bas}
+done
+
+echo "Installation of the lifebot command and associated scripts is complete."
+echo "Add /usr/local/bin to your execution PATH if it is not already included."
+echo "Configure lifebot by adding and editing the file ${HOME}/.lifebots"
+echo "See ${SCRIPT_PATH}/LifeBots/example_dot_lifebots for a template to use for this file."
+echo "See ${SCRIPT_PATH}/LifeBots/crontab.in for example crontab entries to schedule bot activities."

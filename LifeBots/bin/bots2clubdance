@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Aliases for the bots that are going to dance
 BOTS="Angel Anya Easy"
