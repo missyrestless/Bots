@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Aliases for the bots that are going to dance
+BOTS="Angel Anya Easy"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Bots are online and if not, login
+needsleep=
+for bot in ${BOTS}
+do
+  lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
+    lifebot -a login -n ${bot} -l club
+    needsleep=1
+  }
+done
+[ "${needsleep}" ] && sleep 20
+
+# Send all Bots to the club dance floor and dance
+needsleep=
+for bot in ${BOTS}
+do
+  lifebot -a status -n ${bot} | jq -r '.location' | grep Scylla >/dev/null || {
+    lifebot -a teleport -n ${bot} -l club
+    needsleep=1
+  }
+done
+[ "${needsleep}" ] && sleep 10
+
+# Touch the Spot-On Mover and join the dance
+for bot in ${BOTS}
+do
+  lifebot -a touch -n ${bot} -u cmover
+done
