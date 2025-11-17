@@ -156,12 +156,31 @@ show_alias() {
 }
 
 list_aliases() {
-  printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
-  show_alias BOT_NAME n
-  printf "\n\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
-  show_alias SLURL l
-  printf "\n\n${BOLD}${LINE}UUID Aliases${NORM}\n"
-  show_alias UUID u
+  local ali="$1"
+  [ "${ali}" ] || ali="aliases"
+
+  case "${ali}" in
+    botalias*|aliasbot*)
+      printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
+      show_alias BOT_NAME n
+      ;;
+    slurlalias*|alias*url*)
+      printf "\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
+      show_alias SLURL l
+      ;;
+    uuidalias*|aliasuu*)
+      printf "\n${BOLD}${LINE}UUID Aliases${NORM}\n"
+      show_alias UUID u
+      ;;
+    *)
+      printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
+      show_alias BOT_NAME n
+      printf "\n\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
+      show_alias SLURL l
+      printf "\n\n${BOLD}${LINE}UUID Aliases${NORM}\n"
+      show_alias UUID u
+      ;;
+  esac
   echo ""
 }
 
@@ -520,8 +539,8 @@ case "${ACTION}" in
       send_request "listinventory"
     fi
     ;;
-  listalias*|Listalias*|alias*|Alias*)
-    list_aliases
+  botalias*|slurlalias*|uuidalias*|listalias*|Listalias*|alias*|Alias*)
+    list_aliases "${ACTION}"
     ;;
   login|Login)
     if [ "${have_jq}" ]; then
