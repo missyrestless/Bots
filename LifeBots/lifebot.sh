@@ -41,6 +41,7 @@ ENDPOINT="${APIURL}/bot.html"
 LOCATION="Last location"
 
 BOT_NAME=
+LOGIN_SITON=
 UUID=
 
 BOLD=$(tput bold 2> /dev/null)
@@ -225,30 +226,60 @@ send_request() {
       fi
       ;;
     login|teleport)
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
-          \"dataType\": \"json\",
-          \"location\": \"${LOCATION}\"
-        }\""
+      if [ "${LOGIN_SITON}" ] && [ "${act}" == "login" ]; then
+        if [ "${dryrun}" ]; then
+          echo "curl -s -X POST ${ENDPOINT} \
+            -H \"Accept: application/json\" \
+            -H \"Content-Type: application/json\" \
+            -d \"{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${LB_BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\",
+            \"siton\": \"${LOGIN_UUID}\",
+            \"dataType\": \"json\",
+            \"location\": \"${LOCATION}\"
+          }\""
+        else
+          curl -s -X POST ${ENDPOINT} \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d "{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${LB_BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\",
+            \"siton\": \"${LOGIN_UUID}\",
+            \"dataType\": \"json\",
+            \"location\": \"${LOCATION}\"
+          }"
+        fi
       else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
-          \"dataType\": \"json\",
-          \"location\": \"${LOCATION}\"
-        }"
+        if [ "${dryrun}" ]; then
+          echo "curl -s -X POST ${ENDPOINT} \
+            -H \"Accept: application/json\" \
+            -H \"Content-Type: application/json\" \
+            -d \"{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${LB_BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\",
+            \"dataType\": \"json\",
+            \"location\": \"${LOCATION}\"
+          }\""
+        else
+          curl -s -X POST ${ENDPOINT} \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d "{
+            \"action\": \"${act}\",
+            \"apikey\": \"${LB_API_KEY}\",
+            \"botname\": \"${LB_BOT_NAME}\",
+            \"secret\": \"${LB_SECRET}\",
+            \"dataType\": \"json\",
+            \"location\": \"${LOCATION}\"
+          }"
+        fi
       fi
       ;;
     walkto)
@@ -387,6 +418,15 @@ shift $(( OPTIND - 1 ))
   envuuid="UUID_${botuuid}"
   [ "${!envuuid}" ] && UUID="${!envuuid}"
 }
+
+# Set the object UUID to sit on when logging in
+if [ "${UUID}" ]; then
+  LOGIN_SITON="${UUID}"
+else
+  botuuid=$(echo "${LB_BOT_NAME}" | sed -e "s/ /_/g")
+  envuuid="LOGIN_SITON_${botuuid}"
+  [ "${!envuuid}" ] && LOGIN_SITON="${!envuuid}"
+fi
 
 [ "${LB_API_KEY}" ] && [ "${LB_SECRET}" ] || {
   echo "LB_API_KEY and LB_SECRET must be set in the environment. Exiting."
