@@ -1,0 +1,19 @@
+#!/bin/bash
+
+have_pd=$(type -p pandoc)
+[ "${have_pd}" ] || {
+  echo "ERROR: cannot locate pandoc"
+  exit 1
+}
+
+inp_md="$1"
+[ -f "${inp_md}" ] || {
+  echo "ERROR: cannot locate input markdown file ${inp_md}"
+  exit 1
+}
+out_ht="$2"
+[ "${out_ht}" ] || {
+    out_ht=$(echo "${inp_md}" | sed -e "s/md$/html/")
+}
+
+pandoc -f markdown -t html ${inp_md} -o ${out_ht}

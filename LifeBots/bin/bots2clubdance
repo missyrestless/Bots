@@ -2,6 +2,14 @@
 
 # Aliases for the bots that are going to dance
 BOTS="Angel Anya Easy"
+# Set to region where your bots need to be
+REGION="Scylla"
+# Set to object UUID to touch or sit for bots to dance
+UUID="cmover"
+# Set to action, sit or touch object to dance
+ACTION="touch"
+# Set to location, a Slurl or a Slurl alias
+LOC="club"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {
@@ -25,25 +33,25 @@ needsleep=
 for bot in ${BOTS}
 do
   lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
-    lifebot -a login -n ${bot} -l club
+    lifebot -a login -n ${bot} -l "${LOC}"
     needsleep=1
   }
 done
 [ "${needsleep}" ] && sleep 20
 
-# Send all Bots to the club dance floor and dance
+# Send all Bots to the dance floor and dance
 needsleep=
 for bot in ${BOTS}
 do
-  lifebot -a status -n ${bot} | jq -r '.location' | grep Scylla >/dev/null || {
-    lifebot -a teleport -n ${bot} -l club
+  lifebot -a status -n ${bot} | jq -r '.location' | grep "${REGION}" >/dev/null || {
+    lifebot -a teleport -n ${bot} -l "${LOC}"
     needsleep=1
   }
 done
 [ "${needsleep}" ] && sleep 10
 
-# Touch the Spot-On Mover and join the dance
+# Sit or Touch the object to dance
 for bot in ${BOTS}
 do
-  lifebot -a touch -n ${bot} -u cmover
+  lifebot -a ${ACTION} -n ${bot} -u ${UUID}
 done

@@ -8,8 +8,8 @@ SHELL=/bin/bash
 #
 # m h  dom mon dow   command
 #
-# Weekdays send Anya bot to the club at 4am
-0 4 * * 1-5 /bin/bash -lc /usr/local/LifeBots/anya2club >> /usr/local/LifeBots/log/cron.log 2>&1
+# Weekdays send Anya bot to the club at midnight
+0 0 * * 1-5 /bin/bash -lc /usr/local/LifeBots/anya2club >> /usr/local/LifeBots/log/cron.log 2>&1
 # Weekends send Anya bot to the beach at 11am
 0 11 * * 0,6 /bin/bash -lc /usr/local/LifeBots/anya2beach >> /usr/local/LifeBots/log/cron.log 2>&1
 # Monday at 4pm send Anya bot to DJ at the Media Sphere
@@ -29,4 +29,4 @@ SHELL=/bin/bash
 # Saturday at 9pm send all bots back to their default locations
 0 21 * * 6 /bin/bash -lc /usr/local/LifeBots/bots2home >> /usr/local/LifeBots/log/cron.log 2>&1
 # Check every hour if Easy bot is at the club greeting visitors
-0 * * * * /bin/bash -lc /usr/local/LifeBots/checkeasy >> /usr/local/LifeBots/log/cron.log 2>&1
+0 * * * * /bin/bash -lc /usr/local/LifeBots/checkbot >> /usr/local/LifeBots/log/cron.log 2>&1
