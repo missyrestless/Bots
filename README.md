@@ -3,6 +3,9 @@
 This repository contains commands, configuration, and management scripts for
 Second Life bots. Included are management systems for `Corrade` bots and `LifeBots`.
 
+**[NOTE:]** The Truth & Beauty Lab and Missy Restless are not associated in any way
+with either `Corrade` or `LifeBots`.
+
 ## LifeBots
 
 [LifeBots](https://lifebots.cloud) bills itself as:
