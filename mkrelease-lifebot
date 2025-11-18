@@ -1,0 +1,61 @@
+#!/bin/bash
+
+usage() {
+    printf "\nUsage: mkrelease [-c] [-d] [-p] [-u]"
+    printf "\nWhere:"
+    printf "\n\t-c indicates clean first"
+    printf "\n\t-d indicates create draft release"
+    printf "\n\t-p indicates skip package creation step"
+    printf "\n\t-u displays this usage message and exits\n"
+    exit 1
+}
+
+CLEAN=
+DRAFT=
+PACKAGE=1
+BRANCH="main"
+while getopts "b:cdpu" flag; do
+    case $flag in
+        b)
+            BRANCH="${OPTARG}"
+            ;;
+        c)
+            CLEAN=1
+            ;;
+        d)
+            DRAFT="--draft"
+            ;;
+        p)
+            PACKAGE=
+            ;;
+        u)
+            usage
+            ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+
+if [ -f LifeBots/VERSION ]; then
+  source LifeBots/VERSION
+else
+  echo "ERROR: missing LifeBots/VERSION"
+  exit 1
+fi
+
+ANNO="Lifebot release, version ${VERSION}"
+
+if [ -f ${HOME}/.mrprivate ]; then
+  source ${HOME}/.mrprivate
+else
+  echo "ERROR: Could not locate ${HOME}/.mrprivate"
+  exit 1
+fi
+
+gh release create v${VERSION} ${DRAFT} \
+                  --title "${ANNO}" \
+                  --target "${BRANCH}" \
+                  --notes-file Release_Notes_Lifebot.md \
+		  install-lifebot \
+		  LifeBots
+
+git fetch --tags origin
