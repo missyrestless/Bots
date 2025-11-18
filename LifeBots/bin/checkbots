@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Set the list of bots you want to check status
+BOTS="Angel Anya Easy"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Get status of all bots
+for bot in ${BOTS}
+do
+  lifebot -a status -n ${bot} | jq -r '{ Name: .slname, Status: .status, Location: .location }'
+done
