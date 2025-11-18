@@ -51,6 +51,37 @@ open source, MIT licensed, and free to download, deploy, modify, and distribute.
 [Truth & Beauty Lab](http://maps.secondlife.com/secondlife/Brightbrook%20Isle/56/135/23)
 or [Club Truth & Beauty](http://maps.secondlife.com/secondlife/Scylla/226/32/78).
 
+### Install lifebot
+
+The `lifebot` command line management system requires:
+
+- Linux, Macos, or Windows Subsystem for Linux (WSL)
+- Bash
+- Cron
+- git
+- [jq](https://jqlang.org)
+
+To install `lifebot`:
+
+```bash
+git clone https://github.com/missyrestless/Bots.git
+cd Bots
+./install-lifebot
+```
+
+The `lifebot` command is installed in `/usr/local/bin` along with some
+utility scripts for use with `cron` or other management systems. These
+utility scripts will need to be modified to suit your specific needs,
+configuration and bot names. You can modify the scripts in
+`LifeBots/bin/` and re-run `./install-lifebot`.
+
+Add `/usr/local/bin` to your execution `PATH` if it is not already included.
+
+Configure `lifebot` by adding and editing the file `${HOME}/.lifebots`.
+See `LifeBots/example_dot_lifebots` for a template to use for this file.
+
+See `LifeBots/crontab.in` for example crontab entries to schedule bot activities.
+
 ## Corrade
 
 The primary advantage of `Corrade` over `LifeBots` is the ability to
