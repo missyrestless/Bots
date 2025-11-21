@@ -1,0 +1,9 @@
+{
+  "action": "send_notice",
+  "apikey": "your-api-key",
+  "botname": "Joe Resident",
+  "secret": "bot-secret-123",
+  "groupuuid": "a2e76fcd-9360-4f6d-a924-000000000000",
+  "subject": "Important Update",
+  "text": "Please read this important information..."
+}
