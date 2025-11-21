@@ -7,7 +7,8 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch
+#   login, logout, status, location, walkto, sit, teleport, listalias, listinventory,
+#   touch, im, send_notice, send_group_im, touch
 #
 # TODO: stand action not working yet, no stand API endpoint
 # TODO: get bot details not working yet, need to generate an access token
@@ -40,24 +41,30 @@ ENDPOINT="${APIURL}/bot.html"
 # Set the default login location
 LOCATION="Last location"
 
-BOT_NAME=
-LOGIN_SITON=
-UUID=
-
 BOLD=$(tput bold 2> /dev/null)
 NORM=$(tput sgr0 2> /dev/null)
 LINE=$(tput smul 2> /dev/null)
 
 usage() {
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-a action] [-l location] [-n name] [-k apikey] [-s secret] [-u uuid] [-dih]${NORM}"
+  [ "${nobold}" ] && {
+    BOLD=
+    LINE=
+    NORM=
+  }
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-a action] [-l location] [-n name] [-k apikey]"
+  printf "\n\t[-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid] [-dih]${NORM}"
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
-  printf "\n\t  Supported actions: login, logout, status (default), location,"
-  printf "\n\t                     walkto, sit, teleport, listalias, listinventory, touch"
+  printf "\n\t  Supported actions: login, logout, status (default), location, walkto, sit, teleport,"
+  printf "\n\t                     listalias, listinventory, im, send_notice, send_group_im, touch"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
   printf "\n\t${BOLD}${LINE}-k apikey${NORM} specifies an API Key, use environment instead"
+  printf "\n\t${BOLD}${LINE}-C channel${NORM} specifies the channel for a message [default: 0]"
+  printf "\n\t${BOLD}${LINE}-M message${NORM} specifies the message body for a group notice/im"
+  printf "\n\t${BOLD}${LINE}-N name${NORM} specifies the SL name of the recipient of an IM"
+  printf "\n\t${BOLD}${LINE}-S subject${NORM} specifies the subject for a group notice"
   printf "\n\t${BOLD}${LINE}-s secret${NORM} specifies a Bot secret, use environment instead"
   printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with actions that require one (e.g. sit)"
   printf "\n\t${BOLD}${LINE}-d${NORM} indicates dryrun mode - tell me what you would do without doing anything"
@@ -301,6 +308,45 @@ send_request() {
         fi
       fi
       ;;
+    im|say_chat_channel|send_group_im|send_notice)
+      msg_label="message"
+      [ "${act}" == "send_notice" ] && msg_label="text"
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          \"action\": \"${act}\",
+          \"apikey\": \"${LB_API_KEY}\",
+          \"botname\": \"${LB_BOT_NAME}\",
+          \"secret\": \"${LB_SECRET}\",
+          \"slname\": \"${SL_NAME}\",
+          \"groupuuid\": \"${GROUP_ID}\",
+          \"subject\": \"${SUBJECT}\",
+          \"channel\": \"${CHANNEL}\",
+          \"${msg_label}\": \"${MESSAGE}\",
+          \"autodelay\": \"1\",
+          \"dataType\": \"json\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          \"action\": \"${act}\",
+          \"apikey\": \"${LB_API_KEY}\",
+          \"botname\": \"${LB_BOT_NAME}\",
+          \"secret\": \"${LB_SECRET}\",
+          \"slname\": \"${SL_NAME}\",
+          \"groupuuid\": \"${GROUP_ID}\",
+          \"subject\": \"${SUBJECT}\",
+          \"channel\": \"${CHANNEL}\",
+          \"${msg_label}\": \"${MESSAGE}\",
+          \"autodelay\": \"1\",
+          \"dataType\": \"json\"
+        }"
+      fi
+      ;;
     walkto)
       if [ "${dryrun}" ]; then
         echo "curl -s -X POST ${ENDPOINT} \
@@ -356,6 +402,15 @@ send_request() {
   esac
 }
 
+BOT_NAME=
+CHANNEL=0
+GROUP_ID=
+LOGIN_SITON=
+MESSAGE=
+SL_NAME=
+SUBJECT=
+UUID=
+
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
 # Use jq to format JSON return if it is available
@@ -364,10 +419,14 @@ have_jq=$(type -p jq)
 command_line_secret=
 details=
 dryrun=
-while getopts ":a:dil:n:k:s:u:h" flag; do
+nobold=
+while getopts ":a:C:dijl:M:N:n:k:S:s:u:Hh" flag; do
   case $flag in
     a)
       ACTION="${OPTARG}"
+      ;;
+    C)
+      CHANNEL="${OPTARG}"
       ;;
     d)
       dryrun=1
@@ -376,8 +435,17 @@ while getopts ":a:dil:n:k:s:u:h" flag; do
     i)
       details=1
       ;;
+    j)
+      have_jq=
+      ;;
     l)
       LOCATION="${OPTARG}"
+      ;;
+    M)
+      MESSAGE="${OPTARG}"
+      ;;
+    N)
+      SL_NAME="${OPTARG}"
       ;;
     n)
       BOT_NAME="${OPTARG}"
@@ -385,12 +453,19 @@ while getopts ":a:dil:n:k:s:u:h" flag; do
     k)
       LB_API_KEY="${OPTARG}"
       ;;
+    S)
+      SUBJECT="${OPTARG}"
+      ;;
     s)
       LB_SECRET="${OPTARG}"
       command_line_secret=1
       ;;
     u)
       UUID="${OPTARG}"
+      ;;
+    H)
+      nobold=1
+      usage
       ;;
     h)
       usage
@@ -475,6 +550,81 @@ case "${ACTION}" in
       fi
     else
       echo "${LOCATION} is NOT valid Coordinates."
+    fi
+    ;;
+  sendnotice|Sendnotice|send_notice|Send_notice)
+    show_usage=
+    if [ "${UUID}" ]; then
+      GROUP_ID="${UUID}"
+    else
+      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
+      show_usage=1
+    fi
+    [ "${SUBJECT}" ] || {
+      echo "The ${ACTION} action requires a Subject specified with -S subject"
+      show_usage=1
+    }
+    [ "${MESSAGE}" ] || {
+      echo "The ${ACTION} action requires a Message body specified with -M message"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage
+    if [ "${have_jq}" ]; then
+      send_request "send_notice" | jq -r .
+    else
+      send_request "send_notice"
+    fi
+    ;;
+  sendgroupim|Sendgroupim|send_group_im|Send_group_im)
+    show_usage=
+    if [ "${UUID}" ]; then
+      GROUP_ID="${UUID}"
+    else
+      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
+      show_usage=1
+    fi
+    [ "${MESSAGE}" ] || {
+      echo "The ${ACTION} action requires a Message body specified with -M message"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage
+    if [ "${have_jq}" ]; then
+      send_request "send_group_im" | jq -r .
+    else
+      send_request "send_group_im"
+    fi
+    ;;
+  im|IM)
+    show_usage=
+    # If recipient SL name was not specified on command line then use UUID
+    [ "${SL_NAME}" ] || {
+      if [ "${UUID}" ]; then
+        SL_NAME="${UUID}"
+      else
+        echo "The ${ACTION} action requires an SL Nem or UUID specified with -N name or -u uuid"
+        show_usage=1
+      fi
+    }
+    [ "${MESSAGE}" ] || {
+      echo "The ${ACTION} action requires a Message body specified with -M message"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage
+    if [ "${have_jq}" ]; then
+      send_request "im" | jq -r .
+    else
+      send_request "im"
+    fi
+    ;;
+  say|Say|say_*|Say_*)
+    [ "${MESSAGE}" ] || {
+      echo "The ${ACTION} action requires a Message body specified with -M message"
+      usage
+    }
+    if [ "${have_jq}" ]; then
+      send_request "say_chat_channel" | jq -r .
+    else
+      send_request "say_chat_channel"
     fi
     ;;
   touch|Touch|touch_prim|touchprim)
@@ -573,6 +723,7 @@ case "${ACTION}" in
   *)
     echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch"
+    echo "  login, logout, status, location, walkto, sit, teleport, listalias, listinventory,"
+    echo "  im, send_notice, send_group_im, touch"
     ;;
 esac

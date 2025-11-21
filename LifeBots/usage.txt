@@ -1,0 +1,34 @@
+
+Usage: lifebot [-a action] [-l location] [-n name] [-k apikey]
+	[-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid] [-dih]
+Where:
+	-a action specifies the API action (sit, teleport, login, ...)
+	  Supported actions: login, logout, status (default), location, walkto, sit, teleport,
+	                     listalias, listinventory, im, send_notice, send_group_im, touch
+	-l location specifies a location for login and teleport actions
+		Default: Last location, teleport action requires a Slurl location
+	-n name specifies a Bot name, Default: Easy Islay
+	-k apikey specifies an API Key, use environment instead
+	-C channel specifies the channel for a message [default: 0]
+	-M message specifies the message body for a group notice/im
+	-N name specifies the SL name of the recipient of an IM
+	-S subject specifies the subject for a group notice
+	-s secret specifies a Bot secret, use environment instead
+	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
+	-d indicates dryrun mode - tell me what you would do without doing anything
+	-i retrieves Bot details
+	-h displays this usage message and exits
+Environment:
+  Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
+  of the form LB_SECRET_BOT_NAME in order to support multiple bots
+  Entries can specify a Slurl alias. For example:
+    export SLURL_club='http://maps.secondlife.com/secondlife/Scylla/226/32/78'
+  A Slurl alias can be used with the -l command line argument, e.g. -l club
+  Entries can also specify a UUID alias. For example:
+    export UUID_Mover='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'
+  A UUID alias can be used with the -u command line argument, e.g. -u Mover
+Examples:
+  lifebot  # Displays the status of the default Bot
+  lifebot -a login -l Home # Default Bot login to Home location
+  lifebot -a touch -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
+  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots
