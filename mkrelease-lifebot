@@ -67,3 +67,4 @@ gh release create v${VERSION} ${DRAFT} \
                   lifebot-${VERSION}.tar.gz
 
 git fetch --tags origin
+rm -f lifebot-${VERSION}.tar.gz
