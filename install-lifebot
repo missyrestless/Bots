@@ -17,13 +17,13 @@ have_real=$(type -p realpath)
 have_git=$(type -p git)
 
 cd "${SCRIPT_PATH}"
-[ -f LifeBots/lifebot.sh ] || {
+[ -f LifeBots/lifebot ] || {
   if [ -d Bots ]; then
     if [ -x Bots/install-lifebot ]; then
       exec Bots/install-lifebot
       exit 0
     else
-      echo "ERROR: cannot locate LifeBots/lifebot.sh. Exiting."
+      echo "ERROR: cannot locate LifeBots/lifebot. Exiting."
       exit 1
     fi
   else
@@ -32,7 +32,7 @@ cd "${SCRIPT_PATH}"
       exec Bots/install-lifebot
       exit 0
     else
-      echo "ERROR: cannot locate LifeBots/lifebot.sh or git. Exiting."
+      echo "ERROR: cannot locate LifeBots/lifebot or git. Exiting."
       exit 1
     fi
   fi
@@ -40,7 +40,7 @@ cd "${SCRIPT_PATH}"
 
 [ -d /usr/local/bin ] || ${SUDO} mkdir -p /usr/local/bin
 
-${SUDO} cp LifeBots/lifebot.sh /usr/local/bin/lifebot
+${SUDO} cp LifeBots/lifebot /usr/local/bin/lifebot
 ${SUDO} chmod 755 /usr/local/bin/lifebot
 
 [ -d LifeBots/bin ] || {

@@ -918,7 +918,7 @@ SHELL=/bin/bash
 # Schedule LifeBots actions
 # -------------------------
 # Uses the lifebot command line tool at:
-#   https://github.com/missyrestless/Bots/blob/main/LifeBots/lifebot.sh
+#   https://github.com/missyrestless/Bots/blob/main/LifeBots/lifebot
 # Assumes some configuration in ~/.lifebots has been performed
 #
 # m h  dom mon dow   command
