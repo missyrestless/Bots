@@ -1,10 +1,11 @@
 
 Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
-	 [-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid]
+	 [-C channel] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	  Supported actions: login, logout, status (default), location, walkto, sit, teleport,
-	                     listalias, listinventory, im, send_notice, send_group_im, touch
+	        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,
+	        touch_attachment, touch_prim, set_hoverheight, get_outfits, wear_outfit
 	-l location specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
@@ -13,9 +14,11 @@ Where:
 	-C channel specifies the channel for a message [default: 0]
 	-M message specifies the message body for a group notice/im
 	-N name specifies the SL name of the recipient of an IM
+	-O name specifies an attachment object name or outfit name
 	-S subject specifies the subject for a group notice
 	-s secret specifies a Bot secret, use environment instead
 	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
+	-z num specifies a hover height adjustment size [default: -0.05]
 	-d indicates dryrun mode - tell me what you would do without doing anything
 	-i retrieves Bot details
 	-h displays this usage message and exits
@@ -31,5 +34,5 @@ Environment:
 Examples:
   lifebot  # Displays the status of the default Bot
   lifebot -a login -l Home # Default Bot login to Home location
-  lifebot -a touch -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
+  lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
   lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots
