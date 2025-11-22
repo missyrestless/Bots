@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+#
+# bot2login - login a LifeBot to a specified location and sit target
+#
+# Usage: bot2login [-n name] [-l location] [-u uuid]
+
+# Default bot
+BOT="Easy"
+# Default location
+LOC="club"
+# Default sit uuid
+UUID="dancepole"
+# Default action
+ACTION="sit"
+# All bots
+ALL_BOTS="Angel Anya Easy"
+# Club sit targets for all bots
+UUID_Easy="${UUID}"
+UUID_Anya="lcouch"
+UUID_Angel="rpole"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: bot2login [-A] [-a action] [-n name] [-l location] [-u uuid]\n\n"
+  exit 1
+}
+
+allbots=
+while getopts ":Aa:n:l:u:h" flag; do
+  case $flag in
+    A)
+      allbots=1
+      ;;
+    a)
+      ACTION="$OPTARG"
+      ;;
+    n)
+      BOT="$OPTARG"
+      ;;
+    l)
+      LOC="$OPTARG"
+      ;;
+    u)
+      UUID="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+if [ "${allbots}" ]; then
+  for BOT in ${ALL_BOTS}
+  do
+    # Check if Bot is online and if not, login
+    lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
+      lifebot -a login -n ${BOT} -l ${LOC}
+      sleep 20
+    }
+
+    # Sit targets are in the club so only sit if location is club
+    [ "${UUID}" ] && [ "${LOC}" == "club" ] && lifebot -a ${ACTION} -n ${BOT} -u ${UUID}
+  done
+else
+  # Check if Bot is online and if not, login
+  lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
+    lifebot -a login -n ${BOT} -l ${LOC}
+    sleep 20
+  }
+
+  # Sit targets are in the club so only sit if location is club
+  [ "${UUID}" ] && [ "${LOC}" == "club" ] && lifebot -a ${ACTION} -n ${BOT} -u ${UUID}
+fi

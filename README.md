@@ -131,8 +131,8 @@ details on scheduling bot actions.
 </summary>
 
 ```
-Usage: lifebot [-a action] [-l location] [-n name] [-k apikey]
-	[-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid] [-dih]
+Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
+	 [-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	  Supported actions: login, logout, status (default), location, walkto, sit, teleport,
@@ -141,6 +141,7 @@ Where:
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
 	-k apikey specifies an API Key, use environment instead
+	-B text specifies the dialog button text for replies to dialog menus
 	-C channel specifies the channel for a message [default: 0]
 	-M message specifies the message body for a group notice/im
 	-N name specifies the SL name of the recipient of an IM
@@ -230,8 +231,12 @@ usage() {
     LINE=
     NORM=
   }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-a action] [-l location] [-n name] [-k apikey]"
-  printf "\n\t[-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid] [-dih]${NORM}"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]"
+  printf "\n\t [-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid]${NORM}"
+  [ "$1" == "brief" ] && {
+    printf "\n\n"
+    exit 1
+  }
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\t  Supported actions: login, logout, status (default), location, walkto, sit, teleport,"
@@ -240,6 +245,7 @@ usage() {
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
   printf "\n\t${BOLD}${LINE}-k apikey${NORM} specifies an API Key, use environment instead"
+  printf "\n\t${BOLD}${LINE}-B text${NORM} specifies the dialog button text for replies to dialog menus"
   printf "\n\t${BOLD}${LINE}-C channel${NORM} specifies the channel for a message [default: 0]"
   printf "\n\t${BOLD}${LINE}-M message${NORM} specifies the message body for a group notice/im"
   printf "\n\t${BOLD}${LINE}-N name${NORM} specifies the SL name of the recipient of an IM"
@@ -461,6 +467,29 @@ send_request() {
         fi
       fi
       ;;
+    reply_dialog)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"button\": \"${BUTTON}\",
+          \"channel\": \"${CHANNEL}\",
+          \"object\": \"${UUID}\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"button\": \"${BUTTON}\",
+          \"channel\": \"${CHANNEL}\",
+          \"object\": \"${UUID}\"
+        }"
+      fi
+      ;;
     im|say_chat_channel|send_group_im|send_notice)
       msg_label="message"
       [ "${act}" == "send_notice" ] && msg_label="text"
@@ -531,7 +560,7 @@ send_request() {
   esac
 }
 
-BOT_NAME= GROUP_ID= LOGIN_SITON= MESSAGE= SL_NAME= SUBJECT= UUID=
+BOT_NAME= BUTTON= GROUP_ID= LOGIN_SITON= MESSAGE= SL_NAME= SUBJECT= UUID=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
@@ -539,10 +568,13 @@ BOT_NAME= GROUP_ID= LOGIN_SITON= MESSAGE= SL_NAME= SUBJECT= UUID=
 have_jq=$(type -p jq)
 
 command_line_secret= details= dryrun= nobold=
-while getopts ":a:C:dijl:M:N:n:k:S:s:u:Hh" flag; do
+while getopts ":a:B:C:dijl:M:N:n:k:S:s:u:Hh" flag; do
   case $flag in
     a)
       ACTION="${OPTARG}"
+      ;;
+    B)
+      BUTTON="${OPTARG}"
       ;;
     C)
       CHANNEL="${OPTARG}"
@@ -655,11 +687,11 @@ case "${ACTION}" in
   walkto|walk|Walkto|Walk)
     [ "${LOCATION}" ] || {
       echo "The ${ACTION} action requires coordinates specified with -l coords"
-      usage
+      usage brief
     }
     [ "${LOCATION}" == "Last location" ] && {
       echo "The ${ACTION} action requires coordinates specified with -l coords"
-      usage
+      usage brief
     }
     if is_valid_coords "${LOCATION}"; then
       if [ "${have_jq}" ]; then
@@ -687,11 +719,32 @@ case "${ACTION}" in
       echo "The ${ACTION} action requires a Message body specified with -M message"
       show_usage=1
     }
-    [ "${show_usage}" ] && usage
+    [ "${show_usage}" ] && usage brief
     if [ "${have_jq}" ]; then
       send_request "send_notice" | jq -r .
     else
       send_request "send_notice"
+    fi
+    ;;
+  reply*|Reply*)
+    show_usage=
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
+      show_usage=1
+    }
+    [ "${BUTTON}" ] || {
+      echo "The ${ACTION} action requires a button text specified with -B text"
+      show_usage=1
+    }
+    [ ${CHANNEL} -eq 0 ] && {
+      echo "The ${ACTION} action requires a non-zero channel specified with -C channel"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage brief
+    if [ "${have_jq}" ]; then
+      send_request "reply_dialog" | jq -r .
+    else
+      send_request "reply_dialog"
     fi
     ;;
   sendgroupim|Sendgroupim|send_group_im|Send_group_im)
@@ -706,7 +759,7 @@ case "${ACTION}" in
       echo "The ${ACTION} action requires a Message body specified with -M message"
       show_usage=1
     }
-    [ "${show_usage}" ] && usage
+    [ "${show_usage}" ] && usage brief
     if [ "${have_jq}" ]; then
       send_request "send_group_im" | jq -r .
     else
@@ -728,7 +781,7 @@ case "${ACTION}" in
       echo "The ${ACTION} action requires a Message body specified with -M message"
       show_usage=1
     }
-    [ "${show_usage}" ] && usage
+    [ "${show_usage}" ] && usage brief
     if [ "${have_jq}" ]; then
       send_request "im" | jq -r .
     else
@@ -738,7 +791,7 @@ case "${ACTION}" in
   say|Say|say_*|Say_*)
     [ "${MESSAGE}" ] || {
       echo "The ${ACTION} action requires a Message body specified with -M message"
-      usage
+      usage brief
     }
     if [ "${have_jq}" ]; then
       send_request "say_chat_channel" | jq -r .
@@ -749,7 +802,7 @@ case "${ACTION}" in
   touch|Touch|touch_prim|touchprim)
     [ "${UUID}" ] || {
       echo "The ${ACTION} action requires a UUID specified with -u uuid"
-      usage
+      usage brief
     }
     if [ "${have_jq}" ]; then
       send_request "touch_prim" | jq -r .
@@ -760,11 +813,11 @@ case "${ACTION}" in
   teleport|Teleport|tp|TP)
     [ "${LOCATION}" ] || {
       echo "The teleport action requires a location specified with -l location"
-      usage
+      usage brief
     }
     [ "${LOCATION}" == "Last location" ] && {
       echo "The teleport action requires a location specified with -l location"
-      usage
+      usage brief
     }
     if is_valid_slurl "${LOCATION}"; then
       if [ "${have_jq}" ]; then
@@ -779,7 +832,7 @@ case "${ACTION}" in
   sit|Sit)
     [ "${UUID}" ] || {
       echo "The sit action requires a UUID specified with -u uuid"
-      usage
+      usage brief
     }
     if [ "${have_jq}" ]; then
       send_request "sit" | jq -r .
