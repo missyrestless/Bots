@@ -1,7 +1,6 @@
 # Lifebot Release
 
-This release of the `lifebot` command line management system for `LifeBots`
-adds support for additional LifeBots API commands including:
+This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands including:
 
 - `attachments` : list bot attachments, optionally specify a filter to match
 - `bot_location` : get precise bot location
@@ -24,10 +23,7 @@ adds support for additional LifeBots API commands including:
 - `walkto` : walk bot to a location
 - `wear_outfit` : wear a specified outfit
 
-The release includes the release artifact `install-lifebot` which can be used
-to install the `lifebot` management system. See the
-[repository README](https://github.com/missyrestless/Bots) for additional info
-and example `lifebot` command invocations.
+The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
 
 ## Install lifebot
 
@@ -45,9 +41,7 @@ Or, you can use the `curl` command to install `lifebot` with a single command:
 curl -fsSL https://raw.githubusercontent.com/missyrestless/Bots/refs/heads/main/install-lifebot | bash
 ```
 
-Alternatively, download the `install-lifebot` release artifact and
-execute it. The `install-lifebot` script will clone the repository
-and install the system:
+Alternatively, download the `install-lifebot` release artifact and execute it. The `install-lifebot` script will clone the repository and install the system:
 
 ```bash
 wget -q https://github.com/missyrestless/Bots/releases/latest/download/install-lifebot
@@ -57,21 +51,15 @@ chmod 755 install-lifebot
 
 ## Configure lifebot
 
-The `lifebot` command is installed in `/usr/local/bin` along with some
-utility scripts for use with `cron` or other management systems. These
-utility scripts will need to be modified to suit your specific needs,
-configuration and bot names. You can modify the scripts in
-`LifeBots/bin/` and re-run `./install-lifebot`.
+The `lifebot` command is installed in `/usr/local/bin` along with some utility scripts for use with `cron` or other management systems. These utility scripts will need to be modified to suit your specific needs, configuration and bot names. You can modify the scripts in `LifeBots/bin/` and re-run `./install-lifebot`.
 
 Add `/usr/local/bin` to your execution `PATH` if it is not already included.
 
 Configure `lifebot` by adding and editing the file `${HOME}/.lifebots`.
 
-At a minimum, you must configure your `LifeBots` developer API key and bot
-secrets for the `LifeBots` bots you wish to control using the `lifebot` command.
+At a minimum, you must configure your `LifeBots` developer API key and bot secrets for the `LifeBots` bots you wish to control using the `lifebot` command.
 
-The following example entries in `$HOME/.lifebots` will allow you to control your
-`LifeBots` bot named "Your Botname" using the `lifebot` command:
+The following example entries in `$HOME/.lifebots` will allow you to control your `LifeBots` bot named "Your Botname" using the `lifebot` command:
 
 ```bash
 ## Minimum contents of $HOME/.lifebots
@@ -82,8 +70,7 @@ export LB_API_KEY='<your-lifebots-api-key>'
 export LB_SECRET_Your_Botname='<your-bot-secret>'
 ```
 
-Add an entry of the form `export LB_SECRET_Firstname_Lastname='<bot-secret>'`
-to `$HOME/.lifebots` for each of your `LifeBots` bots.
+Add an entry of the form `export LB_SECRET_Firstname_Lastname='<bot-secret>'` to `$HOME/.lifebots` for each of your `LifeBots` bots.
 
 See `LifeBots/example_dot_lifebots` for a template to use for this file.
 

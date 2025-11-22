@@ -182,74 +182,74 @@ The following actions and commands, along with example command line invocations,
 are supported by the `lifebot` command.
 
 - `attachments` : list bot attachments, optionally specify a filter to match
-  - Example : list bot named `John Doebot` attachments with name containing the string `HUD`
+  - `Example` : list bot named `John Doebot` attachments with name containing the string `HUD`
   - `lifebot -a attachments -F "HUD" -n "John Doebot"`
 - `bot_location` : get precise bot location
-  - Example : get location of bot named `John Doebot`
+  - `Example` : get location of bot named `John Doebot`
   - `lifebot -a location -n "John Doebot"`
 - `get_outfit` : list currently worn bot outfit
-  - Example : list currently worn outfit of bot named `John Doebot`
+  - `Example` : list currently worn outfit of bot named `John Doebot`
   - `lifebot -a get_outfit -n "John Doebot"`
 - `get_outfits` : list available bot outfits
-  - Example : list available outfits for bot named `John Doebot`
+  - `Example` : list available outfits for bot named `John Doebot`
   - `lifebot -a get_outfits -n "John Doebot"`
 - `im` : send an instant message to an avatar
-  - Example : send IM from `John Doebot` to avatar "Jane Free"
+  - `Example` : send IM from `John Doebot` to avatar "Jane Free"
   - `lifebot -a im -n "John Doebot" -N "Jane Free" -M 'Hi Jane, do you want to meetup?'`
 - `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
-  - Example : list all configured `lifebot` aliases
+  - `Example` : list all configured `lifebot` aliases
   - `lifebot -a listalias`
-  - Example : list configured `lifebot` bot aliases only
+  - `Example` : list configured `lifebot` bot aliases only
   - `lifebot -a botalias`
-  - Example : list configured `lifebot` location aliases only
+  - `Example` : list configured `lifebot` location aliases only
   - `lifebot -a slurlalias`
-  - Example : list configured `lifebot` UUID aliases only
+  - `Example` : list configured `lifebot` UUID aliases only
   - `lifebot -a uuidalias`
 - `listinventory` : list bot inventory, optionally specify an inventory folder UUID
-  - Example : list inventory of bot named `John Doebot`
+  - `Example` : list inventory of bot named `John Doebot`
   - `lifebot -a listinventory -n "John Doebot"`
 - `login` : login bot
-  - Example : login bot named `John Doebot`
+  - `Example` : login bot named `John Doebot`
   - `lifebot -a login -n "John Doebot"`
 - `logout` : logout bot
-  - Example : logout bot named `John Doebot`
+  - `Example` : logout bot named `John Doebot`
   - `lifebot -a logout -n "John Doebot"`
 - `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
-  - Example : click couch menu button "Male" on channel 99999
+  - `Example` : click couch menu button "Male" on channel 99999
   - `lifebot -a reply -n "John Doebot" -C 99999 -B Male -u "a811d6fe-de59-2f4e-ee19-0cc48da48981"`
 - `send_group_im` : send an instant message to a group
-  - Example : send IM to a group from bot named `John Doebot`
+  - `Example` : send IM to a group from bot named `John Doebot`
   - `lifebot -a send_group_im -n "John Doebot" -u "f7d3c1b9-a141-9546-7e2d-dfd698c5df7c" -M "Meeting at Noon SLT tomorrow"`
 - `send_notice` : send an official group notice to all group members
-  - Example : send group notice with subject and message from bot named `John Doebot`
+  - `Example` : send group notice with subject and message from bot named `John Doebot`
   - `lifebot -a send_notice -n "John Doebot" -u "f7d3c1b9-a141-9546-7e2d-dfd698c5df7c" -M "Meeting at Noon SLT tomorrow" -S "Meeting Tomorrow"`
 - `set_hoverheight` : adjust bot hover height
-  - Example : lower hover height of bot `John Doebot` by 0.05
+  - `Example` : lower hover height of bot `John Doebot` by 0.05
   - `lifebot -a height -n "John Doebot" -z "-0.05"`
 - `sit` : sit on a specified object UUID
-  - Example : sit bot named `John Doebot` on an object
+  - `Example` : sit bot named `John Doebot` on an object
   - `lifebot -a sit -n "John Doebot" -u "d46e217b-fb5c-4796-bae3-ea016b280210"`
 - `status` : get bot status
-  - Example : get status of bot `John Doebot` (status is default action)
+  - `Example` : get status of bot `John Doebot` (status is default action)
   - `lifebot -n "John Doebot"`
 - `teleport` : teleport bot to specified location
-  - Example : teleport bot `John Doebot` to the aliased location "club"
+  - `Example` : teleport bot `John Doebot` to the aliased location "club"
   - Requires an entry of the following form in `$HOME/.lifebots`
     - `export SLURL_club="http://maps.secondlife.com/secondlife/Scylla/226/32/78"`
   - `lifebot -a teleport -n "John Doebot" -l club`
 - `touch_attachment` : touch a specified bot attachment
-  - Example : bot `John Doebot` touch attachment named "HUD Controller"
+  - `Example` : bot `John Doebot` touch attachment named "HUD Controller"
   - `lifebot -a touch_attachment -n "John Doebot" -O "HUD Controller"`
 - `touch_prim` : touch a specified object by UUID
-  - Example : bot named `John Doebot` touch an object
+  - `Example` : bot named `John Doebot` touch an object
   - `lifebot -a touch_prim -n "John Doebot" -u "f11781d0-763f-52f9-4e23-3a2b97759fa2"`
     - If `~/.lifebots` contains : `export UUID_spoton="f11781d0-763f-52f9-4e23-3a2b97759fa2"`
     - `lifebot -a touch_prim -n "John Doebot" -u spoton`
 - `walkto` : walk bot to a location
-  - Example : bot named `John Doebot` walk to X/Y/Z coordinates 100/50/28
+  - `Example` : bot named `John Doebot` walk to X/Y/Z coordinates 100/50/28
   - `lifebot -a walkto -n "John Doebot" -l "100/50/28"`
 - `wear_outfit` : wear a specified outfit
-  - Example : bot named `John Doebot` wear the outfit named "Business Casual"
+  - `Example` : bot named `John Doebot` wear the outfit named "Business Casual"
   - `lifebot -a wear_outfit -n "John Doebot" -O "Business Casual"`
     - If `~/.lifebots` contains : `export LB_BOT_NAME='John Doebot'`
     - `lifebot -a wear_outfit -O "Business Casual"`
