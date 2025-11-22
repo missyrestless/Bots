@@ -717,7 +717,7 @@ case "${ACTION}" in
       send_request "set_hoverheight"
     fi
     ;;
-  wear*|*outfit)
+  wear*|replace*outfit)
     [ "${OBJ_NAME}" ] && OUTFIT_NAME="${OBJ_NAME}"
     [ "${OUTFIT_NAME}" ] || {
       echo "The ${ACTION} action requires an outfit name specified with -O name"
