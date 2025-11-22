@@ -12,6 +12,7 @@ with either `Corrade` or `LifeBots`.
 - [LifeBots](#lifebots)
   - [Requirements](#requirements)
   - [Install lifebot](#install-lifebot)
+  - [Configure lifebot](#configure-lifebot)
   - [Supported Bot Actions and Examples](#supported-bot-actions-and-examples)
   - [Usage and Source of lifebot command](#usage-and-source-of-lifebot-command)
   - [Scheduling Bot Actions](#scheduling-bot-actions)
@@ -34,6 +35,9 @@ with either `Corrade` or `LifeBots`.
 - `Toggle_Vista_AO`: example script turning on/off the Vista AO of a bot
 
 ## LifeBots
+
+**[DISCLAIMER:]** Truth &amp; Beauty Lab is not officially affiliated with `LifeBots` other
+than contributing Knowledge Base articles in exchange for a couple of free `LifeBots` bots.
 
 [LifeBots](https://lifebots.cloud) bills itself as:
 
@@ -85,7 +89,7 @@ or [Club Truth & Beauty](http://maps.secondlife.com/secondlife/Scylla/226/32/78)
 
 The `lifebot` command line management system requires:
 
-- Linux, Macos, or Windows Subsystem for Linux (WSL)
+- Unix, Linux, Macos, or Windows Subsystem for Linux (WSL)
 - Bash
 - Cron
 - curl
@@ -107,6 +111,24 @@ cd Bots
 ./install-lifebot
 ```
 
+Or, you can use the `curl` command to install `lifebot` with a single command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/missyrestless/Bots/refs/heads/main/install-lifebot | bash
+```
+
+Alternatively, download the `install-lifebot` release artifact and
+execute it. The `install-lifebot` script will clone the repository
+and install the system:
+
+```bash
+wget -q https://github.com/missyrestless/Bots/releases/latest/download/install-lifebot
+chmod 755 install-lifebot
+./install-lifebot
+```
+
+### Configure lifebot
+
 The `lifebot` command is installed in `/usr/local/bin` along with some
 utility scripts for use with `cron` or other management systems. These
 utility scripts will need to be modified to suit your specific needs,
@@ -116,6 +138,25 @@ configuration and bot names. You can modify the scripts in
 Add `/usr/local/bin` to your execution `PATH` if it is not already included.
 
 Configure `lifebot` by adding and editing the file `${HOME}/.lifebots`.
+
+At a minimum, you must configure your `LifeBots` developer API key and bot
+secrets for the `LifeBots` bots you wish to control using the `lifebot` command.
+
+The following example entries in `$HOME/.lifebots` will allow you to control your
+`LifeBots` bot named "Your Botname" using the `lifebot` command:
+
+```bash
+## Minimum contents of $HOME/.lifebots
+#
+# LifeBots Developer API Key
+export LB_API_KEY='<your-lifebots-api-key>'
+# LifeBots bot secret
+export LB_SECRET_Your_Botname='<your-bot-secret>'
+```
+
+Add an entry of the form `export LB_SECRET_Firstname_Lastname='<bot-secret>'`
+to `$HOME/.lifebots` for each of your `LifeBots` bots.
+
 See `LifeBots/example_dot_lifebots` for a template to use for this file.
 
 See `LifeBots/crontab.in` for example crontab entries to schedule bot activities.
