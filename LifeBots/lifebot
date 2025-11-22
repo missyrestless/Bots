@@ -185,7 +185,7 @@ list_aliases() {
       printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
       show_alias BOT_NAME n
       ;;
-    slurlalias*|alias*url*)
+    localias*|slurlalias*|alias*url*)
       printf "\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
       show_alias SLURL l
       ;;
@@ -451,7 +451,7 @@ send_request() {
   esac
 }
 
-BOT_NAME= BUTTON= FILTER= GROUP_ID= LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
+ACTION_STR= BOT_NAME= BUTTON= FILTER= GROUP_ID= LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
@@ -462,7 +462,7 @@ command_line_secret= details= dryrun= nobold=
 while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Hh" flag; do
   case $flag in
     a)
-      ACTION="${OPTARG}"
+      ACTION_STR="${OPTARG}"
       ;;
     B)
       BUTTON="${OPTARG}"
@@ -583,8 +583,14 @@ fi
   exit 0
 }
 
+# If an action was specified on the command line, convert it to lowercase
+# Use tr for portability
+[ "${ACTION_STR}" ] && {
+  ACTION=$(echo "${ACTION_STR}" | tr '[:upper:]' '[:lower:]')
+}
+
 case "${ACTION}" in
-  walkto|walk|Walkto|Walk)
+  walk*)
     [ "${LOCATION}" ] || {
       echo "The ${ACTION} action requires coordinates specified with -l coords"
       usage brief
@@ -603,7 +609,7 @@ case "${ACTION}" in
       echo "${LOCATION} is NOT valid Coordinates."
     fi
     ;;
-  sendnotice|Sendnotice|send_notice|Send_notice)
+  sendnoti*|send_noti*)
     show_usage=
     if [ "${UUID}" ]; then
       GROUP_ID="${UUID}"
@@ -626,10 +632,10 @@ case "${ACTION}" in
       send_request "send_notice"
     fi
     ;;
-  reply*|Reply*)
+  reply*)
     show_usage=
     [ "${UUID}" ] || {
-      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
+      echo "The ${ACTION} action requires an Object UUID specified with -u uuid"
       show_usage=1
     }
     [ "${BUTTON}" ] || {
@@ -647,7 +653,7 @@ case "${ACTION}" in
       send_request "reply_dialog"
     fi
     ;;
-  sendgroupim|Sendgroupim|send_group_im|Send_group_im)
+  sendgroupi*|send_group_i*)
     show_usage=
     if [ "${UUID}" ]; then
       GROUP_ID="${UUID}"
@@ -666,7 +672,7 @@ case "${ACTION}" in
       send_request "send_group_im"
     fi
     ;;
-  im|IM)
+  im|instantm*)
     show_usage=
     # If recipient SL name was not specified on command line then use UUID
     [ "${SL_NAME}" ] || {
@@ -688,7 +694,7 @@ case "${ACTION}" in
       send_request "im"
     fi
     ;;
-  say|Say|say_*|Say_*)
+  say*|say_*)
     [ "${MESSAGE}" ] || {
       echo "The ${ACTION} action requires a Message body specified with -M message"
       usage brief
@@ -722,7 +728,7 @@ case "${ACTION}" in
       send_request "wear_outfit"
     fi
     ;;
-  touch*attach*|Touch*attach*)
+  touch*attach*)
     [ "${OBJ_NAME}" ] || {
       echo "The ${ACTION} action requires an attachment object name specified with -O name"
       usage brief
@@ -733,7 +739,7 @@ case "${ACTION}" in
       send_request "touch_attachment"
     fi
     ;;
-  touch*|Touch*)
+  touch*)
     [ "${UUID}" ] || {
       echo "The ${ACTION} action requires a UUID specified with -u uuid"
       usage brief
@@ -744,7 +750,7 @@ case "${ACTION}" in
       send_request "touch_prim"
     fi
     ;;
-  teleport|Teleport|tp|TP)
+  teleport|tp)
     [ "${LOCATION}" ] || {
       echo "The teleport action requires a location specified with -l location"
       usage brief
@@ -763,7 +769,7 @@ case "${ACTION}" in
       echo "${LOCATION} is NOT a valid SLURL."
     fi
     ;;
-  sit|Sit)
+  sit)
     [ "${UUID}" ] || {
       echo "The sit action requires a UUID specified with -u uuid"
       usage brief
@@ -774,52 +780,52 @@ case "${ACTION}" in
       send_request "sit"
     fi
     ;;
-  stand|Stand)
+  stand)
     if [ "${have_jq}" ]; then
       send_request "stand" | jq -r .
     else
       send_request "stand"
     fi
     ;;
-  status|Status)
+  status)
     if [ "${have_jq}" ]; then
       send_request "status" | jq -r .
     else
       send_request "status"
     fi
     ;;
-  listinventory|Listinventory|inventory)
+  listinventory|inventory)
     if [ "${have_jq}" ]; then
       send_request "listinventory" | jq -r .
     else
       send_request "listinventory"
     fi
     ;;
-  botalias*|slurlalias*|uuidalias*|listalias*|Listalias*|alias*|Alias*)
+  botalias*|localias*|slurlalias*|uuidalias*|listalias*|alias*)
     list_aliases "${ACTION}"
     ;;
-  login|Login)
+  login)
     if [ "${have_jq}" ]; then
       send_request "login" | jq -r .
     else
       send_request "login"
     fi
     ;;
-  logout|Logout)
+  logout)
     if [ "${have_jq}" ]; then
       send_request "logout" | jq -r .
     else
       send_request "logout"
     fi
     ;;
-  location|Location|loc|Loc)
+  location|loc|bot*loc*)
     if [ "${have_jq}" ]; then
       send_request "bot_location" | jq -r .
     else
       send_request "bot_location"
     fi
     ;;
-  get_outfit*|GetOutfit*|getoutfit*|list_outfit*|listoutfit*)
+  get_outfit*|getoutfit*|list_outfit*|listoutfit*)
     if echo "${ACTION}" | grep -i outfits >/dev/null; then
       if [ "${have_jq}" ]; then
         send_request "get_outfits" | jq -r .
