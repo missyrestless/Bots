@@ -8,7 +8,7 @@
 #
 # Currently supported actions:
 #   login, logout, status, location, walkto, sit, teleport, listalias, listinventory,
-#   touch, im, send_notice, send_group_im, touch
+#   reply_dialog, touch, im, send_notice, send_group_im, touch
 #
 # TODO: stand action not working yet, no stand API endpoint
 # TODO: get bot details not working yet, need to generate an access token
@@ -62,7 +62,7 @@ usage() {
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\t  Supported actions: login, logout, status (default), location, walkto, sit, teleport,"
-  printf "\n\t                     listalias, listinventory, im, send_notice, send_group_im, touch"
+  printf "\n\t        listalias, listinventory, im, reply_dialog, send_notice, send_group_im, touch"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
@@ -718,6 +718,6 @@ case "${ACTION}" in
     echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
     echo "  login, logout, status, location, walkto, sit, teleport, listalias, listinventory,"
-    echo "  im, send_notice, send_group_im, touch"
+    echo "  im, reply_dialog, send_notice, send_group_im, touch"
     ;;
 esac
