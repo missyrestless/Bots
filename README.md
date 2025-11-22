@@ -12,6 +12,7 @@ with either `Corrade` or `LifeBots`.
 - [LifeBots](#lifebots)
   - [Requirements](#requirements)
   - [Install lifebot](#install-lifebot)
+  - [Supported Bot Actions and Examples](#supported-bot-actions-and-examples)
   - [Usage and Source of lifebot command](#usage-and-source-of-lifebot-command)
   - [Scheduling Bot Actions](#scheduling-bot-actions)
 - [Corrade](#corrade)
@@ -122,6 +123,79 @@ See `LifeBots/crontab.in` for example crontab entries to schedule bot activities
 See the section [Scheduling Bot Actions](#scheduling-bot-actions) below for more
 details on scheduling bot actions.
 
+### Supported Bot Actions and Examples
+
+The `lifebot` command supports a significant subset of the full `LifeBots` API.
+
+The following actions and commands, along with example command line invocations,
+are supported by the `lifebot` command:
+
+- `attachments` : list bot attachments, optionally specify a filter to match
+  - Example : list bot named `John Doebot` attachments with name containing the string `HUD`
+  - `lifebot -a attachments -F "HUD" -n "John Doebot"`
+- `bot_location` : get precise bot location
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `get_outfit` : list currently worn bot outfit
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `get_outfits` : list available bot outfits
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `im` : send an instant message to an avatar
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `listinventory` : list bot inventory, optionally specify an inventory folder UUID
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `login` : login bot
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `logout` : logout bot
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `reply_dialog` : reply to a dialog menu (requires channel and button text)
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `send_group_im` : send an instant message to a group
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `send_notice` : send an official group notice to all group members
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `set_hoverheight` : adjust bot hover height
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `sit` : sit on a specified object UUID
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `status` : get bot status
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `teleport` : teleport bot to specified location
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `touch_attachment` : touch a specified bot attachment
+  - Example : bot named `John Doebot`
+  - `lifebot -a foobar -n "John Doebot"`
+- `touch_prim` : touch a specified object by UUID
+  - Example : bot named `John Doebot` touch an object
+  - `lifebot -a touch_prim -n "John Doebot" -u "f11781d0-763f-52f9-4e23-3a2b97759fa2"`
+    - If `$HOME/.lifebots` contains an entry : `export UUID_spoton="f11781d0-763f-52f9-4e23-3a2b97759fa2"`
+    - `lifebot -a touch_prim -n "John Doebot" -u spoton`
+- `walkto` : walk bot to a location
+  - Example : bot named `John Doebot` walk to X/Y/Z coordinates 100/50/28
+  - `lifebot -a walkto -n "John Doebot" -l "100/50/28"`
+- `wear_outfit` : wear a specified outfit
+  - Example : bot named `John Doebot` wear the outfit named "Business Casual"
+  - `lifebot -a wear_outfit -n "John Doebot" -O "Business Casual"`
+
+Development is in progress for additional actions. Let us know which
+`LifeBots` API requests you would like supported.
+
 ### Usage and Source of lifebot command
 
 <details><summary>Click here to view the
@@ -131,43 +205,6 @@ details on scheduling bot actions.
 </summary>
 
 ```
-Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
-	 [-C channel] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
-Where:
-	-a action specifies the API action (sit, teleport, login, ...)
-	  Supported actions: login, logout, status (default), location, walkto, sit, teleport,
-	        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,
-	        touch_attachment, touch_prim, set_hoverheight, get_outfits, wear_outfit
-	-l location specifies a location for login and teleport actions
-		Default: Last location, teleport action requires a Slurl location
-	-n name specifies a Bot name, Default: Easy Islay
-	-k apikey specifies an API Key, use environment instead
-	-B text specifies the dialog button text for replies to dialog menus
-	-C channel specifies the channel for a message [default: 0]
-	-M message specifies the message body for a group notice/im
-	-N name specifies the SL name of the recipient of an IM
-	-O name specifies an attachment object name or outfit name
-	-S subject specifies the subject for a group notice
-	-s secret specifies a Bot secret, use environment instead
-	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
-	-z num specifies a hover height adjustment size [default: -0.05]
-	-d indicates dryrun mode - tell me what you would do without doing anything
-	-i retrieves Bot details
-	-h displays this usage message and exits
-Environment:
-  Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
-  of the form LB_SECRET_BOT_NAME in order to support multiple bots
-  Entries can specify a Slurl alias. For example:
-    export SLURL_club='http://maps.secondlife.com/secondlife/Scylla/226/32/78'
-  A Slurl alias can be used with the -l command line argument, e.g. -l club
-  Entries can also specify a UUID alias. For example:
-    export UUID_Mover='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'
-  A UUID alias can be used with the -u command line argument, e.g. -u Mover
-Examples:
-  lifebot  # Displays the status of the default Bot
-  lifebot -a login -l Home # Default Bot login to Home location
-  lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
-  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots
 ```
 
 </details>
@@ -179,817 +216,6 @@ Examples:
 </summary>
 
 ```bash
-#!/usr/bin/env bash
-#
-# lifebot - control a LifeBot using the API
-#
-# Author:  Missy Restless <missyrestless@gmail.com>
-# Date:    15-Nov-2025
-# License: MIT
-#
-# Currently supported actions:
-#   login, logout, status, location, walkto, sit, teleport, listalias, listinventory,
-#   reply_dialog, im, send_notice, send_group_im, touch_attachment, touch_prim,
-#   set_hoverheight, get_outfits, wear_outfit
-#
-# TODO: stand action not working yet, no stand API endpoint
-# TODO: get bot details not working yet, need to generate an access token
-#
-# ----------------- $HOME/.lifebots Format ----------------------
-# Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
-# of the form LB_SECRET_BOT_NAME in order to support multiple bots
-#
-# Entries can specify a Slurl alias. For example:
-#   export SLURL_club="http://maps.secondlife.com/secondlife/Scylla/226/32/78"
-# A Slurl alias can be used with the -l command line argument, e.g. -l club
-#
-# Entries can also specify a UUID alias. For example:
-#   export UUID_couch="xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
-# A UUID alias can be used with the -u command line argument, e.g. -u couch
-# ---------------------------------------------------------------
-#
-# Command line arguments can be used to override the settings in .lifebots
-# NOTE: command line arguments are stored in the shell history
-#       environment variables are preferable over command line arguments
-#
-# Set the default Bot name
-# Setting in .lifebots overrides, setting on command line with -n name overrides all
-LB_BOT_NAME="Easy Islay"
-# Set the default action, can be specified with -a action
-ACTION="status"
-# LifeBots API endpoint
-APIURL="https://api.lifebots.cloud/api"
-ENDPOINT="${APIURL}/bot.html"
-# Set the default login location
-LOCATION="Last location"
-# Default chat channel
-CHANNEL=0
-# Default hover height adjustment
-HEIGHT="-0.05"
-
-BOLD=$(tput bold 2> /dev/null)
-NORM=$(tput sgr0 2> /dev/null)
-LINE=$(tput smul 2> /dev/null)
-
-usage() {
-  [ "${nobold}" ] && {
-    BOLD=
-    LINE=
-    NORM=
-  }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]"
-  printf "\n\t [-C channel] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
-  [ "$1" == "brief" ] && {
-    printf "\n\n"
-    exit 1
-  }
-  printf "\n${BOLD}${LINE}Where:${NORM}"
-  printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
-  printf "\n\t  Supported actions: login, logout, status (default), location, walkto, sit, teleport,"
-  printf "\n\t        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,"
-  printf "\n\t        touch_attachment, touch_prim, set_hoverheight, get_outfits, wear_outfit"
-  printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
-  printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
-  printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
-  printf "\n\t${BOLD}${LINE}-k apikey${NORM} specifies an API Key, use environment instead"
-  printf "\n\t${BOLD}${LINE}-B text${NORM} specifies the dialog button text for replies to dialog menus"
-  printf "\n\t${BOLD}${LINE}-C channel${NORM} specifies the channel for a message [default: 0]"
-  printf "\n\t${BOLD}${LINE}-M message${NORM} specifies the message body for a group notice/im"
-  printf "\n\t${BOLD}${LINE}-N name${NORM} specifies the SL name of the recipient of an IM"
-  printf "\n\t${BOLD}${LINE}-O name${NORM} specifies an attachment object name or outfit name"
-  printf "\n\t${BOLD}${LINE}-S subject${NORM} specifies the subject for a group notice"
-  printf "\n\t${BOLD}${LINE}-s secret${NORM} specifies a Bot secret, use environment instead"
-  printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with actions that require one (e.g. sit)"
-  printf "\n\t${BOLD}${LINE}-z num${NORM} specifies a hover height adjustment size [default: -0.05]"
-  printf "\n\t${BOLD}${LINE}-d${NORM} indicates dryrun mode - tell me what you would do without doing anything"
-  printf "\n\t${BOLD}${LINE}-i${NORM} retrieves Bot details"
-  printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits"
-  printf "\n${BOLD}${LINE}Environment:${NORM}"
-  printf "\n  Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries"
-  printf "\n  of the form LB_SECRET_BOT_NAME in order to support multiple bots"
-  printf "\n  Entries can specify a Slurl alias. For example:"
-  printf "\n    export SLURL_club='http://maps.secondlife.com/secondlife/Scylla/226/32/78'"
-  printf "\n  A Slurl alias can be used with the -l command line argument, e.g. -l club"
-  printf "\n  Entries can also specify a UUID alias. For example:"
-  printf "\n    export UUID_Mover='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'"
-  printf "\n  A UUID alias can be used with the -u command line argument, e.g. -u Mover"
-  printf "\n${BOLD}${LINE}Examples:${NORM}"
-  printf "\n  lifebot  # Displays the status of the default Bot"
-  printf "\n  lifebot -a login -l Home # Default Bot login to Home location"
-  printf "\n  lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID"
-  printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots\n"
-  exit 1
-}
-
-# Regex to match the basic SLURL format
-# secondlife://RegionName/X/Y/Z (X, Y, Z are optional, and can be floats)
-# or
-# http://maps.secondlife.com/secondlife/RegionName/X/Y/Z
-is_valid_slurl() {
-  local slurl="$1"
-  if [[ "$slurl" =~ ^secondlife://%[0-9a-fA-F]{2}|[a-zA-Z0-9_]+(/[0-9]+(\.[0-9]+)?(/[0-9]+(\.[0-9]+)?(/[0-9]+(\.[0-9]+)?)?)?)?$ ]]; then
-    return 0 # Valid SLURL
-  else
-    if [[ "$slurl" =~ ^http://maps.secondlife.com/secondlife/%[0-9a-fA-F]{2}|[a-zA-Z0-9_]+(/[0-9]+(\.[0-9]+)?(/[0-9]+(\.[0-9]+)?(/[0-9]+(\.[0-9]+)?)?)?)?$ ]]; then
-      return 0 # Valid SLURL
-    else
-      return 1 # Invalid SLURL
-    fi
-  fi
-}
-
-# Validate coordinates provided with -l coords are in supported format, X,Y,Z or X/Y/Z.
-is_valid_coords() {
-  local coords="$1"
-  if [[ "${coords}" =~ ^[[:digit:]]+,[[:digit:]]+,[[:digit:]]+$ ]]; then
-    return 0 # Valid Coordinates
-  else
-    if [[ "${coords}" =~ ^[[:digit:]]+/[[:digit:]]+/[[:digit:]]+$ ]]; then
-      return 0 # Valid Coordinates
-    else
-      return 1 # Invalid Coordinates
-    fi
-  fi
-}
-
-# TODO: get_details not yet working
-get_details() {
-  local access_token="${LB_SECRET}"
-  [ "${LB_BOT_ID}" ] || {
-    echo "No Bot ID set in .lifebots"
-    usage
-  }
-  if [ "${dryrun}" ]; then
-    echo "curl -s GET ${APIURL}/v1/bots/${LB_BOT_ID} \
-      -H \"Authorization: Bearer ${access_token}\" \
-      -H \"Accept: application/json\" \
-      -H \"Content-Type: application/json\""
-  else
-    curl -s GET ${APIURL}/v1/bots/${LB_BOT_ID} \
-      -H "Authorization: Bearer ${access_token}" \
-      -H "Accept: application/json" \
-      -H "Content-Type: application/json"
-  fi
-}
-
-show_alias() {
-  local astr="$1"
-  local argl="$2"
-  if env | grep ^${astr}_ >/dev/null; then
-    env | grep ^${astr}_ | while read entr
-    do
-      [ "${entr}" ] && {
-        alias=$(echo "${entr}" | awk -F '=' '{ print $1 }' | sed -e "s/${astr}_//")
-        along=$(echo "${entr}" | awk -F '=' '{ print $2 }')
-        alen=${#alias}
-        if [ ${alen} -lt 5 ]; then
-          printf "\n${BOLD}${LINE}-%s %s${NORM}\t\talias for: ${BOLD}-%s %s${NORM}" \
-                 "${argl}" "${alias}" "${argl}" "${along}"
-        else
-          printf "\n${BOLD}${LINE}-%s %s${NORM}\talias for: ${BOLD}-%s %s${NORM}" \
-                 "${argl}" "${alias}" "${argl}" "${along}"
-        fi
-      }
-    done
-  else
-    printf "\nNo ${astr} aliases defined in ${HOME}/.lifebots"
-  fi
-}
-
-list_aliases() {
-  local ali="$1"
-  [ "${ali}" ] || ali="aliases"
-
-  case "${ali}" in
-    botalias*|aliasbot*)
-      printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
-      show_alias BOT_NAME n
-      ;;
-    slurlalias*|alias*url*)
-      printf "\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
-      show_alias SLURL l
-      ;;
-    uuidalias*|aliasuu*)
-      printf "\n${BOLD}${LINE}UUID Aliases${NORM}\n"
-      show_alias UUID u
-      ;;
-    *)
-      printf "\n${BOLD}${LINE}Bot Name Aliases${NORM}\n"
-      show_alias BOT_NAME n
-      printf "\n\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
-      show_alias SLURL l
-      printf "\n\n${BOLD}${LINE}UUID Aliases${NORM}\n"
-      show_alias UUID u
-      ;;
-  esac
-  echo ""
-}
-
-send_request() {
-  local act="$1"
-  [ "${act}" ] || {
-    echo "Empty action. Exiting."
-    usage
-  }
-  COMMON="\"action\": \"${act}\", \
-          \"apikey\": \"${LB_API_KEY}\", \
-          \"botname\": \"${LB_BOT_NAME}\", \
-          \"secret\": \"${LB_SECRET}\", \
-          \"dataType\": \"json\""
-  case "${act}" in
-    listinventory|sit|touch_attachment|touch_prim)
-      if [ "${dryrun}" ]; then
-        if [ "${UUID}" ]; then
-          echo "curl -s -X POST ${ENDPOINT} \
-            -H \"Accept: application/json\" \
-            -H \"Content-Type: application/json\" \
-            -d \"{
-            ${COMMON},
-            \"objectname\": \"${OBJ_NAME}\",
-            \"uuid\": \"${UUID}\"
-          }\""
-        else
-          echo "curl -s -X POST ${ENDPOINT} \
-            -H \"Accept: application/json\" \
-            -H \"Content-Type: application/json\" \
-            -d \"{
-            ${COMMON},
-            \"objectname\": \"${OBJ_NAME}\"
-          }\""
-        fi
-      else
-        if [ "${UUID}" ]; then
-          curl -s -X POST ${ENDPOINT} \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -d "{
-            ${COMMON},
-            \"objectname\": \"${OBJ_NAME}\",
-            \"uuid\": \"${UUID}\"
-          }"
-        else
-          curl -s -X POST ${ENDPOINT} \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -d "{
-            ${COMMON},
-            \"objectname\": \"${OBJ_NAME}\"
-          }"
-        fi
-      fi
-      ;;
-    login|teleport)
-      if [ "${LOGIN_SITON}" ] && [ "${act}" == "login" ]; then
-        if [ "${dryrun}" ]; then
-          echo "curl -s -X POST ${ENDPOINT} \
-            -H \"Accept: application/json\" \
-            -H \"Content-Type: application/json\" \
-            -d \"{
-            ${COMMON},
-            \"siton\": \"${LOGIN_SITON}\",
-            \"location\": \"${LOCATION}\"
-          }\""
-        else
-          curl -s -X POST ${ENDPOINT} \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -d "{
-            ${COMMON},
-            \"siton\": \"${LOGIN_SITON}\",
-            \"location\": \"${LOCATION}\"
-          }"
-        fi
-      else
-        if [ "${dryrun}" ]; then
-          echo "curl -s -X POST ${ENDPOINT} \
-            -H \"Accept: application/json\" \
-            -H \"Content-Type: application/json\" \
-            -d \"{
-            ${COMMON},
-            \"location\": \"${LOCATION}\"
-          }\""
-        else
-          curl -s -X POST ${ENDPOINT} \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -d "{
-            ${COMMON},
-            \"location\": \"${LOCATION}\"
-          }"
-        fi
-      fi
-      ;;
-    reply_dialog)
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          ${COMMON},
-          \"button\": \"${BUTTON}\",
-          \"channel\": \"${CHANNEL}\",
-          \"object\": \"${UUID}\"
-        }\""
-      else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          ${COMMON},
-          \"button\": \"${BUTTON}\",
-          \"channel\": \"${CHANNEL}\",
-          \"object\": \"${UUID}\"
-        }"
-      fi
-      ;;
-    im|say_chat_channel|send_group_im|send_notice)
-      msg_label="message"
-      [ "${act}" == "send_notice" ] && msg_label="text"
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          ${COMMON},
-          \"slname\": \"${SL_NAME}\",
-          \"groupuuid\": \"${GROUP_ID}\",
-          \"subject\": \"${SUBJECT}\",
-          \"channel\": \"${CHANNEL}\",
-          \"${msg_label}\": \"${MESSAGE}\",
-          \"autodelay\": \"1\"
-        }\""
-      else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          ${COMMON},
-          \"slname\": \"${SL_NAME}\",
-          \"groupuuid\": \"${GROUP_ID}\",
-          \"subject\": \"${SUBJECT}\",
-          \"channel\": \"${CHANNEL}\",
-          \"${msg_label}\": \"${MESSAGE}\",
-          \"autodelay\": \"1\"
-        }"
-      fi
-      ;;
-    set_hoverheight)
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          ${COMMON},
-          \"height\": \"${HEIGHT}\"
-        }\""
-      else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          ${COMMON},
-          \"height\": \"${HEIGHT}\"
-        }"
-      fi
-      ;;
-    wear_outfit)
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          ${COMMON},
-          \"outfitname\": \"${OUTFIT_NAME}\"
-        }\""
-      else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          ${COMMON},
-          \"outfitname\": \"${OUTFIT_NAME}\"
-        }"
-      fi
-      ;;
-    walkto)
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          ${COMMON},
-          \"coords\": \"${LOCATION}\"
-        }\""
-      else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          ${COMMON},
-          \"coords\": \"${LOCATION}\"
-        }"
-      fi
-      ;;
-    *)
-      if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
-          -H \"Accept: application/json\" \
-          -H \"Content-Type: application/json\" \
-          -d \"{
-          ${COMMON}
-        }\""
-      else
-        curl -s -X POST ${ENDPOINT} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-          ${COMMON}
-        }"
-      fi
-      ;;
-  esac
-}
-
-BOT_NAME= BUTTON= GROUP_ID= LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
-
-[ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
-
-# Use jq to format JSON return if it is available
-have_jq=$(type -p jq)
-
-command_line_secret= details= dryrun= nobold=
-while getopts ":a:B:C:dijl:M:N:n:O:k:S:s:u:z:Hh" flag; do
-  case $flag in
-    a)
-      ACTION="${OPTARG}"
-      ;;
-    B)
-      BUTTON="${OPTARG}"
-      ;;
-    C)
-      CHANNEL="${OPTARG}"
-      ;;
-    d)
-      dryrun=1
-      have_jq=
-      ;;
-    i)
-      details=1
-      ;;
-    j)
-      have_jq=
-      ;;
-    l)
-      LOCATION="${OPTARG}"
-      ;;
-    M)
-      MESSAGE="${OPTARG}"
-      ;;
-    N)
-      SL_NAME="${OPTARG}"
-      ;;
-    n)
-      BOT_NAME="${OPTARG}"
-      ;;
-    O)
-      OBJ_NAME="${OPTARG}"
-      ;;
-    k)
-      LB_API_KEY="${OPTARG}"
-      ;;
-    S)
-      SUBJECT="${OPTARG}"
-      ;;
-    s)
-      LB_SECRET="${OPTARG}"
-      command_line_secret=1
-      ;;
-    u)
-      UUID="${OPTARG}"
-      ;;
-    z)
-      HEIGHT="${OPTARG}"
-      ;;
-    H)
-      nobold=1
-      usage
-      ;;
-    h)
-      usage
-      ;;
-    \?)
-      echo "Invalid option: $flag"
-      usage
-      ;;
-  esac
-done
-shift $(( OPTIND - 1 ))
-
-# Check for Name alias in ~/.lifebots
-[ "${BOT_NAME}" ] && {
-  botname=$(echo "${BOT_NAME}" | sed -e "s/ /_/g")
-  envname="BOT_NAME_${botname}"
-  [ "${!envname}" ] && LB_BOT_NAME="${!envname}"
-}
-
-# Check for a bot specific secret
-[ "${command_line_secret}" ] || {
-  botname=$(echo "${LB_BOT_NAME}" | sed -e "s/ /_/g")
-  envsecret="LB_SECRET_${botname}"
-  [ "${!envsecret}" ] && LB_SECRET="${!envsecret}"
-}
-
-# Check for Bot ID alias in ~/.lifebots
-[ "${LB_BOT_ID}" ] && {
-  botid=$(echo "${LB_BOT_ID}" | sed -e "s/ /_/g")
-  envid="LB_BOT_ID_${botid}"
-  [ "${!envid}" ] && LB_BOT_ID="${!envid}"
-}
-
-# Check for location alias in ~/.lifebots
-[ "${LOCATION}" ] && {
-  botloc=$(echo "${LOCATION}" | sed -e "s/ /_/g")
-  envloc="SLURL_${botloc}"
-  [ "${!envloc}" ] && LOCATION="${!envloc}"
-}
-
-# Check for UUID alias in ~/.lifebots
-[ "${UUID}" ] && {
-  botuuid=$(echo "${UUID}" | sed -e "s/ /_/g")
-  envuuid="UUID_${botuuid}"
-  [ "${!envuuid}" ] && UUID="${!envuuid}"
-}
-
-# Set the object UUID to sit on when logging in
-if [ "${UUID}" ]; then
-  LOGIN_SITON="${UUID}"
-else
-  botuuid=$(echo "${LB_BOT_NAME}" | sed -e "s/ /_/g")
-  envuuid="LOGIN_SITON_${botuuid}"
-  [ "${!envuuid}" ] && LOGIN_SITON="${!envuuid}"
-fi
-
-[ "${LB_API_KEY}" ] && [ "${LB_SECRET}" ] || {
-  echo "LB_API_KEY and LB_SECRET must be set in the environment. Exiting."
-  exit 1
-}
-
-[ "${details}" ] && {
-  get_details
-  exit 0
-}
-
-case "${ACTION}" in
-  walkto|walk|Walkto|Walk)
-    [ "${LOCATION}" ] || {
-      echo "The ${ACTION} action requires coordinates specified with -l coords"
-      usage brief
-    }
-    [ "${LOCATION}" == "Last location" ] && {
-      echo "The ${ACTION} action requires coordinates specified with -l coords"
-      usage brief
-    }
-    if is_valid_coords "${LOCATION}"; then
-      if [ "${have_jq}" ]; then
-        send_request "walkto" | jq -r .
-      else
-        send_request "walkto"
-      fi
-    else
-      echo "${LOCATION} is NOT valid Coordinates."
-    fi
-    ;;
-  sendnotice|Sendnotice|send_notice|Send_notice)
-    show_usage=
-    if [ "${UUID}" ]; then
-      GROUP_ID="${UUID}"
-    else
-      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
-      show_usage=1
-    fi
-    [ "${SUBJECT}" ] || {
-      echo "The ${ACTION} action requires a Subject specified with -S subject"
-      show_usage=1
-    }
-    [ "${MESSAGE}" ] || {
-      echo "The ${ACTION} action requires a Message body specified with -M message"
-      show_usage=1
-    }
-    [ "${show_usage}" ] && usage brief
-    if [ "${have_jq}" ]; then
-      send_request "send_notice" | jq -r .
-    else
-      send_request "send_notice"
-    fi
-    ;;
-  reply*|Reply*)
-    show_usage=
-    [ "${UUID}" ] || {
-      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
-      show_usage=1
-    }
-    [ "${BUTTON}" ] || {
-      echo "The ${ACTION} action requires a button text specified with -B text"
-      show_usage=1
-    }
-    [ ${CHANNEL} -eq 0 ] && {
-      echo "The ${ACTION} action requires a non-zero channel specified with -C channel"
-      show_usage=1
-    }
-    [ "${show_usage}" ] && usage brief
-    if [ "${have_jq}" ]; then
-      send_request "reply_dialog" | jq -r .
-    else
-      send_request "reply_dialog"
-    fi
-    ;;
-  sendgroupim|Sendgroupim|send_group_im|Send_group_im)
-    show_usage=
-    if [ "${UUID}" ]; then
-      GROUP_ID="${UUID}"
-    else
-      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
-      show_usage=1
-    fi
-    [ "${MESSAGE}" ] || {
-      echo "The ${ACTION} action requires a Message body specified with -M message"
-      show_usage=1
-    }
-    [ "${show_usage}" ] && usage brief
-    if [ "${have_jq}" ]; then
-      send_request "send_group_im" | jq -r .
-    else
-      send_request "send_group_im"
-    fi
-    ;;
-  im|IM)
-    show_usage=
-    # If recipient SL name was not specified on command line then use UUID
-    [ "${SL_NAME}" ] || {
-      if [ "${UUID}" ]; then
-        SL_NAME="${UUID}"
-      else
-        echo "The ${ACTION} action requires an SL Nem or UUID specified with -N name or -u uuid"
-        show_usage=1
-      fi
-    }
-    [ "${MESSAGE}" ] || {
-      echo "The ${ACTION} action requires a Message body specified with -M message"
-      show_usage=1
-    }
-    [ "${show_usage}" ] && usage brief
-    if [ "${have_jq}" ]; then
-      send_request "im" | jq -r .
-    else
-      send_request "im"
-    fi
-    ;;
-  say|Say|say_*|Say_*)
-    [ "${MESSAGE}" ] || {
-      echo "The ${ACTION} action requires a Message body specified with -M message"
-      usage brief
-    }
-    if [ "${have_jq}" ]; then
-      send_request "say_chat_channel" | jq -r .
-    else
-      send_request "say_chat_channel"
-    fi
-    ;;
-  *height*|*hover*)
-    [ "${HEIGHT}" ] || {
-      echo "The ${ACTION} action requires a hover height adjustment specified with -z num"
-      usage brief
-    }
-    if [ "${have_jq}" ]; then
-      send_request "set_hoverheight" | jq -r .
-    else
-      send_request "set_hoverheight"
-    fi
-    ;;
-  wear*|*outfit)
-    [ "${OBJ_NAME}" ] && OUTFIT_NAME="${OBJ_NAME}"
-    [ "${OUTFIT_NAME}" ] || {
-      echo "The ${ACTION} action requires an outfit name specified with -O name"
-      usage brief
-    }
-    if [ "${have_jq}" ]; then
-      send_request "wear_outfit" | jq -r .
-    else
-      send_request "wear_outfit"
-    fi
-    ;;
-  touch*attach*|Touch*attach*)
-    [ "${OBJ_NAME}" ] || {
-      echo "The ${ACTION} action requires an attachment object name specified with -O name"
-      usage brief
-    }
-    if [ "${have_jq}" ]; then
-      send_request "touch_attachment" | jq -r .
-    else
-      send_request "touch_attachment"
-    fi
-    ;;
-  touch*prim|Touch*prim)
-    [ "${UUID}" ] || {
-      echo "The ${ACTION} action requires a UUID specified with -u uuid"
-      usage brief
-    }
-    if [ "${have_jq}" ]; then
-      send_request "touch_prim" | jq -r .
-    else
-      send_request "touch_prim"
-    fi
-    ;;
-  teleport|Teleport|tp|TP)
-    [ "${LOCATION}" ] || {
-      echo "The teleport action requires a location specified with -l location"
-      usage brief
-    }
-    [ "${LOCATION}" == "Last location" ] && {
-      echo "The teleport action requires a location specified with -l location"
-      usage brief
-    }
-    if is_valid_slurl "${LOCATION}"; then
-      if [ "${have_jq}" ]; then
-        send_request "teleport" | jq -r .
-      else
-        send_request "teleport"
-      fi
-    else
-      echo "${LOCATION} is NOT a valid SLURL."
-    fi
-    ;;
-  sit|Sit)
-    [ "${UUID}" ] || {
-      echo "The sit action requires a UUID specified with -u uuid"
-      usage brief
-    }
-    if [ "${have_jq}" ]; then
-      send_request "sit" | jq -r .
-    else
-      send_request "sit"
-    fi
-    ;;
-  stand|Stand)
-    if [ "${have_jq}" ]; then
-      send_request "stand" | jq -r .
-    else
-      send_request "stand"
-    fi
-    ;;
-  status|Status)
-    if [ "${have_jq}" ]; then
-      send_request "status" | jq -r .
-    else
-      send_request "status"
-    fi
-    ;;
-  listinventory|Listinventory|inventory)
-    if [ "${have_jq}" ]; then
-      send_request "listinventory" | jq -r .
-    else
-      send_request "listinventory"
-    fi
-    ;;
-  botalias*|slurlalias*|uuidalias*|listalias*|Listalias*|alias*|Alias*)
-    list_aliases "${ACTION}"
-    ;;
-  login|Login)
-    if [ "${have_jq}" ]; then
-      send_request "login" | jq -r .
-    else
-      send_request "login"
-    fi
-    ;;
-  logout|Logout)
-    if [ "${have_jq}" ]; then
-      send_request "logout" | jq -r .
-    else
-      send_request "logout"
-    fi
-    ;;
-  location|Location|loc|Loc)
-    if [ "${have_jq}" ]; then
-      send_request "bot_location" | jq -r .
-    else
-      send_request "bot_location"
-    fi
-    ;;
-  get_outfit*|GetOutfit*|getoutfit*|list_outfit*|listoutfit*)
-    if [ "${have_jq}" ]; then
-      send_request "get_outfits" | jq -r .
-    else
-      send_request "get_outfits"
-    fi
-    ;;
-  *)
-    echo "Action '${ACTION}' not yet supported"
-    echo "Currently supported actions:"
-    echo "  login, logout, status, location, walkto, sit, teleport, listalias, listinventory,"
-    echo "  im, reply_dialog, send_notice, send_group_im, touch_attachment, touch_prim,"
-    echo "  set_hoverheight, get_outfits, wear_outfit"
-    ;;
-esac
 ```
 
 </details>
@@ -1091,16 +317,6 @@ is just an easier way of issuing the command
 ```bash
 lifebot -a teleport -n "Easy Islay" -l "http://maps.secondlife.com/secondlife/Scylla/226/32/78"
 ```
-
-Currently supported `lifebot` actions include:
-
-```
-login, logout, status, location, walkto, sit, teleport, touch_attachment, get_outfits, wear_outfit,
-touch_prim, listalias, listinventory, im, reply_dialog, send_notice, send_group_im, set_hoverheight
-```
-
-Development is in progress for additional actions. Let us know which
-`LifeBots` API requests you would like supported.
 
 ## Corrade
 
