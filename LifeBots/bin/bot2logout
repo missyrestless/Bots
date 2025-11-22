@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# bot2logout - logout a LifeBot to a specified location and sit target
+#
+# Usage: bot2logout [-n name] [-l location] [-u uuid]
+
+# Default bot
+BOT="Easy"
+# All bots
+ALL_BOTS="Angel Anya Easy"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: bot2logout [-A] [-n name]\n\n"
+  exit 1
+}
+
+allbots=
+while getopts ":An:h" flag; do
+  case $flag in
+    A)
+      allbots=1
+      ;;
+    n)
+      BOT="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+if [ "${allbots}" ]; then
+  for bot in ${ALL_BOTS}
+  do
+    lifebot -a logout -n ${bot}
+    sleep 3
+  done
+else
+  lifebot -a logout -n ${BOT}
+fi

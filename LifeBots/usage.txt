@@ -1,6 +1,6 @@
 
-Usage: lifebot [-a action] [-l location] [-n name] [-k apikey]
-	[-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid] [-dih]
+Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
+	 [-C channel] [-M message] [-N name] [-S subject] [-s secret] [-u uuid]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	  Supported actions: login, logout, status (default), location, walkto, sit, teleport,
@@ -9,6 +9,7 @@ Where:
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
 	-k apikey specifies an API Key, use environment instead
+	-B text specifies the dialog button text for replies to dialog menus
 	-C channel specifies the channel for a message [default: 0]
 	-M message specifies the message body for a group notice/im
 	-N name specifies the SL name of the recipient of an IM
