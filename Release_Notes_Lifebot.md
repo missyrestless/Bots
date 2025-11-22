@@ -1,7 +1,12 @@
 # Lifebot Release
 
-This is the initial release of the `lifebot` command line management system
-for `LifeBots`, a modern system of bots (scripted agents) for Second Life.
+This release of the `lifebot` command line management system for `LifeBots`
+adds support for additional LifeBots API commands including:
+
+```
+login, logout, status, location, walkto, sit, teleport, listalias,
+listinventory, im, reply_dialog, send_notice, send_group_im, touch
+```
 
 The release includes the release artifact `install-lifebot` which can be used
 to install the `lifebot` management system. See the
