@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# bot2dj - send bot to the club and sit on the DJ booth
+#
+# Usage: bot2dj [-n name] [-l location] [-u uuid]
+
+# Default DJ bot
+BOT="Easy"
+# Default location
+LOC="club"
+# Default sit uuid
+UUID="clubdj"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: bot2dj [-n name] [-l location] [-u uuid]\n\n"
+  exit 1
+}
+
+while getopts ":n:l:u:h" flag; do
+  case $flag in
+    n)
+      BOT="$OPTARG"
+      ;;
+    l)
+      LOC="$OPTARG"
+      ;;
+    u)
+      UUID="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+# Check if Bot is online and if not, login
+lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
+  lifebot -a login -n ${BOT} -l ${LOC}
+  sleep 20
+}
+
+lifebot -a teleport -n ${BOT} -l ${LOC}
+sleep 10
+lifebot -a sit -n ${BOT} -u ${UUID}

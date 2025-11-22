@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
-# bots2clubdance - send the bots to the club and dance
-#                  without arguments send all bots
-#                  arguments can specify which bots
+# bots2mseats - send the bots to the media sphere and sit in theater seating
+#               without arguments send all bots
+#               arguments can specify which bots
 
-# Aliases for the bots that are going to dance
+# Aliases for the bots that are going to sit
 BOTS="Angel Anya Easy"
 # Set to region where your bots need to be
-REGION="Scylla"
-# Set to object UUID to touch or sit for bots to dance
-UUID="cmover"
-# Set to action, sit or touch object to dance
-ACTION="touch"
+REGION="Brightbrook Isle"
+# Set to object UUID to touch or sit
+UUID="mseats"
+# Set to action, sit or touch object
+ACTION="sit"
 # Set to location, a Slurl or a Slurl alias
-LOC="club"
+LOC="media"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {
@@ -46,7 +46,7 @@ do
 done
 [ "${needsleep}" ] && sleep 20
 
-# Send all Bots to the dance floor and dance
+# Send all Bots to the media sphere and sit
 needsleep=
 for bot in ${BOTS}
 do
@@ -57,7 +57,7 @@ do
 done
 [ "${needsleep}" ] && sleep 10
 
-# Sit or Touch the object to dance
+# Sit or Touch the object
 for bot in ${BOTS}
 do
   lifebot -a ${ACTION} -n ${bot} -u ${UUID}
