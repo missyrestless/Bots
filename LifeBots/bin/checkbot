@@ -10,7 +10,7 @@ BOT="Easy"
 LOC="club"
 # Set to object UUID bot should sit on, UUID or UUID alias
 # Set to empty if no sit action is required
-UUID="dancepole"
+UUID=
 # Set to the region your bot needs to be located
 REGION="Scylla"
 
@@ -35,22 +35,31 @@ NORM=$(tput sgr0 2> /dev/null)
 LINE=$(tput smul 2> /dev/null)
 
 usage() {
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}checkbot [-l location] [-n name] [-u uuid] [-h]${NORM}"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}checkbot [-f] [-l location] [-n name] [-r region] [-u uuid] [-h]${NORM}"
   printf "\n${BOLD}${LINE}Where:${NORM}"
+  printf "\n\t${BOLD}${LINE}-f${NORM} indicates force teleport, skip region check"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
+  printf "\n\t${BOLD}${LINE}-r region${NORM} specifies the region to check"
   printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with the sit action"
   printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits\n"
   exit 1
 }
 
-while getopts ":l:n:u:h" flag; do
+force=
+while getopts ":fl:n:r:u:h" flag; do
   case $flag in
+    f)
+      force=1
+      ;;
     l)
       LOC="$OPTARG"
       ;;
     n)
       BOT="$OPTARG"
+      ;;
+    r)
+      REGION="$OPTARG"
       ;;
     u)
       UUID="$OPTARG"
@@ -66,6 +75,13 @@ while getopts ":l:n:u:h" flag; do
 done
 shift $(( OPTIND - 1 ))
 
+# If bot is Easy and location is club then sit on dancepole
+echo "${BOT}" | grep Easy >/dev/null && {
+  [ "${UUID}" ] || {
+    [ "${LOC}" == "club" ] && UUID="dancepole"
+  }
+}
+
 # Check if bot is online and if not, login
 lifebot -a status -n "${BOT}" | jq -r '.status' | grep -i online >/dev/null || {
   lifebot -a login -n "${BOT}" -l "${LOC}"
@@ -73,10 +89,14 @@ lifebot -a status -n "${BOT}" | jq -r '.status' | grep -i online >/dev/null || {
 }
 
 # Check if bot is at the set location and if not, teleport and sit
-lifebot -a status -n "${BOT}" | jq -r '.location' | grep "${REGION}" >/dev/null || {
+if [ "${force}" ]; then
   lifebot -a teleport -n "${BOT}" -l "${LOC}"
-  [ "${UUID}" ] && {
-    sleep 10
-    lifebot -a sit -n "${BOT}" -u ${UUID}
+else
+  lifebot -a status -n "${BOT}" | jq -r '.location' | grep "${REGION}" >/dev/null || {
+    lifebot -a teleport -n "${BOT}" -l "${LOC}"
   }
+fi
+[ "${UUID}" ] && {
+  sleep 10
+  lifebot -a sit -n "${BOT}" -u ${UUID}
 }

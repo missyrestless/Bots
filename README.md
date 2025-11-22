@@ -217,6 +217,8 @@ APIURL="https://api.lifebots.cloud/api"
 ENDPOINT="${APIURL}/bot.html"
 # Set the default login location
 LOCATION="Last location"
+# Default chat channel
+CHANNEL=0
 
 BOLD=$(tput bold 2> /dev/null)
 NORM=$(tput sgr0 2> /dev/null)
@@ -374,6 +376,11 @@ send_request() {
     echo "Empty action. Exiting."
     usage
   }
+  COMMON="\"action\": \"${act}\", \
+          \"apikey\": \"${LB_API_KEY}\", \
+          \"botname\": \"${LB_BOT_NAME}\", \
+          \"secret\": \"${LB_SECRET}\", \
+          \"dataType\": \"json\""
   case "${act}" in
     listinventory|sit|touch_prim)
       if [ "${dryrun}" ]; then
@@ -382,11 +389,7 @@ send_request() {
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"secret\": \"${LB_SECRET}\",
-            \"dataType\": \"json\",
+            ${COMMON},
             \"uuid\": \"${UUID}\"
           }\""
         else
@@ -394,10 +397,7 @@ send_request() {
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"dataType\": \"json\",
+            ${COMMON},
             \"secret\": \"${LB_SECRET}\"
           }\""
         fi
@@ -407,11 +407,7 @@ send_request() {
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"secret\": \"${LB_SECRET}\",
-            \"dataType\": \"json\",
+            ${COMMON},
             \"uuid\": \"${UUID}\"
           }"
         else
@@ -419,11 +415,7 @@ send_request() {
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"dataType\": \"json\",
-            \"secret\": \"${LB_SECRET}\"
+            ${COMMON}
           }"
         fi
       fi
@@ -435,12 +427,8 @@ send_request() {
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"secret\": \"${LB_SECRET}\",
+            ${COMMON},
             \"siton\": \"${LOGIN_SITON}\",
-            \"dataType\": \"json\",
             \"location\": \"${LOCATION}\"
           }\""
         else
@@ -448,12 +436,8 @@ send_request() {
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"secret\": \"${LB_SECRET}\",
+            ${COMMON},
             \"siton\": \"${LOGIN_SITON}\",
-            \"dataType\": \"json\",
             \"location\": \"${LOCATION}\"
           }"
         fi
@@ -463,11 +447,7 @@ send_request() {
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"secret\": \"${LB_SECRET}\",
-            \"dataType\": \"json\",
+            ${COMMON},
             \"location\": \"${LOCATION}\"
           }\""
         else
@@ -475,11 +455,7 @@ send_request() {
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
-            \"action\": \"${act}\",
-            \"apikey\": \"${LB_API_KEY}\",
-            \"botname\": \"${LB_BOT_NAME}\",
-            \"secret\": \"${LB_SECRET}\",
-            \"dataType\": \"json\",
+            ${COMMON},
             \"location\": \"${LOCATION}\"
           }"
         fi
@@ -493,34 +469,26 @@ send_request() {
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
+          ${COMMON},
           \"slname\": \"${SL_NAME}\",
           \"groupuuid\": \"${GROUP_ID}\",
           \"subject\": \"${SUBJECT}\",
           \"channel\": \"${CHANNEL}\",
           \"${msg_label}\": \"${MESSAGE}\",
-          \"autodelay\": \"1\",
-          \"dataType\": \"json\"
+          \"autodelay\": \"1\"
         }\""
       else
         curl -s -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
+          ${COMMON},
           \"slname\": \"${SL_NAME}\",
           \"groupuuid\": \"${GROUP_ID}\",
           \"subject\": \"${SUBJECT}\",
           \"channel\": \"${CHANNEL}\",
           \"${msg_label}\": \"${MESSAGE}\",
-          \"autodelay\": \"1\",
-          \"dataType\": \"json\"
+          \"autodelay\": \"1\"
         }"
       fi
       ;;
@@ -530,11 +498,7 @@ send_request() {
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
-          \"dataType\": \"json\",
+          ${COMMON},
           \"coords\": \"${LOCATION}\"
         }\""
       else
@@ -542,11 +506,7 @@ send_request() {
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"secret\": \"${LB_SECRET}\",
-          \"dataType\": \"json\",
+          ${COMMON},
           \"coords\": \"${LOCATION}\"
         }"
       fi
@@ -557,46 +517,28 @@ send_request() {
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"dataType\": \"json\",
-          \"secret\": \"${LB_SECRET}\"
+          ${COMMON}
         }\""
       else
         curl -s -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
-          \"action\": \"${act}\",
-          \"apikey\": \"${LB_API_KEY}\",
-          \"botname\": \"${LB_BOT_NAME}\",
-          \"dataType\": \"json\",
-          \"secret\": \"${LB_SECRET}\"
+          ${COMMON}
         }"
       fi
       ;;
   esac
 }
 
-BOT_NAME=
-CHANNEL=0
-GROUP_ID=
-LOGIN_SITON=
-MESSAGE=
-SL_NAME=
-SUBJECT=
-UUID=
+BOT_NAME= GROUP_ID= LOGIN_SITON= MESSAGE= SL_NAME= SUBJECT= UUID=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
 # Use jq to format JSON return if it is available
 have_jq=$(type -p jq)
 
-command_line_secret=
-details=
-dryrun=
-nobold=
+command_line_secret= details= dryrun= nobold=
 while getopts ":a:C:dijl:M:N:n:k:S:s:u:Hh" flag; do
   case $flag in
     a)
@@ -1009,10 +951,11 @@ lifebot -a teleport -n "Easy Islay" -l "http://maps.secondlife.com/secondlife/Sc
 Currently supported `lifebot` actions include:
 
 ```
-login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch
+login, logout, status, location, walkto, sit, teleport, touch,
+listalias, listinventory, im, send_notice, send_group_im
 ```
 
-Support for additional actions are being added, please let us know which
+Development is in progress for additional actions. Let us know which
 `LifeBots` API requests you would like supported.
 
 ## Corrade
