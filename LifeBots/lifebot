@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 #
-# lifebot - control a LifeBot using the API
+# lifebot - control LifeBot bots from the command line using the LifeBot API
+#
+# Copyright (c) 2025 Truth & Beauty Lab
 #
 # Author:  Missy Restless <missyrestless@gmail.com>
 # Date:    15-Nov-2025
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,
-#   reply_dialog, im, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
-#   set_hoverheight, get_outfit, get_outfits, wear_outfit
+#   login, logout, status, bot_location, walkto, sit, teleport, listalias,
+#   listinventory, reply_dialog, im, send_notice, send_group_im, attachments,
+#   touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit
 #
-# TODO: stand action not working yet, no stand API endpoint
 # TODO: get bot details not working yet, need to generate an access token
 #
 # ----------------- $HOME/.lifebots Format ----------------------
