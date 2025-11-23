@@ -181,6 +181,11 @@ export LB_SECRET_John_Doebot='<redacted>'
 The following actions and commands, along with example command line invocations,
 are supported by the `lifebot` command.
 
+- `activate_group` : activate a group tag
+  - `Example` : activate the specified group tag for bot `John Doebot`
+  - `lifebot -a activate -n "John Doebot" -u "f8e95201-20af-b85f-a682-7ac25ab9fcaf"`
+    - If `~/.lifebots` contains : `export UUID_pay2play="f8e95201-20af-b85f-a682-7ac25ab9fcaf"`
+    - `lifebot -a activate -n "John Doebot" -u pay2play`
 - `attachments` : list bot attachments, optionally specify a filter to match
   - `Example` : list bot named `John Doebot` attachments with name containing the string `HUD`
   - `lifebot -a attachments -F "HUD" -n "John Doebot"`
@@ -232,6 +237,9 @@ are supported by the `lifebot` command.
 - `status` : get bot status
   - `Example` : get status of bot `John Doebot` (status is default action)
   - `lifebot -n "John Doebot"`
+- `takeoff` : remove a worn item
+  - `Example` : bot `John Doebot` remove the specified inventory item
+  - `lifebot -a takeoff -n "John Doebot" -u "d666e910-ba72-0c11-a66e-c3759d8af0f5"`
 - `teleport` : teleport bot to specified location
   - `Example` : teleport bot `John Doebot` to the aliased location "club"
   - Requires an entry of the following form in `$HOME/.lifebots`
@@ -248,6 +256,9 @@ are supported by the `lifebot` command.
 - `walkto` : walk bot to a location
   - `Example` : bot named `John Doebot` walk to X/Y/Z coordinates 100/50/28
   - `lifebot -a walkto -n "John Doebot" -l "100/50/28"`
+- `wear` : wear an inventory item (uses "add" rather than "wear")
+  - `Example` : bot `John Doebot` wear the specified inventory item
+  - `lifebot -a wear -n "John Doebot" -u "d666e910-ba72-0c11-a66e-c3759d8af0f5"`
 - `wear_outfit` : wear a specified outfit
   - `Example` : bot named `John Doebot` wear the outfit named "Business Casual"
   - `lifebot -a wear_outfit -n "John Doebot" -O "Business Casual"`
@@ -267,13 +278,14 @@ Let us know which `LifeBots` API requests you would like supported.
 </summary>
 
 ```
-Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
-	 [-C channel] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
+Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
-	  Supported actions: login, logout, status (default), bot_location, walkto, sit, teleport,
-	        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,
-	        attachments, touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit
+	Supported actions:
+	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, listinventory,
+	  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
+	  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit
 	-l location specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
@@ -327,9 +339,9 @@ Examples:
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, teleport, listalias,
-#   listinventory, reply_dialog, im, send_notice, send_group_im, attachments,
-#   touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit
+#   login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,
+#   im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
+#   activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
@@ -375,17 +387,18 @@ usage() {
     LINE=
     NORM=
   }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]"
-  printf "\n\t [-C channel] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
+  printf "\n\t[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
   [ "$1" == "brief" ] && {
     printf "\n\n"
     exit 1
   }
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
-  printf "\n\t  Supported actions: login, logout, status (default), bot_location, walkto, sit, teleport,"
-  printf "\n\t        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,"
-  printf "\n\t        attachments, touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit"
+  printf "\n\tSupported actions:"
+  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, listinventory,"
+  printf "\n\t  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,"
+  printf "\n\t  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
@@ -643,7 +656,7 @@ send_request() {
         }"
       fi
       ;;
-    im|say_chat_channel|send_group_im|send_notice)
+    activate_group|im|say_chat_channel|send_group_im|send_notice)
       msg_label="message"
       [ "${act}" == "send_notice" ] && msg_label="text"
       if [ "${dryrun}" ]; then
@@ -690,6 +703,27 @@ send_request() {
           -d "{
           ${COMMON},
           \"height\": \"${HEIGHT}\"
+        }"
+      fi
+      ;;
+    takeoff|wear)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"uuid\": \"${UUID}\",
+          \"wear\": \"add\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"uuid\": \"${UUID}\",
+          \"wear\": \"add\"
         }"
       fi
       ;;
@@ -972,6 +1006,19 @@ case "${ACTION}" in
       send_request "reply_dialog"
     fi
     ;;
+  activate*)
+    if [ "${UUID}" ]; then
+      GROUP_ID="${UUID}"
+    else
+      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
+      usage brief
+    fi
+    if [ "${have_jq}" ]; then
+      send_request "activate_group" | jq -r .
+    else
+      send_request "activate_group"
+    fi
+    ;;
   sendgroupi*|send_group_i*)
     show_usage=
     if [ "${UUID}" ]; then
@@ -1035,7 +1082,29 @@ case "${ACTION}" in
       send_request "set_hoverheight"
     fi
     ;;
-  wear*|*outfit)
+  takeoff|remove)
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an item UUID to remove specified with -u uuid"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "takeoff" | jq -r .
+    else
+      send_request "takeoff"
+    fi
+    ;;
+  wear)
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an item UUID to wear specified with -u uuid"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "wear" | jq -r .
+    else
+      send_request "wear"
+    fi
+    ;;
+  wear*|replace*outfit)
     [ "${OBJ_NAME}" ] && OUTFIT_NAME="${OBJ_NAME}"
     [ "${OUTFIT_NAME}" ] || {
       echo "The ${ACTION} action requires an outfit name specified with -O name"
@@ -1171,7 +1240,7 @@ case "${ACTION}" in
     echo "Currently supported actions:"
     echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,"
     echo "  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,"
-    echo "  set_hoverheight, get_outfit, get_outfits, wear_outfit"
+    echo "  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit"
     ;;
 esac
 ```
