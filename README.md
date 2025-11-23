@@ -1,10 +1,14 @@
 # Second Life Bots
 
-This repository contains commands, configuration, and management scripts for
-Second Life bots. Included are management systems for `Corrade` bots and `LifeBots`.
+This repository contains commands, configuration, and management scripts for Second Life
+scripted agents (bots). Included are management systems for `Corrade` and `LifeBots`.
 
-**[NOTE:]** The Truth & Beauty Lab and Missy Restless are not associated in any way
-with either `Corrade` or `LifeBots`.
+**[NOTE:]** Missy Restless and the Truth &amp; Beauty Lab are not affiliated with
+`Corrade` or `LifeBots` other than contributing `LifeBots` Knowledge Base articles.
+This repository provides 3rd party tools for `Corrade` and `LifeBots` and is not
+the official product of either. The official `LifeBots` site can be found at
+[https://lifebots.cloud](https://lifebots.cloud) and `Corrade` at
+[https://grimore.org/secondlife/scripted_agents/corrade](https://grimore.org/secondlife/scripted_agents/corrade).
 
 ## Table of Contents
 
@@ -37,9 +41,6 @@ with either `Corrade` or `LifeBots`.
 
 ## LifeBots
 
-**[DISCLAIMER:]** Truth &amp; Beauty Lab is not officially affiliated with `LifeBots` other
-than contributing Knowledge Base articles in exchange for a couple of free `LifeBots` bots.
-
 [LifeBots](https://lifebots.cloud) bills itself as:
 
 > The most advanced bot platform for Second Life. From AI characters to
@@ -47,39 +48,32 @@ than contributing Knowledge Base articles in exchange for a couple of free `Life
 
 I cannot disagree - `LifeBots` is the most advanced bot platform for Second Life.
 
-For `L$165/wk` the LifeBots Lite Bot provides:
+`LifeBots` offers 2 subscription plans, `Lite` and `Full`. The plans provide these features:
 
-- Basic bot functionality
-- Greeter Bot addon
-- HUD Support
-- Dialog Menu Interactions
-- RLV capabilities
-- Compatible addons support
-- API access
-- Email support
-- Web dashboard access
-- AI Access (No AI Functions / Avatar Specific Memory)
-
-For `L$450/wk` the LifeBots Full Bot provides:
-
-- All Lite Bot features
-- Group Notice scheduling
-- Group IM scheduling
-- Group Web Chat
-- Group Discord Sync
-- Complete addon support
-- Advanced AI integration
-- Priority support
-- Custom scripting
-- Advanced analytics
+| `LifeBots` Lite (`L$165/wk`) | `LifeBots` Full (`L$450/wk`) |
+|:---------------------------- |:---------------------------- |
+| Basic bot functionality      | All Lite Bot features        |
+| Greeter Bot addon            | Group Notice scheduling      |
+| HUD Support                  | Group IM scheduling          |
+| Dialog Menu Interactions     | Group Web Chat               |
+| RLV capabilities             | Group Discord Sync           |
+| Compatible addons support    | Complete addon support       |
+| API access                   | Advanced AI integration      |
+| Email support                | Priority support             |
+| Web dashboard access         | Custom scripting             |
+| AI Access                    | AI Functions                 |
+|                              | Avatar Specific Memory       |
+|                              | Advanced analytics           |
 
 This repository provides a command line management system for `LifeBots`.
-The `LifeBots` web UI and HUD can be used for interactive control and for
-many users this is sufficient. For those power users who wish to automate
-their `LifeBots` using the command line and tools such as `cron` and `jq`
-the `lifebot` command and associated utilities may provide additional
-power and flexibility. The `LifeBots` command line management system is
-open source, MIT licensed, and free to download, deploy, modify, and distribute.
+
+Both `LifeBots` subscription plans provide a web UI and HUD that can be used for
+interactive control of `LifeBots` bots and, for many users, this is sufficient.
+
+For those power users who wish to automate their `LifeBots` using the command line
+and tools such as `cron` and `jq` the `lifebot` command and associated utilities
+found here may provide additional power and flexibility. The `LifeBots` command line
+management system is open source and free to download, deploy, modify, and distribute.
 
 `LifeBots` managed by the `lifebot` command line and scheduled using the Unix
 `cron` facility can be viewed and interacted with in Second Life at the
@@ -1653,6 +1647,15 @@ BALANCE=$(lifebot -a balance -n "${MY_BOT}" | jq -r '.balance')
 [ ${BALANCE} -gt 0 ] && {
   lifebot -a give_money -n "${MY_BOT}" -u "${MY_UUID}" -z ${BALANCE}
 }
+```
+
+A script like this could be used to automate transfer of L$ from your bots to your
+primary avatar. For example, automated transfer of a bot's L$ balance on the 1st of
+every month could be setup to run as a `cron` job with the following `crontab` entry:
+
+```
+# Send the Easy Islay bot's L$ balance to myself on the 1st of every month
+0 0 1 * * /bin/bash -lc /usr/local/LifeBots/send_easy_balance >> /usr/local/LifeBots/log/easy.log 2>&1
 ```
 
 ## Corrade
