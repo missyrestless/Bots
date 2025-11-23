@@ -2,6 +2,7 @@
 
 This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands including:
 
+- `activate_group` : activate a group tag
 - `attachments` : list bot attachments, optionally specify a filter to match
 - `bot_location` : get precise bot location
 - `get_outfit` : list currently worn bot outfit
@@ -17,10 +18,12 @@ This release of the `lifebot` command line management system for `LifeBots` adds
 - `set_hoverheight` : adjust bot hover height
 - `sit` : sit on a specified object UUID
 - `status` : get bot status
+- `takeoff` : remove a worn item
 - `teleport` : teleport bot to specified location
 - `touch_attachment` : touch a specified bot attachment
 - `touch_prim` : touch a specified object by UUID
 - `walkto` : walk bot to a location
+- `wear` : wear an inventory item (uses "add" rather than "wear")
 - `wear_outfit` : wear a specified outfit
 
 The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
