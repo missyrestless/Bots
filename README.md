@@ -173,6 +173,12 @@ export LB_API_KEY='<redacted>'
 export LB_SECRET_John_Doebot='<redacted>'
 ```
 
+<details><summary>Click here to view the
+
+**lifebot command examples**
+
+</summary>
+
 The following actions and commands, along with example command line invocations,
 are supported by the `lifebot` command.
 
@@ -274,6 +280,8 @@ are supported by the `lifebot` command.
   - `lifebot -a wear_outfit -n "John Doebot" -O "Business Casual"`
     - If `~/.lifebots` contains : `export LB_BOT_NAME='John Doebot'`
     - `lifebot -a wear_outfit -O "Business Casual"`
+
+</details>
 
 Development is in rapid progress for additional actions.
 
