@@ -16,6 +16,7 @@ with either `Corrade` or `LifeBots`.
   - [Supported Bot Actions and Examples](#supported-bot-actions-and-examples)
   - [Usage and Source of lifebot command](#usage-and-source-of-lifebot-command)
   - [Scheduling Bot Actions](#scheduling-bot-actions)
+  - [Using the JSON return as Input](#using-the-json-return-as-input)
 - [Corrade](#corrade)
 - [Corrade HUD](#corrade-hud)
 
@@ -210,6 +211,9 @@ are supported by the `lifebot` command.
 - `im` : send an instant message to an avatar
   - `Example` : send IM from `John Doebot` to avatar "Jane Free"
   - `lifebot -a im -n "John Doebot" -N "Jane Free" -M 'Hi Jane, do you want to meetup?'`
+- `key2name` : convert an avatar UUID to avatar name
+  - `Example` : use `John Doebot` bot to get avatar name of specified UUID
+  - `lifebot -a key2name -n "John Doebot" -u "3506213c-29c8-4aa1-a38f-e12f6d41b804"`
 - `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
   - `Example` : list all configured `lifebot` aliases
   - `lifebot -a listalias`
@@ -228,6 +232,9 @@ are supported by the `lifebot` command.
 - `logout` : logout bot
   - `Example` : logout bot named `John Doebot`
   - `lifebot -a logout -n "John Doebot"`
+- `name2key` : convert an avatar name to avatar UUID
+  - `Example` : use `John Doebot` bot to get avatar UUID of Missy Restless
+  - `lifebot -a name2key -n "John Doebot" -N "Missy Restless"`
 - `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
   - `Example` : click couch menu button "Male" on channel 99999
   - `lifebot -a reply -n "John Doebot" -C 99999 -B Male -u "a811d6fe-de59-2f4e-ee19-0cc48da48981"`
@@ -287,13 +294,13 @@ Let us know which `LifeBots` API requests you would like supported.
 </summary>
 
 ```
-Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+Usage: lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
 	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	Supported actions:
-	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias,
-	  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, key2name,
+	  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
 	  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
 	  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 	-l location specifies a location for login and teleport actions
@@ -312,6 +319,7 @@ Where:
 	-z num specifies a hover height adjustment size [default: -0.05]
 		can also be used to specify a payment amount
 	-d indicates dryrun mode - tell me what you would do without doing anything
+	-e displays a list of supported commands and examples then exits
 	-i retrieves Bot details
 	-h displays this usage message and exits
 Environment:
@@ -350,8 +358,8 @@ Examples:
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, teleport, listalias,
-#   listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+#   login, logout, status, bot_location, walkto, sit, teleport, listalias, key2name,
+#   name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
 #   touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
 #   get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 #
@@ -399,7 +407,7 @@ usage() {
     LINE=
     NORM=
   }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
   printf "\n\t[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
   [ "$1" == "brief" ] && {
     printf "\n\n"
@@ -408,8 +416,8 @@ usage() {
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\tSupported actions:"
-  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias,"
-  printf "\n\t  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, key2name,"
+  printf "\n\t  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
   printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,"
   printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
@@ -428,6 +436,7 @@ usage() {
   printf "\n\t${BOLD}${LINE}-z num${NORM} specifies a hover height adjustment size [default: -0.05]"
   printf "\n\t\tcan also be used to specify a payment amount"
   printf "\n\t${BOLD}${LINE}-d${NORM} indicates dryrun mode - tell me what you would do without doing anything"
+  printf "\n\t${BOLD}${LINE}-e${NORM} displays a list of supported commands and examples then exits"
   printf "\n\t${BOLD}${LINE}-i${NORM} retrieves Bot details"
   printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits"
   printf "\n${BOLD}${LINE}Environment:${NORM}"
@@ -445,6 +454,120 @@ usage() {
   printf "\n  lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID"
   printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots\n"
   exit 1
+}
+
+examples() {
+  printf "\nThe following actions and commands, along with example command"
+  printf "\nline invocations, are supported by the lifebot command.\n"
+
+  printf "\nactivate_group : activate a group tag"
+  printf "\n\tExample : activate the specified group tag for bot John Doebot"
+  printf "\n\tlifebot -a activate -n \"John Doebot\" -u \"f8e95201-20af-b85f-a682-7ac25ab9fcaf\""
+  printf "\n\t\tIf ~/.lifebots contains : export UUID_pay2play=\"f8e95201-20af-b85f-a682-7ac25ab9fcaf\""
+  printf "\n\t\tlifebot -a activate -n \"John Doebot\" -u pay2play"
+  printf "\nattachments : list bot attachments, optionally specify a filter to match"
+  printf "\n\tExample : list bot named John Doebot attachments with name containing the string HUD"
+  printf "\n\tlifebot -a attachments -F \"HUD\" -n \"John Doebot\""
+  printf "\nbot_location : get precise bot location"
+  printf "\n\tExample : get location of bot named John Doebot"
+  printf "\n\tlifebot -a location -n \"John Doebot\""
+  printf "\nget_balance : get your bot's L$ balance"
+  printf "\n\tExample : get the L$ balance of bot John Doebot"
+  printf "\n\tlifebot -a balance -n \"John Doebot\""
+  printf "\nget_outfit : list currently worn bot outfit"
+  printf "\n\tExample : list currently worn outfit of bot named John Doebot"
+  printf "\n\tlifebot -a get_outfit -n \"John Doebot\""
+  printf "\nget_outfits : list available bot outfits"
+  printf "\n\tExample : list available outfits for bot named John Doebot"
+  printf "\n\tlifebot -a get_outfits -n \"John Doebot\""
+  printf "\ngive_money : pay another avatar L$ from your bot"
+  printf "\n\tExample : pay avatar with specified UUID L$300 from bot John Doebot"
+  printf "\n\tlifebot -a give_money -n \"John Doebot\" -u \"3506213c-29c8-4aa1-a38f-e12f6d41b804\" -z 300"
+  printf "\ngive_money_object : pay an object L$ from your bot"
+  printf "\n\tExample : pay a tip jar with specified UUID L$100 from bot John Doebot"
+  printf "\n\tlifebot -a give_money_object -n \"John Doebot\" -u \"47cb1fc7-8144-b538-6716-c723fb1332d6\" -z 100"
+  printf "\nim : send an instant message to an avatar"
+  printf "\n\tExample : send IM from John Doebot to avatar \"Jane Free\""
+  printf "\n\tlifebot -a im -n \"John Doebot\" -N \"Jane Free\" -M 'Hi Jane, do you want to meetup?'"
+  printf "\nkey2name : convert an avatar UUID to avatar name"
+  printf "\n\tExample : use John Doebot bot to get avatar name of specified UUID"
+  printf "\n\tlifebot -a key2name -n \"John Doebot\" -u \"3506213c-29c8-4aa1-a38f-e12f6d41b804\""
+  printf "\nlistalias : list configured lifebot aliases in $HOME/.lifebots"
+  printf "\n\tExample : list all configured lifebot aliases"
+  printf "\n\tlifebot -a listalias"
+  printf "\n\tExample : list configured lifebot bot aliases only"
+  printf "\n\tlifebot -a botalias"
+  printf "\n\tExample : list configured lifebot location aliases only"
+  printf "\n\tlifebot -a slurlalias"
+  printf "\n\tExample : list configured lifebot UUID aliases only"
+  printf "\n\tlifebot -a uuidalias"
+  printf "\nlistinventory : list bot inventory, optionally specify an inventory folder UUID"
+  printf "\n\tExample : list inventory of bot named John Doebot"
+  printf "\n\tlifebot -a listinventory -n \"John Doebot\""
+  printf "\nlogin : login bot"
+  printf "\n\tExample : login bot named John Doebot"
+  printf "\n\tlifebot -a login -n \"John Doebot\""
+  printf "\nlogout : logout bot"
+  printf "\n\tExample : logout bot named John Doebot"
+  printf "\n\tlifebot -a logout -n \"John Doebot\""
+  printf "\nname2key : convert an avatar name to avatar UUID"
+  printf "\n\tExample : use John Doebot bot to get avatar UUID of Missy Restless"
+  printf "\n\tlifebot -a name2key -n \"John Doebot\" -N \"Missy Restless\""
+  printf "\nreply_dialog : reply to a dialog menu (requires channel, UUID, and button text)"
+  printf "\n\tExample : click couch menu button \"Male\" on channel 99999"
+  printf "\n\tlifebot -a reply -n \"John Doebot\" -C 99999 -B Male -u \"a811d6fe-de59-2f4e-ee19-0cc48da48981\""
+  printf "\nsend_group_im : send an instant message to a group"
+  printf "\n\tExample : send IM to a group from bot named John Doebot"
+  printf "\n\tlifebot -a send_group_im -n \"John Doebot\" -u \"f7d3c1b9-a141-9546-7e2d-dfd698c5df7c\" -M \"Meeting at Noon SLT tomorrow\""
+  printf "\nsend_notice : send an official group notice to all group members"
+  printf "\n\tExample : send group notice with subject and message from bot named John Doebot"
+  printf "\n\tlifebot -a send_notice -n \"John Doebot\" -u \"f7d3c1b9-a141-9546-7e2d-dfd698c5df7c\" -M \"Meeting at Noon SLT tomorrow\" -S \"Meeting Tomorrow\""
+  printf "\nset_hoverheight : adjust bot hover height"
+  printf "\n\tExample : lower hover height of bot John Doebot by 0.05"
+  printf "\n\tlifebot -a height -n \"John Doebot\" -z \"-0.05\""
+  printf "\nsit : sit on a specified object UUID"
+  printf "\n\tExample : sit bot named John Doebot on an object"
+  printf "\n\tlifebot -a sit -n \"John Doebot\" -u \"d46e217b-fb5c-4796-bae3-ea016b280210\""
+  printf "\nstatus : get bot status"
+  printf "\n\tExample : get status of bot John Doebot (status is default action)"
+  printf "\n\tlifebot -n \"John Doebot\""
+  printf "\ntakeoff : remove a worn item"
+  printf "\n\tExample : bot John Doebot remove the specified inventory item"
+  printf "\n\tlifebot -a takeoff -n \"John Doebot\" -u \"d666e910-ba72-0c11-a66e-c3759d8af0f5\""
+  printf "\nteleport : teleport bot to specified location"
+  printf "\n\tExample : teleport bot John Doebot to the aliased location \"club\""
+  printf "\n\tRequires an entry of the following form in $HOME/.lifebots"
+  printf "\n\t\texport SLURL_club=\"http://maps.secondlife.com/secondlife/Scylla/226/32/78\""
+  printf "\n\tlifebot -a teleport -n \"John Doebot\" -l club"
+  printf "\ntouch_attachment : touch a specified bot attachment"
+  printf "\n\tExample : bot John Doebot touch attachment named \"HUD Controller\""
+  printf "\n\tlifebot -a touch_attachment -n \"John Doebot\" -O \"HUD Controller\""
+  printf "\ntouch_prim : touch a specified object by UUID"
+  printf "\n\tExample : bot named John Doebot touch an object"
+  printf "\n\tlifebot -a touch_prim -n \"John Doebot\" -u \"f11781d0-763f-52f9-4e23-3a2b97759fa2\""
+  printf "\n\t\tIf ~/.lifebots contains : export UUID_spoton=\"f11781d0-763f-52f9-4e23-3a2b97759fa2\""
+  printf "\n\t\tlifebot -a touch_prim -n \"John Doebot\" -u spoton"
+  printf "\nwalkto : walk bot to a location"
+  printf "\n\tExample : bot named John Doebot walk to X/Y/Z coordinates 100/50/28"
+  printf "\n\tlifebot -a walkto -n \"John Doebot\" -l \"100/50/28\""
+  printf "\nwear : wear an inventory item (uses \"add\" rather than \"wear\")"
+  printf "\n\tExample : bot John Doebot wear the specified inventory item"
+  printf "\n\tlifebot -a wear -n \"John Doebot\" -u \"d666e910-ba72-0c11-a66e-c3759d8af0f5\""
+  printf "\nwear_outfit : wear a specified outfit"
+  printf "\n\tExample : bot named John Doebot wear the outfit named \"Business Casual\""
+  printf "\n\tlifebot -a wear_outfit -n \"John Doebot\" -O \"Business Casual\""
+  printf "\n\t\tIf ~/.lifebots contains : export LB_BOT_NAME='John Doebot'"
+  printf "\n\t\tlifebot -a wear_outfit -O \"Business Casual\"\n"
+  exit 1
+}
+
+is_valid_uuid() {
+  local uuid="$1"
+  if [[ "$uuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$ ]]; then
+    return 0 # Valid UUID
+  else
+    return 1 # Invalid UUID
+  fi
 }
 
 # Regex to match the basic SLURL format
@@ -647,6 +770,46 @@ send_request() {
         fi
       fi
       ;;
+    key2name)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"key\": \"${UUID}\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"key\": \"${UUID}\"
+        }"
+      fi
+      ;;
+    name2key)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"name\": \"${SL_NAME}\",
+          \"request_case\": \"1\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"name\": \"${SL_NAME}\",
+          \"request_case\": \"1\"
+        }"
+      fi
+      ;;
     give_money|give_money_object)
       if [ "${dryrun}" ]; then
         echo "curl -s -X POST ${ENDPOINT} \
@@ -664,7 +827,8 @@ send_request() {
           -H "Content-Type: application/json" \
           -d "{
           ${COMMON},
-          \"object_uuid\": \"${UUID}\",
+          \"avatar\": \"${AVATAR_UUID}\",
+          \"object_uuid\": \"${OBJECT_UUID}\",
           \"amount\": ${AMOUNT}
         }"
       fi
@@ -849,7 +1013,7 @@ LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
 have_jq=$(type -p jq)
 
 command_line_secret= details= dryrun= nobold=
-while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Hh" flag; do
+while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
   case $flag in
     a)
       ACTION_STR="${OPTARG}"
@@ -905,6 +1069,9 @@ while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Hh" flag; do
       HEIGHT="${OPTARG}"
       AMOUNT="${OPTARG}"
       ;;
+    e)
+      examples
+      ;;
     H)
       nobold=1
       usage
@@ -950,9 +1117,12 @@ shift $(( OPTIND - 1 ))
 
 # Check for UUID alias in ~/.lifebots
 [ "${UUID}" ] && {
-  botuuid=$(echo "${UUID}" | sed -e "s/ /_/g")
-  envuuid="UUID_${botuuid}"
-  [ "${!envuuid}" ] && UUID="${!envuuid}"
+  # Check if UUID is a valid Second Life UUID, if not then check for alias
+  is_valid_uuid "${UUID}" || {
+    botuuid=$(echo "${UUID}" | sed -e "s/ /_/g")
+    envuuid="UUID_${botuuid}"
+    [ "${!envuuid}" ] && UUID="${!envuuid}"
+  }
 }
 
 # Set the object UUID to sit on when logging in
@@ -1045,9 +1215,9 @@ case "${ACTION}" in
     if [[ "${AMOUNT}" =~ ^[0-9]+$ ]]; then
       AVATAR_UUID="${UUID}"
       if [ "${have_jq}" ]; then
-        send_request "give_money_object" | jq -r .
+        send_request "give_money" | jq -r .
       else
-        send_request "give_money_object"
+        send_request "give_money"
       fi
     else
       echo "Amount specified to pay must be a positive integer."
@@ -1131,6 +1301,28 @@ case "${ACTION}" in
       send_request "send_group_im"
     fi
     ;;
+  key*name)
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an avatar UUID specified with -u uuid"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "key2name" | jq -r .
+    else
+      send_request "key2name"
+    fi
+    ;;
+  name*key)
+    [ "${SL_NAME}" ] || {
+      echo "The ${ACTION} action requires an SL Name specified with -N name"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "name2key" | jq -r .
+    else
+      send_request "name2key"
+    fi
+    ;;
   im|instantm*)
     show_usage=
     # If recipient SL name was not specified on command line then use UUID
@@ -1138,7 +1330,7 @@ case "${ACTION}" in
       if [ "${UUID}" ]; then
         SL_NAME="${UUID}"
       else
-        echo "The ${ACTION} action requires an SL Nem or UUID specified with -N name or -u uuid"
+        echo "The ${ACTION} action requires an SL Name or UUID specified with -N name or -u uuid"
         show_usage=1
       fi
     }
@@ -1331,8 +1523,8 @@ case "${ACTION}" in
   *)
     echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias,"
-    echo "  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+    echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias, key2name,"
+    echo "  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
     echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,"
     echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
     ;;
@@ -1437,6 +1629,30 @@ is just an easier way of issuing the command
 
 ```bash
 lifebot -a teleport -n "Easy Islay" -l "http://maps.secondlife.com/secondlife/Scylla/226/32/78"
+```
+
+### Using the JSON return as Input
+
+The `lifebot` command returns a JSON object containing the results of the API request. This
+object can be parsed with `jq` and the return values used as input to another `lifebot` command.
+
+For example, if you want to send all of the L$ balance of your bot to yourself:
+
+```bash
+#!/bin/bash
+#
+# Get the John Doebot bot's balance and send it to myself
+
+MY_UUID="3506213c-29c8-4aa1-a38f-e12f6d41b804"
+MY_BOT="John Doebot"
+
+# Get the bot's balance
+BALANCE=$(lifebot -a balance -n "${MY_BOT}" | jq -r '.balance')
+
+# Send balance to myself if it is greater than 0
+[ ${BALANCE} -gt 0 ] && {
+  lifebot -a give_money -n "${MY_BOT}" -u "${MY_UUID}" -z ${BALANCE}
+}
 ```
 
 ## Corrade
