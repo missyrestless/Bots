@@ -1,11 +1,11 @@
 
-Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+Usage: lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
 	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	Supported actions:
-	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias,
-	  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, key2name,
+	  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
 	  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
 	  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 	-l location specifies a location for login and teleport actions
@@ -24,6 +24,7 @@ Where:
 	-z num specifies a hover height adjustment size [default: -0.05]
 		can also be used to specify a payment amount
 	-d indicates dryrun mode - tell me what you would do without doing anything
+	-e displays a list of supported commands and examples then exits
 	-i retrieves Bot details
 	-h displays this usage message and exits
 Environment:

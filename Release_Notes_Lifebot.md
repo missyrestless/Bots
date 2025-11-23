@@ -1,4 +1,4 @@
-# Lifebot Release
+# Lifebot
 
 This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands including:
 
@@ -11,10 +11,12 @@ This release of the `lifebot` command line management system for `LifeBots` adds
 - `give_money` : pay another avatar L$ from your bot
 - `give_money_object` : pay an object L$ from your bot
 - `im` : send an instant message to an avatar
+- `key2name` : convert an avatar name to avatar UUID
 - `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
 - `listinventory` : list bot inventory, optionally specify an inventory folder UUID
 - `login` : login bot
 - `logout` : logout bot
+- `name2key` : convert an avatar UUID to avatar name
 - `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
 - `send_group_im` : send an instant message to a group
 - `send_notice` : send an official group notice to all group members

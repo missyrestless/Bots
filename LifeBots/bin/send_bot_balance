@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+#
+# send_bot_balance - get the bot's balance and send it to myself
+#
+# Usage: send_bot_balance [-A] [-n bot_name] [-N recipient_name] [-u uuid]
+
+# Set this to your Second Life avatar name
+SL_NAME="Missy Restless"
+# Set this to your bot's name
+BOT_NAME="Easy Islay"
+# Set this to all your bots names or their aliases, for use with -A
+ALL_BOTS="Angel Anya Easy"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: send_bot_balance [-A] [-d] [-n bot_name] [-N recipient_name]\n\n"
+  exit 1
+}
+
+send_balance() {
+  # Get the bot's balance
+  [ "${debug}" ] && {
+    echo "Getting bot balance with:"
+    echo "lifebot -a balance -n \"${BOT_NAME}\" | jq -r '.balance'"
+  }
+  BALANCE=$(lifebot -a balance -n "${BOT_NAME}" | jq -r '.balance')
+  [ "${BALANCE}" ] || {
+    echo "ERROR: cannot get bot ${BOT_NAME} balance"
+    exit 1
+  }
+
+  # Send balance if it is greater than 0
+  [ ${BALANCE} -gt 0 ] && {
+    [ "${debug}" ] && {
+      echo "Sending bot balance to ${SL_NAME} with:"
+      echo "lifebot -a give_money -n \"${BOT_NAME}\" -u \"${SL_UUID}\" -z ${BALANCE} ${debug}"
+    }
+    lifebot -a give_money -n "${BOT_NAME}" -u "${SL_UUID}" -z ${BALANCE} ${debug}
+  }
+}
+
+allbots=
+debug=
+while getopts ":Adn:N:h" flag; do
+  case $flag in
+    A)
+      allbots=1
+      ;;
+    d)
+      debug="-d"
+      ;;
+    n)
+      BOT_NAME="$OPTARG"
+      ;;
+    N)
+      SL_NAME="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+SL_UUID=$(lifebot -a name2key -n "${BOT_NAME}" -N "${SL_NAME}" | jq -r '.key') 
+[ "${SL_UUID}" ] || {
+  echo "ERROR: cannot get UUID for Second Life avatar name ${SL_NAME}"
+  exit 1
+}
+
+if [ "${allbots}" ]; then
+  for bot in ${ALL_BOTS}
+  do
+    BOT_NAME="${bot}"
+    [ "${BOT_NAME}" ] || {
+      echo "ERROR: empty bot name"
+      exit 1
+    }
+    send_balance
+  done
+else
+  [ "${BOT_NAME}" ] || {
+    echo "ERROR: empty bot name"
+    exit 1
+  }
+  send_balance
+fi
