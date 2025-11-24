@@ -5,11 +5,11 @@
 # Usage: bot2dj [-n name] [-l location] [-u uuid]
 
 # Default DJ bot
-BOT="Easy"
+DEF_BOT="Easy"
 # Default location
-LOC="club"
+DEF_LOC="club"
 # Default sit uuid
-UUID="clubdj"
+DEF_UUID="clubdj"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {
@@ -29,10 +29,15 @@ have_jq=$(type -p jq)
 }
 
 usage() {
-  printf "\nUsage: bot2dj [-n name] [-l location] [-u uuid]\n\n"
+  printf "\nUsage: bot2dj [-n name] [-l location] [-u uuid]"
+  printf "\nWhere:"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]"
+  printf "\n\t-l location specifies the location to teleport [default: ${DEF_LOC}]"
+  printf "\n\t-u uuid specifies the UUID of object to sit on [default: ${DEF_UUID}]\n\n"
   exit 1
 }
 
+BOT= LOC= UUID=
 while getopts ":n:l:u:h" flag; do
   case $flag in
     n)
@@ -54,6 +59,10 @@ while getopts ":n:l:u:h" flag; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+[ "${LOC}" ] || LOC="${DEF_LOC}"
+[ "${UUID}" ] || UUID="${DEF_UUID}"
 
 # Check if Bot is online and if not, login
 lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {

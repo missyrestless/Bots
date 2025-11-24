@@ -5,14 +5,14 @@
 # Bot, location, and uuid can be specified on the command line
 #
 # Set to the name of bot to check, full name or bot name alias
-BOT="Easy"
+DEF_BOT="Easy"
 # Set to the location the bot should be, slurl or slurl alias
-LOC="club"
+DEF_LOC="club"
 # Set to object UUID bot should sit on, UUID or UUID alias
 # Set to empty if no sit action is required
-UUID=
+DEF_UUID=
 # Set to the region your bot needs to be located
-REGION="Scylla"
+DEF_REGION="Scylla"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {
@@ -38,14 +38,15 @@ usage() {
   printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}checkbot [-f] [-l location] [-n name] [-r region] [-u uuid] [-h]${NORM}"
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-f${NORM} indicates force teleport, skip region check"
-  printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
-  printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
-  printf "\n\t${BOLD}${LINE}-r region${NORM} specifies the region to check"
-  printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with the sit action"
+  printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location to teleport [default: ${DEF_LOC}]"
+  printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name [default: ${DEF_BOT}]"
+  printf "\n\t${BOLD}${LINE}-r region${NORM} specifies the region to check [default: ${DEF_REGION}]"
+  printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with sit [default: ${DEF_UUID}]"
   printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits\n"
   exit 1
 }
 
+BOT= LOC= UUID= REGION=
 force=
 while getopts ":fl:n:r:u:h" flag; do
   case $flag in
@@ -74,6 +75,11 @@ while getopts ":fl:n:r:u:h" flag; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+[ "${LOC}" ] || LOC="${DEF_LOC}"
+[ "${REGION}" ] || REGION="${DEF_REGION}"
+[ "${UUID}" ] || UUID="${DEF_UUID}"
 
 # If bot is Easy and location is club then sit on dancepole
 echo "${BOT}" | grep Easy >/dev/null && {

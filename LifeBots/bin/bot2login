@@ -5,17 +5,17 @@
 # Usage: bot2login [-n name] [-l location] [-u uuid]
 
 # Default bot
-BOT="Easy"
+DEF_BOT="Easy"
 # Default location
-LOC="club"
+DEF_LOC="club"
 # Default sit uuid
-UUID="dancepole"
+DEF_UUID="dancepole"
 # Default action
-ACTION="sit"
+DEF_ACTION="sit"
 # All bots
 ALL_BOTS="Angel Anya Easy"
-# Club sit targets for all bots
-UUID_Easy="${UUID}"
+# Sit targets for all bots
+UUID_Easy="${DEF_UUID}"
 UUID_Anya="lcouch"
 UUID_Angel="rpole"
 
@@ -38,8 +38,17 @@ have_jq=$(type -p jq)
 
 usage() {
   printf "\nUsage: bot2login [-A] [-a action] [-n name] [-l location] [-u uuid]\n\n"
+  printf "\nWhere:"
+  printf "\n\t-A indicates login all bots"
+  printf "\n\t\tAll Bots = ${ALL_BOTS}"
+  printf "\n\t-a action specifies the action to take after logging in [default: ${DEF_ACTION}]"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]"
+  printf "\n\t-l location specifies the location to teleport [default: ${DEF_LOC}]"
+  printf "\n\t-u uuid specifies the UUID of object to sit on [default: ${DEF_UUID}]\n\n"
   exit 1
 }
+
+ACTION= BOT= LOC= UUID=
 
 allbots=
 while getopts ":Aa:n:l:u:h" flag; do
@@ -69,6 +78,11 @@ while getopts ":Aa:n:l:u:h" flag; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+[ "${ACTION}" ] || ACTION="${DEF_ACTION}"
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+[ "${LOC}" ] || LOC="${DEF_LOC}"
+[ "${UUID}" ] || UUID="${DEF_UUID}"
 
 if [ "${allbots}" ]; then
   for BOT in ${ALL_BOTS}
