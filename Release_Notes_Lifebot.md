@@ -1,6 +1,6 @@
 # Lifebot
 
-This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands, provides examples for each command, fixes several bugs, and simplifies installation and updates.
+This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands, provides examples for each command, adds a `lifebot` man page, fixes several bugs, and simplifies installation and updates.
 
 The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [Install lifebot](#install-lifebot) section below for installation instructions. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
 

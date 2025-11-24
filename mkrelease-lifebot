@@ -56,7 +56,10 @@ tar cf - install-lifebot \
          LifeBots/crontab.in \
          LifeBots/LICENSE \
          LifeBots/lifebot \
+         LifeBots/man \
+         LifeBots/markdown \
          LifeBots/usage.txt \
+         LifeBots/viewman \
          LifeBots/VERSION | gzip -9 > lifebot-${VERSION}.tar.gz
 
 gh release create v${VERSION} ${DRAFT} \
