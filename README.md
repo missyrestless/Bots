@@ -163,6 +163,60 @@ details on scheduling bot actions.
 
 The `lifebot` command supports a significant subset of the full `LifeBots` API.
 
+#### Basic Commands
+
+- `bot_location` : get precise bot location
+- `key2name` : convert an avatar name to avatar UUID
+- `login` : login bot
+- `logout` : logout bot
+- `name2key` : convert an avatar UUID to avatar name
+- `status` : get bot status
+
+#### Movement Commands
+
+- `sit` : sit on a specified object UUID
+- `stand` : make bot stand up
+- `teleport` : teleport bot to specified location
+- `walkto` : walk bot to a location
+
+#### Communication
+
+- `im` : send an instant message to an avatar
+- `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
+- `say_chat_channel` : send a message to the specified chat channel
+- `send_group_im` : send an instant message to a group
+- `send_notice` : send an official group notice to all group members
+
+#### Inventory Management
+
+- `get_outfit` : list currently worn bot outfit
+- `get_outfits` : list available bot outfits
+- `listinventory` : list bot inventory, optionally specify an inventory folder UUID
+- `set_hoverheight` : adjust bot hover height
+- `takeoff` : remove a worn item
+- `wear` : wear an inventory item (uses "add" rather than "wear")
+- `wear_outfit` : wear a specified outfit
+
+#### Group Management
+
+- `activate_group` : activate a group tag
+
+#### Money &amp; Transactions
+
+- `get_balance` : get your bot's L$ balance
+- `give_money` : pay another avatar L$ from your bot
+- `give_money_object` : pay an object L$ from your bot
+
+#### Object Interaction
+
+- `attachments` : list bot attachments, optionally specify a filter to match
+- `touch_attachment` : touch a specified bot attachment
+- `touch_prim` : touch a specified object by UUID
+
+#### Lifebot Configuration
+
+- `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
+
 **[NOTE:]** the examples below all assume you have configured `$HOME/.lifebots`
 with your `LifeBots` API key and the bot secret:
 
@@ -238,6 +292,9 @@ are supported by the `lifebot` command.
 - `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
   - `Example` : click couch menu button "Male" on channel 99999
   - `lifebot -a reply -n "John Doebot" -C 99999 -B Male -u "a811d6fe-de59-2f4e-ee19-0cc48da48981"`
+- `say_chat_channel` : send a message to the specified chat channel
+  - `Example` : send a message on channel 0, visible to everyone nearby
+  - `lifebot -a say -n "John Doebot" -C 0 -M "Hi everyone, you look great"`
 - `send_group_im` : send an instant message to a group
   - `Example` : send IM to a group from bot named `John Doebot`
   - `lifebot -a send_group_im -n "John Doebot" -u "f7d3c1b9-a141-9546-7e2d-dfd698c5df7c" -M "Meeting at Noon SLT tomorrow"`
@@ -250,6 +307,9 @@ are supported by the `lifebot` command.
 - `sit` : sit on a specified object UUID
   - `Example` : sit bot named `John Doebot` on an object
   - `lifebot -a sit -n "John Doebot" -u "d46e217b-fb5c-4796-bae3-ea016b280210"`
+- `stand` :  make bot stand up
+  - `Example` : make bot `John Doebot` stand up
+  - `lifebot -a stand -n "John Doebot"`
 - `status` : get bot status
   - `Example` : get status of bot `John Doebot` (status is default action)
   - `lifebot -n "John Doebot"`
@@ -360,9 +420,9 @@ Examples:
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, teleport, listalias, key2name,
+#   login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,
 #   name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
-#   touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
+#   touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
 #   get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 #
 # TODO: get bot details not working yet, need to generate an access token
@@ -418,9 +478,9 @@ usage() {
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\tSupported actions:"
-  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, key2name,"
+  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, stand, teleport, listalias, key2name,"
   printf "\n\t  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
-  printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,"
+  printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
   printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
@@ -518,6 +578,9 @@ examples() {
   printf "\nreply_dialog : reply to a dialog menu (requires channel, UUID, and button text)"
   printf "\n\tExample : click couch menu button \"Male\" on channel 99999"
   printf "\n\tlifebot -a reply -n \"John Doebot\" -C 99999 -B Male -u \"a811d6fe-de59-2f4e-ee19-0cc48da48981\""
+  printf "\nsay_chat_channel : send a message to the specified chat channel"
+  printf "\n\tExample : send a message on channel 0, visible to everyone nearby"
+  printf "\n\tlifebot -a say -n \"John Doebot\" -C 0 -M \"Hi everyone, you look great\""
   printf "\nsend_group_im : send an instant message to a group"
   printf "\n\tExample : send IM to a group from bot named John Doebot"
   printf "\n\tlifebot -a send_group_im -n \"John Doebot\" -u \"f7d3c1b9-a141-9546-7e2d-dfd698c5df7c\" -M \"Meeting at Noon SLT tomorrow\""
@@ -530,6 +593,9 @@ examples() {
   printf "\nsit : sit on a specified object UUID"
   printf "\n\tExample : sit bot named John Doebot on an object"
   printf "\n\tlifebot -a sit -n \"John Doebot\" -u \"d46e217b-fb5c-4796-bae3-ea016b280210\""
+  printf "\nstand : make a bot stand up"
+  printf "\n\tExample : make bot John Doebot stand up"
+  printf "\n\tlifebot -a stand -n \"John Doebot\""
   printf "\nstatus : get bot status"
   printf "\n\tExample : get status of bot John Doebot (status is default action)"
   printf "\n\tlifebot -n \"John Doebot\""
@@ -1515,7 +1581,7 @@ case "${ACTION}" in
       fi
     fi
     ;;
-  *attach*)
+  attach*|list*attach*)
     if [ "${have_jq}" ]; then
       send_request "attachments" | jq -r .
     else
@@ -1525,9 +1591,9 @@ case "${ACTION}" in
   *)
     echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias, key2name,"
+    echo "  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,"
     echo "  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
-    echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,"
+    echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
     echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
     ;;
 esac
