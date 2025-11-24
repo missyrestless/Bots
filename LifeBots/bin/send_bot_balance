@@ -5,9 +5,9 @@
 # Usage: send_bot_balance [-A] [-n bot_name] [-N recipient_name] [-u uuid]
 
 # Set this to your Second Life avatar name
-SL_NAME="Missy Restless"
+DEF_SL_NAME="Missy Restless"
 # Set this to your bot's name
-BOT_NAME="Easy Islay"
+DEF_BOT_NAME="Easy Islay"
 # Set this to all your bots names or their aliases, for use with -A
 ALL_BOTS="Angel Anya Easy"
 
@@ -30,6 +30,11 @@ have_jq=$(type -p jq)
 
 usage() {
   printf "\nUsage: send_bot_balance [-A] [-d] [-n bot_name] [-N recipient_name]\n\n"
+  printf "\nWhere:"
+  printf "\n\t-A indicates all bots [All Bots: ${ALL_BOTS}]"
+  printf "\n\t-d indicates debug mode, no payment [default: false]"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT_NAME}]"
+  printf "\n\t-N recipient_name specifies the payment recipient [default: ${DEF_SL_NAME}]\n\n"
   exit 1
 }
 
@@ -55,6 +60,7 @@ send_balance() {
   }
 }
 
+BOT_NAME= SL_NAME=
 allbots=
 debug=
 while getopts ":Adn:N:h" flag; do
@@ -81,6 +87,9 @@ while getopts ":Adn:N:h" flag; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+[ "${BOT_NAME}" ] || BOT_NAME="${DEF_BOT_NAME}"
+[ "${SL_NAME}" ] || SL_NAME="${DEF_SL_NAME}"
 
 SL_UUID=$(lifebot -a name2key -n "${BOT_NAME}" -N "${SL_NAME}" | jq -r '.key') 
 [ "${SL_UUID}" ] || {

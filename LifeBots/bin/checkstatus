@@ -5,7 +5,7 @@
 # Usage: checkstatus [-n name]
 
 # Default bot
-BOT="Easy"
+DEF_BOT="Easy"
 # All bots
 ALL_BOTS="Angel Anya Easy"
 
@@ -28,9 +28,13 @@ have_jq=$(type -p jq)
 
 usage() {
   printf "\nUsage: checkstatus [-A] [-n name]\n\n"
+  printf "\nWhere:"
+  printf "\n\t-A indicates check status of all bots [All Bots: ${ALL_BOTS}]"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]\n\n"
   exit 1
 }
 
+BOT=
 allbots=
 while getopts ":An:h" flag; do
   case $flag in
@@ -50,6 +54,8 @@ while getopts ":An:h" flag; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
 
 if [ "${allbots}" ]; then
   for bot in ${ALL_BOTS}
