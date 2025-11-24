@@ -1,37 +1,66 @@
 # Lifebot
 
-This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands including:
+This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands, provides examples for each command, fixes several bugs, and simplifies installation and updates.
 
-- `activate_group` : activate a group tag
-- `attachments` : list bot attachments, optionally specify a filter to match
+The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [Install lifebot](#install-lifebot) section below for installation instructions. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
+
+## Supported Commands
+
+Support for additional `LifeBots` API requests and commands is being extended rapidly. This listing of supported commands is complete with respect to this release but may quickly be out of date. Currently the supported commands and their categories are as follows:
+
+### Basic Commands
+
 - `bot_location` : get precise bot location
-- `get_balance` : get your bot's L$ balance
-- `get_outfit` : list currently worn bot outfit
-- `get_outfits` : list available bot outfits
-- `give_money` : pay another avatar L$ from your bot
-- `give_money_object` : pay an object L$ from your bot
-- `im` : send an instant message to an avatar
 - `key2name` : convert an avatar name to avatar UUID
-- `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
-- `listinventory` : list bot inventory, optionally specify an inventory folder UUID
 - `login` : login bot
 - `logout` : logout bot
 - `name2key` : convert an avatar UUID to avatar name
+- `status` : get bot status
+
+### Movement Commands
+
+- `sit` : sit on a specified object UUID
+- `stand` : make bot stand up
+- `teleport` : teleport bot to specified location
+- `walkto` : walk bot to a location
+
+### Communication
+
+- `im` : send an instant message to an avatar
 - `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
+- `say_chat_channel` : send a message to the specified chat channel
 - `send_group_im` : send an instant message to a group
 - `send_notice` : send an official group notice to all group members
+
+### Inventory Management
+
+- `get_outfit` : list currently worn bot outfit
+- `get_outfits` : list available bot outfits
+- `listinventory` : list bot inventory, optionally specify an inventory folder UUID
 - `set_hoverheight` : adjust bot hover height
-- `sit` : sit on a specified object UUID
-- `status` : get bot status
 - `takeoff` : remove a worn item
-- `teleport` : teleport bot to specified location
-- `touch_attachment` : touch a specified bot attachment
-- `touch_prim` : touch a specified object by UUID
-- `walkto` : walk bot to a location
 - `wear` : wear an inventory item (uses "add" rather than "wear")
 - `wear_outfit` : wear a specified outfit
 
-The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
+### Group Management
+
+- `activate_group` : activate a group tag
+
+### Money &amp; Transactions
+
+- `get_balance` : get your bot's L$ balance
+- `give_money` : pay another avatar L$ from your bot
+- `give_money_object` : pay an object L$ from your bot
+
+### Object Interaction
+
+- `attachments` : list bot attachments, optionally specify a filter to match
+- `touch_attachment` : touch a specified bot attachment
+- `touch_prim` : touch a specified object by UUID
+
+### Lifebot Configuration
+
+- `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
 
 ## Install lifebot
 
