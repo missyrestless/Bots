@@ -21,6 +21,7 @@ the official product of either. The official `LifeBots` site can be found at
   - [Usage and Source of lifebot command](#usage-and-source-of-lifebot-command)
   - [Scheduling Bot Actions](#scheduling-bot-actions)
   - [Using the JSON return as Input](#using-the-json-return-as-input)
+  - [Lifebot Help](#lifebot-help)
 - [Corrade](#corrade)
 - [Corrade HUD](#corrade-hud)
 
@@ -1731,6 +1732,21 @@ every month could be setup to run as a `cron` job with the following `crontab` e
 # Send the Easy Islay bot's L$ balance to myself on the 1st of every month
 0 0 1 * * /bin/bash -lc /usr/local/LifeBots/send_easy_balance >> /usr/local/LifeBots/log/easy.log 2>&1
 ```
+### Lifebot Help
+
+In addition to this README, help is available for the `lifebot` command via the commands:
+
+```bash
+lifebot -h
+```
+
+or
+
+```bash
+man lifebot
+```
+
+Issues can be reported at https://github.com/missyrestless/Bots/issues
 
 ## Corrade
 
