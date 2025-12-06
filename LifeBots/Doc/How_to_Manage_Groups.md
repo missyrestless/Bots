@@ -47,18 +47,9 @@ Select or Deselect which group services are enabled (**Group Greeter/Inviter** c
 
 ### API Details
 
-Click **API Details** and set your Group API Access Code
-
-- This access code allows external applications to interact with your group through the LifeBots API.
-  - Use this code to authenticate API requests for this group
-  - Keep this code secure and don't share it publicly
-  - You can change this code at any time
-  - Code must be between 6-32 characters
-- You can enter the code you wish to use or click the **Generate Random Code** button (recommended)
-- Click **Copy Code** to copy the code to your clipboard.
-- Store the code securely and do not share it with anyone
-- Click the **Save Access Code** button
-- To view the Groups API documentation visit [https://lifebots.cloud/developer](https://lifebots.cloud/developer) and click on Groups
+If you do not have a LifeBots Full Bot Plan with Personal Bot Groups
+then you can manage your groups using the **Group API**. See the
+**Related Articles** below for an article on **How to Manage Group API**.
 
 ### Group Notices
 
@@ -92,53 +83,10 @@ or click the send icon to the right of the message bar.
 
 ### Group Inviter
 
-**Group Inviter** is in development.
+**Group Inviter** is currently in development.
 
 ### Discord Integration
 
-**Note:** In order to connect this service with Discord you must have
-a Discord account and you must create a Discord Server if you do not
-already have one. To create a server in Discord click the **Add a Server**
-plus icon in the left side panel and follow the instructions.
-
-#### Setup Discord Integration
-
-Click **Manage Groups** then click on the group you wish to manage.
-
-Connect the **Discord Integration** with Discord by clicking the **Setup**
-button at the bottom of the Discord Integration tile and clicking the
-**Set Up Discord** button.
-
-Select a Discord account to connect or click the **Connect Discord Account**
-button if no Discord accounts are connected yet.
-
-Clicking the **Connect Discord Account** button will bring up the LB-Sync
-Discord App in your browser. Make sure you are signed into Discord as the
-user you wish to use for this service by checking the "Signed in as" in the
-LB-Sync window.
-
-Select a Discord Server from the dropdown and Click **Continue**
-
-Click **Authorize** to grant administrative privileges to LB-Sync.
-
-Your Discord account is now connected. You can optionally add more Discord accounts.
-
-Click **Set Up Discord** again.
-
-Select which Discord account to use for this integration and click **Continue**.
-
-Select which Discord Server you want to connect to this group and click **Continue**.
-
-Select a Chat Channel and click **Save Configuration**.
-
-Repeat this Discord Integration Setup process for each group you wish to
-integrate with Discord.
-
-#### Manage Discord Integration
-
-Once Discord Integration Setup is completed you can manage this service by
-clicking on **Manage Groups** then click on the group you wish to manage
-then click the **Discord Integration** tile for that group.
-
-Here you can manage connected Discord channels, change the Discord connected accout,
-change the connected Discord server, and reconfigure the LB-Sync integration.
+If you have a **Discord** account you can connect and sync your groups
+with Discord Channels. See the **Related Articles** below for an article
+on **How to Manage Discord Integration**.
