@@ -1,0 +1,56 @@
+Note: This guide describes usage of the Truth & Beauty Lab line of Pandorabots. This extends to a variety of products including the Answer Board, Smart Jewelry, and other items from the Truth & Beauty Lab. Throughout this document your item will simply be referred to as “Pandorabot”.
+
+INTRODUCTION
+============
+Greetings and congratulations on your use of a Truth & Beauty Lab Pandorabot. This document will detail the command set and interactive use of the Pandorabot. If you are an owner of a Truth & Beauty Lab Pandorabot and want to learn how to configure or customize your Pandorabot, see the Pandorabot Owner Manual included with the product or available in PDF format at http://www.scribd.com/doc/45108454/Pandorabots-Owner-Manual
+
+FEATURES
+========
+Truth & Beauty Lab Pandorabots contain the following features:
+  - Artificially Intelligent chat
+  - Email – you can use your Pandorabot to send email
+  - Notecard and Landmark dispenser
+  - Highly configurable including ability to restrict responses based on name
+  - Dialog menu configuration makes it easy to configure
+  - Configurable as public (local chat) or private channel only – low lag
+
+HOW TO CHAT WITH A PANDORABOT
+=============================
+Pandorabots listen to Local Chat. To chat with a Pandorabot, simply type something in Local Chat. Pandorabots can be configured to respond either to all local chat or only to local chat which includes either the first or last name of the Pandorabot. In this case, preface your local chat with the Pandorabot's first or last name. For example, “pandorabot, what is the meaning of life” would prompt a response from a Pandorabot named “Ana Pandorabot”.
+
+HOW TO SEND EMAIL WITH A PANDORABOT
+===================================
+Pandorabots can be configured to support the sending of email by any resident to any valid email address. To do so, use one of the following email triggers:
+
+    "i want to email "
+    "i would like to email "
+    "i want to send an email to "
+    "i would like to send an email to "
+    "email "
+    "send an email to "
+
+Follow one of the above phrases with a valid email address. For instance,
+
+    “email missyrestless@gmail.com”
+
+would prompt the Pandorabot to ask you for a subject and message body then send an email to Missy Restless. Note that the email “From” address is the Pandorabot's UUID so if you wish to include your own email address for a reply, do so in the body of your message. Note also that this feature, like most Pandorabot features, can be enabled or disabled by the Pandorabot owner. If you wish to cancel your email in the middle of your email entry with the Pandorabot, type the line “cancel email”. It is not necessary to use the Pandorabot name to send email even when the Pandorabot is configured to respond only by name.
+
+HOW TO RECEIVE A NOTECARD, LANDMARK, OR THIS GUIDE
+==================================================
+Pandorabots can be configured to present a dialog menu to the user when they hear the message “menu” in chat. If this is the case, the notecards, landmarks, manuals, and guides can be accessed via the dialog menu. Note that the  Pandorabot owner can choose to restrict access to the menu system to owner or group only.
+
+HOW TO TURN A PANDORABOT OFF/ON
+===============================
+The owner of a Pandorabot can choose to configure the item to listen for verbal shutoff commands from the owner, an authorized group, or any resident. In this mode the Pandorabot will turn itself off when hearing any of the following phrases:
+    "shut up", "shut up.", "shut up!", "be quiet.", or "be quiet".
+Touch (left mouse click) a disabled Pandorabot to turn it back on. The dialog menu can also be used to turn Pandorabots off and on.
+
+FURTHER INFORMATION
+===================
+This document, The Truth & Beauty Lab Smart Dance Pole Manual, Truth & Beauty Lab Smart Tip Jar Manual, Pandorabot METAbolt Add-On Manual, Pandorabot METAbolt Diagram, Pandorabots Owner Manual, and Pandorabots User Guide are available in PDF format at http://www.scribd.com/missyrestless
+
+Visit the Pandorabot blog at http://pandorabot.blogspot.com where you can find many How-To tutorials on Pandorabot use, configuration, and deployment at http://pandorabot.blogspot.com/p/how-to.html
+
+Have fun and email missyrestless@gmail.com with any questions, comments, suggestions, requests for custom configurations or AIML programming.
+
+View other Truth & Beauty Lab creations in the Second Life Marketplace at https://marketplace.secondlife.com/stores/44210

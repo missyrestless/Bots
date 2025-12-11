@@ -14,8 +14,7 @@
 // Modified 19-Jan-2012 by Missy Restless - Option to set primary follow target
 // Modified 20-Jan-2012 by Missy Restless - Check if object is > 32 prims
 // Modified 01-Feb-2012 by Missy Restless - Support for firing but not following
-// Modified 07-Feb-2012 by Missy Restless - Support for texture changes and
-//     particle displays
+// Modified 07-Feb-2012 by Missy Restless - Support for texture changes / particle displays
 // Modified 14-Feb-2012 by Missy Restless - Adapted for use in Smart Ring series
 // Modified 15-Feb-2012 by Missy Restless - Added lightning and thunder
 // Modified 21-Feb-2012 by Missy Restless - Added Bling and Sparkle
@@ -24,7 +23,7 @@
 //     commands More, Less, Slower, Faster, Next, Prev, Default
 // Modified 06-Mar-2012 by Missy Restless - Added scan by name
 // Modified 11-Mar-2012 by Missy Restless - Integrated with standard Pandorabot
-// Modified 10-Dec-2025 by Missy Restless - Integrated with LifeBots Command & Control
+// Modified 10-Dec-2025 by Missy Restless - Integrated with LifeBots Control Panel
 //
 
 list nearby_keys = [];

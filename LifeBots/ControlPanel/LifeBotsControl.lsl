@@ -1,9 +1,9 @@
-///////////// LifeBots Control Board ///////////////
+///////////// LifeBots Control Panel ///////////////
 //                                                //
 // This script acts as a bridge between LifeBots  //
 // command and control scripts and LifeBots bots  //
 //                                                //
-// On touch the LifeBots Control Board presents a //
+// On touch the LifeBots Control Panel presents a //
 // dialog menu with command and control choices   //
 // depending on what user scripts are present     //
 //                                                //
@@ -117,30 +117,24 @@ integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
 // LifeBots Command & Control Bridge
 //////////////////////////////////////////////////
 
-string apiKey = "your-lifebots-developer-api-key";
+string API_URL = "https://api.lifebots.cloud/api/bot.html";
+string API_KEY = "your-lifebots-developer-api-key";
+string BOT_NAME = "";
+string BOT_SECRET = "";
 
-string DEF_FIRST = "Ana";
-string DEF_LAST = "LifeBot";
-string FIRST_NAME = DEF_FIRST;
-string LAST_NAME = DEF_LAST;
-string LANG_NAME = "English";
 string _BOTNAME = "";
+string DEVICE_NAME = "";
+
 key Owner = NULL_KEY;
 
 list particle_names = [ ];
 list nearby_names = [ ];
-list LANG_NAMES = [ "English", "Deutsch", "Français", "Polski", "Italiano", "Nihongo", "Español", "Nederlands", "Português", "Russkiy" ];
 list COMMAND_NAMES = [];
 
 integer SHOW_BOT_MENU = TRUE;
 integer OWNER_BOT_MENU = FALSE;
-integer WIKIPEDIA_ENABLED = FALSE;
 integer AI_ENABLED = TRUE;
-integer ALPHA_ENABLED = FALSE;
 integer INVISIBLE = FALSE; // Enable making the bot invisible
-integer NAME_ENABLED = TRUE; // Only respond if my name is in the chat message
-integer GREET_ENABLED = FALSE; // Does the bot greet new arrivals ?
-integer FOLLOW_ENABLED = FALSE; // Does the bot follow the owner/others ?
 integer PART_ENABLED = FALSE; // Does the bot emit particles etc ?
 integer EMAIL_ENABLED = TRUE; // Send emails
 integer VERBAL_SHUTOFF_ENABLED = TRUE;
@@ -148,11 +142,7 @@ integer RESTRICTED_ACCESS = 1;
 integer chat_channel = 0;
 integer dialog_handle = 0;
 integer handle = 1;
-integer at_home = 0;
-integer others = 0;
-integer select_follower = 1;
 integer enabled = 1;
-integer ignore_touch = 0;
 integer duo = 0;
 float range = 20.0;
 vector offset = ZERO_VECTOR;
@@ -162,8 +152,6 @@ string _DEFAULT = "default";
 string _RESET = "Reset";
 string _UPGRADE = "Upgrade";
 string _EXIT = "<<< Exit >>>";
-string _OTHERS = "Follow Others";
-string _FOLLOWME = "Follow Me";
 string _GOHOME = "Go Home";
 string _HOME = "Set Home";
 string _FIRE = "Fire Laser";
@@ -176,15 +164,12 @@ string _OFF = "OFF";
 string _ON = "ON";
 string _GUIDE = "LifeBots User Guide";
 string OWNER_MANUAL = "LifeBots Owner Manual";
-string ADDON_MANUAL = "LifeBot Actorbot Add-On Manual";
+string ADDON_MANUAL = "LifeBots Add-On Manual";
 string _OMAN = "Owner Doc";
 string _AMAN = "Addon Doc";
 string _UMAN = "User Guide";
 string _LM = "Landmark";
 string _INFO = "Info";
-string _DLOAD = ", download a PDF version of the Truth & Beauty Lab LifeBots Owner Manual at http://www.scribd.com/doc/45108454/LifeBots-Owner-Manual\nRead the Second Life LifeBots blog at http://pandorabot.blogspot.com\nVisit the Truth & Beauty Lab Marketplace at https://marketplace.secondlife.com/stores/44210 .";
-string _MYNAME = "My name is ";
-string _READY = "LifeBot ready to chat!";
 string _VERBAL = "Verbal ";
 string _ABLE = "You can enable/disable";
 string _EDIT = "here\nor edit the Configuration notecard to change\nthe default setting.";
@@ -212,15 +197,11 @@ list _NavigationRoot = [_PREVIOUS, _SPACE, _NEXT, _EXIT];
 list _Navigation = [_BACK, _PREVIOUS, _NEXT, _EXIT];
 
 string _MAIN = "Main";
-string _GREET = "Greeter";
-string _FOLLOW = "Follow";
 string _SPARKLE = "Scan_n_Sparkle";
 string _POSITION = "Position";
 string _ADJUST = "Adjust";
 string _DOC = "Help";
-string _NAME = "Name";
 string _EMAIL = "Email";
-string _LANG = "Language";
 string _CHAT = "AI Chat";
 string _SHUTOFF = "Access";
 string _VISIBLE = "Visibility";
@@ -243,7 +224,6 @@ string _ACTIVE = "Active";
 string _PASSIVE = "Passive";
 string _SCRIPTED = "Scripted";
 string _TARGET = "LaserTarget";
-string _FARGET = "Follow Av";
 string _SARGET = "Scan Results";
 string _RAIN = "Rain";
 string _SNOW = "Snow";
@@ -283,7 +263,7 @@ list SLOW_FAST = [ _SPACE, _EXIT, _SLOWEST, _SLOWER, _SLOW, _FAST, _FASTER, _FAS
 list ON_OFF = [ _SPACE, _EXIT, _ON, _SPACE, _OFF ];
 
 // List of the menus in the system
-list _NavigationMenus = [ _MAIN, _EMAIL, _NAME, _ADJUST, _POSITION, _RANGE, _SCAN, _FOLLOW, _UPGRADE, _GREET, _CHAT, _SHUTOFF, _VISIBLE, _LANG, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
+list _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _CHAT, _SHUTOFF, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
 
 list _NavigationStack;        // Manages the menus calling submenus
 
@@ -412,18 +392,13 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             DialogOptions = DialogOptions + [ _INNER ];
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             DialogOptions = DialogOptions + [ _COMMANDS, _PARTICLES ];
-        if (llGetInventoryType(_GREET) == INVENTORY_SCRIPT)
-            DialogOptions = DialogOptions + [ _GREET ];
-        if (llGetInventoryType(_FOLLOW) == INVENTORY_SCRIPT)
-            DialogOptions = DialogOptions + [ _FOLLOW, _SCAN, _TARGET ];
-        else
-            if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
-                DialogOptions = DialogOptions + [ _SCAN, _TARGET ];
+        if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
+            DialogOptions = DialogOptions + [ _SCAN, _TARGET ];
         if ((SHOW_BOT_MENU) && (_BOTNAME != "")) {
             if ((aID == Owner) || 
                 ((RESTRICTED_ACCESS == 2) && llSameGroup(aID))) {
               if (pandora)
-                  DialogOptions = DialogOptions + [ _NAME, _CHAT, _EMAIL, _SHUTOFF, _VISIBLE, _LANG, _DOC, _UPGRADE, _RESET ];
+                  DialogOptions = DialogOptions + [ _CHAT, _EMAIL, _SHUTOFF, _VISIBLE, _DOC, _UPGRADE, _RESET ];
               else
                   DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
             } else {
@@ -445,7 +420,7 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             }
           } else {
             if (pandora)
-                DialogOptions = DialogOptions + [ _NAME, _CHAT, _EMAIL, _SHUTOFF, _VISIBLE, _LANG, _DOC, _UPGRADE, _RESET ];
+                DialogOptions = DialogOptions + [ _CHAT, _EMAIL, _SHUTOFF, _VISIBLE, _DOC, _UPGRADE, _RESET ];
             else
                 DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
           }
@@ -514,13 +489,6 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
     } else if ( aMenu == _FORCE ) {
         DialogMessage = _IS + " Force:";
         DialogOptions = Z_1;
-    } else if ( aMenu == _NAME ) {
-        DialogMessage = _MYNAME + _CURRENT + FIRST_NAME + _SPACE + LAST_NAME + _SELECT + " first names " + _EDIT + " The 'Name ON/OFF' button\ntoggles whether your LifeBot responds to all\nlocal chat or just chat including his/her name";
-        DialogOptions = [ DEF_FIRST, "Bob", "Polly", "Steven" ];
-        if (NAME_ENABLED)
-            DialogOptions = DialogOptions + [_NAME + _SPACE + _OFF];
-        else
-            DialogOptions = DialogOptions + [_NAME + _SPACE + _ON];
     } else if ( aMenu == _VISIBLE ) {
         DialogMessage = "Visibility Menu: set LifeBot visible/invisible";
         DialogMessage = DialogMessage + "\nLifeBot " + _CURRENT;
@@ -573,53 +541,12 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             DialogOptions = DialogOptions + [_EMAIL + _SPACE + _OFF];
         else
             DialogOptions = DialogOptions + [_EMAIL + _SPACE + _ON];
-    } else if ( aMenu == _FOLLOW ) {
-        DialogMessage = "\nFollow owner or nearest avatar " + _CURRENT;
-        if (FOLLOW_ENABLED)
-          DialogMessage = DialogMessage + _ENBLED;
-        else
-          DialogMessage = DialogMessage + _DSBLED;
-        DialogMessage = DialogMessage + _ABLE + " following " + _EDIT;
-        DialogOptions = [_ADJUST, _POSITION, _HOME, _SCAN, _FARGET, _FIRE, _PHYS, _PHAN];
-        if (at_home)
-            DialogOptions = [ _COME ] + DialogOptions;
-        else
-            DialogOptions = [ _GOHOME ] + DialogOptions;
-        if (others)
-            DialogOptions = [ _FOLLOWME ] + DialogOptions;
-        else
-            DialogOptions = [ _OTHERS ] + DialogOptions;
-        if (FOLLOW_ENABLED)
-            DialogOptions = [_FOLLOW + _SPACE + _OFF] + DialogOptions;
-        else
-            DialogOptions = [_FOLLOW + _SPACE + _ON] + DialogOptions;
     } else if ( aMenu == _RANGE ) {
         DialogMessage = "\nSelect the range of scans (in meters).\nRange " + _CURRENT + (string)range + " meters.";
         DialogOptions = ["2.0", "5.0", "10.0", "20.0", "30.0", "40.0", "50.0", "60.0", "70.0", "80.0", "90.0"];
     } else if ( aMenu == _SCAN ) {
         DialogMessage = "\nScan the area for objects or avatars:";
         DialogOptions = [_RANGE, _AGENT, _ACTIVE, _PASSIVE, _SCRIPTED, _ALL];
-    } else if ( aMenu == _POSITION ) {
-        DialogMessage = "\nPosition Presets for the Follower:";
-        DialogOptions = [_ADJUST, "Behind Left", "Behind", "Behind Right", "Left", "Above", "Right", "Front Left", "Front", "Front Right"];
-    } else if ( aMenu == _ADJUST ) {
-        DialogMessage = "\nAdjust position offset of the Follower.\nOffset ";
-        DialogMessage = DialogMessage + _CURRENT + ":\n<" + (string)offset.x;
-        DialogMessage = DialogMessage + ", " + (string)offset.y;
-        DialogMessage = DialogMessage + ", " + (string)offset.z + ">";
-        DialogOptions = [_SPACE, "X-", "Y-", "Z-", "X+", "Y+", "Z+"];
-    } else if ( aMenu == _GREET ) {
-        DialogMessage = "\nGreeting new arrivals " + _CURRENT;
-        if (GREET_ENABLED)
-          DialogMessage = DialogMessage + _ENBLED;
-        else
-          DialogMessage = DialogMessage + _DSBLED;
-        DialogMessage = DialogMessage + _ABLE + " greetings " + _EDIT;
-        DialogOptions = [];
-        if (GREET_ENABLED)
-            DialogOptions = DialogOptions + [_GREET + _SPACE + _OFF];
-        else
-            DialogOptions = DialogOptions + [_GREET + _SPACE + _ON];
     } else if ( aMenu == _PARTICLES ) {
         DialogMessage = "\nParticle displays and chat commands " + _CURRENT;
         if (PART_ENABLED)
@@ -644,21 +571,6 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             DialogOptions = DialogOptions + ["Chat OFF"];
         else
             DialogOptions = DialogOptions + ["Chat ON"];
-    } else if ( aMenu == _SARGET ) {
-        select_follower = 2;
-        DialogMessage = "Select which of the detected objects or avatars you wish to locate:";
-        DialogOptions = [ "Full Report"] + nearby_names;
-    } else if ( aMenu == _FARGET ) {
-        select_follower = 1;
-        DialogMessage = "Targets - select who will be the primary target:";
-        DialogOptions = nearby_names;
-    } else if ( aMenu == _TARGET ) {
-        select_follower = 0;
-        DialogMessage = "Particle Stream Targets - select who will be the target of the particle stream:";
-        DialogOptions = nearby_names;
-    } else if ( aMenu == _LANG ) {
-        DialogMessage = _LANG + _CURRENT + LANG_NAME + _SELECT + " language codes " + _EDIT;
-        DialogOptions = LANG_NAMES;
     } else if ( aMenu == _COMMANDS ) {
         DialogMessage = _SELECT + _SPACE + _BOTNAME + " command";
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT) {
@@ -698,20 +610,16 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
                  llGiveInventory(aAvatarKey, ADDON_MANUAL);
             if (llGetInventoryType(_GUIDE) == 7)
                  llGiveInventory(aAvatarKey, _GUIDE);
-            llInstantMessage(aAvatarKey, aAvatarName + _DLOAD);
         }
         else if ( aButton == _OMAN ) {
             llGiveInventory(aAvatarKey, OWNER_MANUAL);
-            llInstantMessage(aAvatarKey, aAvatarName + _DLOAD);
         }
         else if ( aButton == _AMAN ) {
             if (llGetInventoryType(ADDON_MANUAL) == 7)
                 llGiveInventory(aAvatarKey, ADDON_MANUAL);
-            llInstantMessage(aAvatarKey, aAvatarName + _DLOAD);
         }
         else if ( aButton == _UMAN ) {
             llGiveInventory(aAvatarKey, _GUIDE);
-            llInstantMessage(aAvatarKey, aAvatarName + _DLOAD);
         }
         else if ( aButton == _LM ) {
             llGiveInventory(aAvatarKey,
@@ -720,21 +628,10 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
         else if ( aButton == _INFO ) {
             llGiveInventory(aAvatarKey,
                             llGetInventoryName(INVENTORY_NOTECARD, 0));
-            llInstantMessage(aAvatarKey, aAvatarName + _DLOAD);
         }
         else if ( aButton == _RESET ) {
             llMessageLinked(LINK_THIS, 53, aButton, aMenu);
             llResetScript();
-            return FALSE;
-        }
-        else if ( (aButton == _TARGET) || (aButton == _FARGET) ) {
-            if (aButton == _TARGET)
-                select_follower = 0;
-            else
-                select_follower = 1;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", AGENT, 20.0, PI); // Look for avatars //
             return FALSE;
         }
         else if ( aButton == _UPGRADE ) {
@@ -838,14 +735,7 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             PART_ENABLED = FALSE;
             if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
                 llSetScriptState(_SPARKLE, FALSE);
-        } else if ( aButton == _TARGET ) {
-            select_follower = 0;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", AGENT, 20.0, PI); // Look for avatars //
-            return FALSE;
-        }
-        else
+        } else {
             if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT) {
                 if ( aButton == _EXIT ) {
                     llMessageLinked(LINK_THIS, 53, aButton, aMenu);
@@ -862,20 +752,11 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             }
             else if (llGetInventoryType(_IS) == INVENTORY_SCRIPT)
                 llMessageLinked(LINK_THIS, 344, aButton, aMenu);
+        }
     } else if ( aMenu == _SARGET ) {
         if (aButton == "Full Report") {
             llMessageLinked(LINK_THIS, 350, aButton, "");
         }
-        else {
-            select_follower = 2;
-            llMessageLinked(LINK_THIS, 502, aButton, (key)"2");
-        }
-    } else if ( aMenu == _FARGET ) {
-        select_follower = 1;
-        llMessageLinked(LINK_THIS, 502, aButton, (key)"1");
-    } else if ( aMenu == _TARGET ) {
-        select_follower = 0;
-        llMessageLinked(LINK_THIS, 502, aButton, (key)"0");
     } else if ( aMenu == _SOUND ) {
         llMessageLinked(LINK_THIS, 345, aButton, aMenu);
     } else if ( aMenu == _RAIN ) {
@@ -886,12 +767,6 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             llMessageLinked(LINK_THIS, 348, aButton, aMenu);
     } else if ( aMenu == _BUBBLES ) {
         llMessageLinked(LINK_THIS, 349, aButton, aMenu);
-    } else if ( aMenu == _NAME ) {
-        if ((aButton == "Ana") || (aButton == "Bob") ||
-            (aButton == "Polly") || (aButton == "Steven")) {
-            FIRST_NAME = aButton;
-        }
-        llMessageLinked(LINK_THIS, 53, aButton, aMenu);
     } else if ( aMenu == _EMAIL ) {
         if ( aButton == _EMAIL + _SPACE + _OFF ) {
             llMessageLinked(LINK_THIS, 53, aButton, aMenu);
@@ -931,93 +806,12 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             llMessageLinked(LINK_THIS, 53, aButton, aMenu);
             RESTRICTED_ACCESS = 0;
         }
-    } else if ( aMenu == _FOLLOW ) {
-        if ( aButton == _FOLLOW + _SPACE + _ON ) {
-            FOLLOW_ENABLED = TRUE;
-            if (llGetInventoryType(_FOLLOW) == INVENTORY_SCRIPT)
-                llSetScriptState(_FOLLOW, TRUE);
-        } else if ( aButton == _FOLLOW + _SPACE + _OFF ) {
-            FOLLOW_ENABLED = FALSE;
-            if (llGetInventoryType(_FOLLOW) == INVENTORY_SCRIPT)
-                llSetScriptState(_FOLLOW, FALSE);
-        } else if ( (aButton == _TARGET) || (aButton == _FARGET) ) {
-            if (aButton == _TARGET)
-                select_follower = 0;
-            else
-                select_follower = 1;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", AGENT, 20.0, PI); // Look for avatars //
-            return FALSE;
-        } else if ( aButton == _FOLLOWME ) {
-            others = 0;
-            llMessageLinked(LINK_THIS, 153, "1", aMenu);
-        } else if ( aButton == _OTHERS ) {
-            others = 1;
-            llMessageLinked(LINK_THIS, 153, "2", aMenu);
-        } else if ( aButton == _HOME ) {
-            llMessageLinked(LINK_THIS, 154, aButton, aMenu);
-        } else if ( aButton == _GOHOME ) {
-            at_home = 1;
-            llMessageLinked(LINK_THIS, 154, aButton, aMenu);
-        } else if ( aButton == _COME ) {
-            at_home = 0;
-            llMessageLinked(LINK_THIS, 154, aButton, aMenu);
-        } else if ( aButton == _PHYS ) {
-            llMessageLinked(LINK_THIS, 154, aButton, aMenu);
-        } else if ( aButton == _PHAN ) {
-            llMessageLinked(LINK_THIS, 154, aButton, aMenu);
-        } else if ( aButton == _FIRE ) {
-            llMessageLinked(LINK_SET, 154, aButton, aMenu);
-        }
-    } else if ( aMenu == _SCAN ) {
-        if (aButton == _AGENT) {
-            select_follower = 2;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", AGENT, range, PI); // Look for Avatars
-            return FALSE;
-        } else if (aButton == _ACTIVE) {
-            select_follower = 2;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", ACTIVE, range, PI); // Look for active objects
-            return FALSE;
-        } else if (aButton == _PASSIVE) {
-            select_follower = 2;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", PASSIVE, range, PI); // Look for passive objects
-            return FALSE;
-        } else if (aButton == _SCRIPTED) {
-            select_follower = 2;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", SCRIPTED, range, PI); // Look for scripted objects
-            return FALSE;
-        } else if (aButton == _ALL) {
-            select_follower = 2;
-            llMessageLinked(LINK_THIS, 350, _ON, aMenu);
-            llSleep(0.1);
-            llSensor("", "", AGENT|ACTIVE|PASSIVE, range, PI);
-            return FALSE;
-        }
     } else if ( aMenu == _RANGE ) {
         range = (float)aButton;
     } else if ( aMenu == _POSITION ) {
         llMessageLinked(LINK_THIS, 155, aButton, aMenu);
     } else if ( aMenu == _ADJUST ) {
         llMessageLinked(LINK_THIS, 156, aButton, aMenu);
-    } else if ( aMenu == _GREET ) {
-        if ( aButton == _GREET + _SPACE + _ON ) {
-            GREET_ENABLED = TRUE;
-            if (llGetInventoryType(_GREET) == INVENTORY_SCRIPT)
-                llSetScriptState(_GREET, TRUE);
-        } else if ( aButton == _GREET + _SPACE + _OFF ) {
-            GREET_ENABLED = FALSE;
-            if (llGetInventoryType(_GREET) == INVENTORY_SCRIPT)
-                llSetScriptState(_GREET, FALSE);
-        }
     } else if ( aMenu == _CHAT ) {
         if ( aButton == "Chat ON" ) {
             llMessageLinked(LINK_THIS, 53, aButton, aMenu);
@@ -1039,10 +833,30 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             if (duo)
                 llWhisper(chat_channel, aButton);
         }
-    } else if ( aMenu == _LANG ) {
-        llMessageLinked(LINK_THIS, 53, aButton, aMenu);
     }
     return RESHOWDIALOG;
+}
+
+// Give_Bot_Inventory(bot name, bot secret, inventory UUID, recipient key)
+Give_Bot_Inventory(string botname, string secret, string uuid, string avatar) {
+    // Build JSON payload
+    string json = "{"
+        + "\"action\":\"" + "give_inventory" + "\""
+        + ",\"apikey\":\"" + API_KEY + "\""
+        + ",\"botname\":\"" + botname + "\""
+        + ",\"secret\":\"" + secret + "\""
+        + ",\"avatar\":\"" + avatar + "\""
+        + ",\"object\":\"" + uuid + "\""
+        + "}";
+    
+    // Send HTTP POST request
+    llHTTPRequest(API_URL, [
+        HTTP_METHOD, "POST",
+        HTTP_MIMETYPE, "application/json"
+    ], json);
+    
+    llOwnerSay("Sending give_inventory request...");
+    
 }
 
 default {
@@ -1056,13 +870,13 @@ default {
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             PART_ENABLED = TRUE;
         if (llGetInventoryType(_IS) == INVENTORY_SCRIPT) {
-            _NavigationMenus = [ _MAIN, _EMAIL, _NAME, _ADJUST, _POSITION, _RANGE, _SCAN, _FOLLOW, _UPGRADE, _GREET, _CHAT, _SHUTOFF, _VISIBLE, _LANG, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
+            _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _CHAT, _SHUTOFF, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
         }
         else {
             if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
-                _NavigationMenus = [ _MAIN, _EMAIL, _NAME, _ADJUST, _POSITION, _RANGE, _SCAN, _FOLLOW, _UPGRADE, _PARTICLES, _GREET, _CHAT, _SHUTOFF, _VISIBLE, _LANG ];
+                _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _PARTICLES, _CHAT, _SHUTOFF, _VISIBLE ];
             else
-                _NavigationMenus = [ _MAIN, _EMAIL, _NAME, _ADJUST, _POSITION, _RANGE, _SCAN, _FOLLOW, _UPGRADE, _GREET, _CHAT, _SHUTOFF, _VISIBLE, _LANG ];
+                _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _CHAT, _SHUTOFF, _VISIBLE ];
         }
         llMessageLinked(LINK_THIS, 154, "Get Commands", "");
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
@@ -1084,13 +898,36 @@ default {
         }
     }
 
+    http_response(key request_id, integer status, list metadata, string body)
+    {
+        if (status == 200)
+        {
+            llOwnerSay("✓ Success!");
+            llOwnerSay("Response: " + body);
+            
+            // Parse JSON response (basic example)
+            // For complex parsing, consider using a JSON library
+            if (llSubStringIndex(body, "result=OK") != -1)
+            {
+                llOwnerSay("✓ Command executed successfully");
+            }
+            else if (llSubStringIndex(body, "result=FAIL") != -1)
+            {
+                llOwnerSay("✗ Command failed - check response");
+            }
+        }
+        else
+        {
+            llOwnerSay("✗ HTTP Error: " + (string)status);
+            llOwnerSay("Response: " + body);
+        }
+    }
+
     touch_start(integer total_number)
     {
         integer i;
         key toucher;
 
-        if (ignore_touch)
-            return;
         for (i=0;i<total_number;i++) {
           toucher = llDetectedKey(i);
           if ((toucher == Owner) ||
@@ -1110,9 +947,23 @@ default {
       }
     }
 
+    //  llMessageLinked(LINK_SET, BOT_SETUP_SETBOT, botName, botCode);
+    //  llMessageLinked(LINK_SET, BOT_SETUP_DEVICENAME, deviceName, llGetOwner());
+    //  llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
+
     link_message(integer sender, integer num, string message, key trigger)
     {
-        if (num == 93) {
+        // TODO: Cleanup legacy link messages
+        if (num == BOT_SETUP_SETBOT) {
+            BOT_NAME = message;
+            BOT_SECRET = (string)trigger;
+        } else if (num == BOT_SETUP_DEVICENAME) {
+            DEVICE_NAME = message;
+            Owner = trigger;
+        } else if (num == BOT_GIVE_INVENTORY) {
+            // Give_Bot_Inventory(bot name, bot secret, inventory UUID, recipient key)
+            Give_Bot_Inventory(BOT_NAME, BOT_SECRET, message, (string)trigger);
+        } else if (num == 93) {
             if (OWNER_BOT_MENU) {
               if ((trigger == Owner) ||
                   ((RESTRICTED_ACCESS == 2) && llSameGroup(trigger))) {
@@ -1124,36 +975,8 @@ default {
             }
         } else if (num == 70) {
             chat_channel = (integer)message;
-        } else if (num == 71) {
-            LANG_NAMES = llParseString2List(message, [","], []);
-        } else if (num == 72) {
-            LANG_NAME = message;
-        } else if (num == 73) {
-            FIRST_NAME = message;
-        } else if (num == 74) {
-            LAST_NAME = message;
-        } else if (num == 75) {
-            NAME_ENABLED = (integer)message;
-        } else if (num == 76) {
-            WIKIPEDIA_ENABLED = FALSE;
         } else if (num == 78) {
             INVISIBLE = (integer)message;
-        } else if (num == 79) {
-            GREET_ENABLED = (integer)message;
-            if (GREET_ENABLED)
-                if (llGetInventoryType(_GREET) == INVENTORY_SCRIPT)
-                    llSetScriptState(_GREET, TRUE);
-            else
-                if (llGetInventoryType(_GREET) == INVENTORY_SCRIPT)
-                    llSetScriptState(_GREET, FALSE);
-        } else if (num == 179) {
-            FOLLOW_ENABLED = (integer)message;
-            if (FOLLOW_ENABLED)
-                if (llGetInventoryType(_FOLLOW) == INVENTORY_SCRIPT)
-                    llSetScriptState(_FOLLOW, TRUE);
-            else
-                if (llGetInventoryType(_FOLLOW) == INVENTORY_SCRIPT)
-                    llSetScriptState(_FOLLOW, FALSE);
         } else if (num == 180) {
             offset = (vector)message;
         } else if (num == 80) {
@@ -1174,8 +997,6 @@ default {
             COMMAND_NAMES = llParseString2List(message, [","], []);
         } else if (num == 90) {
             _BOTNAME = message;
-        } else if (num == 91) {
-            ALPHA_ENABLED = FALSE;
         } else if (num == 350) {
             if (message == "flipped")
                 enabled = 0;
@@ -1183,35 +1004,6 @@ default {
                 duo = 1;
         } else if (num == 401) {
             particle_names = llParseString2List(message, [","], []);
-        } else if (num == 501) {
-            if (message == _ON) {
-                nearby_names = [];
-            }
-            else if (message == _OFF) {
-                _DialogOptions = nearby_names;
-                if (select_follower == 1) {
-                    _DialogMessage = "Targets - select who will be the primary target:";
-                    _NavigationStack += [ _FARGET ];
-                } else if (select_follower == 0) {
-                    _DialogMessage = "Particle Stream Targets - select who will be the target of the particle stream:";
-                    _NavigationStack += [ _TARGET ];
-                } else if (select_follower == 2) {
-                    _DialogOptions = [ "Full Report"] + nearby_names;
-                    _DialogMessage = "Select which of the detected objects or avatars you wish to locate:";
-                    _NavigationStack += [ _SARGET ];
-                }
-                ShowDialogInitial("\n" + _DialogMessage, _DialogOptions,
-                                                         _DialogUser);
-            }
-            else if (message == "Away") {
-                at_home = 0;
-            }
-            else if (message == "Home") {
-                at_home = 1;
-            }
-            else {
-                nearby_names = nearby_names + [message];
-            }
         }
     }
 
