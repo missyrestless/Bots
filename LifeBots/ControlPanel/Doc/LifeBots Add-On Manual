@@ -1,0 +1,209 @@
+INTRODUCTION
+
+Restless Studio Pandorabot V5 can be integrated with an Actorbot from Sine Wave to provide a realistic 3D animated bot avatar. These instructions on integrating a Pandorabot with an Actorbot are included in the Pandorabot V5 package and available in PDF format at http://www.scribd.com/doc/44821053 . A tutorial on creating a 3D animated avatar Pandorabot is available at http://pandorabot.blogspot.com/p/how-to.html . Details on setup and configuration of the Pandorabot are available in the Pandorabots Owner Manual.
+
+CONTENTS
+
+This package contains:
+
+    * The Pandorabot Actorbot Base Prim which includes one Pandorabot V5 preconfigured for Actorbot integration, an Actorbot animation and integration script (Actorabot), and the associated configuration notecard for the Actorabot script (Actorabot_Config)
+    * A script to deploy in a prim the Actorbot or clients will sit on for services (TimedSitAndNotify)
+    * The associated configuration notecard for the TimedSitAndNotify script (Configure_Key)
+    * The Pandorabot Actorbot Add-On Manual (this document), the Pandorabot Owner Manual, the Pandorabot User Guide
+    * A Pandorabots Info notecard, a Pandorabot demonstration landmark, and the Copyright information
+
+SETUP OVERVIEW
+
+Steps required to setup an integrated Actorbot/Pandorabot:
+
+1. Purchase one Pandorabot Actorbot Add-On for each of your Actorbots
+2. Create a Second Life account with Scripted Agent Status set to bot (create one account for each Actorbot you want to run)
+3. Create an account at http://www.sinewaverobots.com/ and create as many Actorbots as you need
+4. Rez the Pandorabot Actorbot Base Prim and edit configuration notecards
+5. Copy the Actorbot Location Script into Pandorabot Actorbot Base Prim
+6. Copy desired animations into Actorbot base prim
+7. Recompile and reset scripts
+8. Start Actorbot(s)
+
+Additional Actorbot/Pandorabot integration can be performed via the “Advanced settings” of the Actorbot at http://www.sinewaverobots.com/ . This and details of the steps above will be covered below.
+
+PURCHASE PANDORABOT ACTORBOT ADD-ONS (step 1)
+
+Pandorabot Actorbot Add-On packages can be purchased on the Second Life Marketplace at https://marketplace.secondlife.com/ . Search the marketplace for “Pandorabot Actorbot”. You will need one Pandorabot Actorbot Add-On for each Actorbot you wish to enhance. Unpack the boxed product and copy the items to your inventory. They will be in a new folder “Pandorabot Actorbot Add-On”. You can delete the box once the items have been copied to your inventory.
+
+NOTE: If you already own a Pandorabot V5 or later you can purchase the Pandorabot Actorbot Add-On Lite. See the Pandorabot Actorbot Add-On Lite Setup section below.
+
+CREATE A SECOND LIFE “ALT” ACCOUNT (step 2)
+
+Visit http://secondlife.com/ , click the “Join Now” button and follow the same procedure you used to create your original Second Life account only with a different user name and setting the Scripted Agent Status to bot. If you wish to fix your newly created alt up a bit before deploying as an Actorbot, login to Second Life as your alt and modify appearance, clothing, etc as desired.
+
+You may also wish to create a few clothing folders with everything you want your Actorbot wearing (including attachments like hair, shoes, facelight, …). Create these in the system “Clothing” folder as subfolders. Later you will be able to program your Actorbot to change outfits. You may prefer to defer this portion of the setup until after you have played around with your Actorbot a little. 
+
+CREATE AN ACTORBOT ACCOUNT & CREATE ACTORBOT(S) (step 3)
+
+Visit http://www.sinewaverobots.com/ and click “Sign up”. On the first page enter your primary Second Life avatar name (not the alt account you created in step 2). Next choose a Sine Wave Actorbot user name and password. Agree to the Terms of Service and click “Sign Up”. Once you have completed the account activation process, create a new Actorbot by logging into your Sine Wave account and clicking “NEW ACTORBOT”. This time the “Avatar name” should be one of the alt accounts you created in step 2. If your alt was created with the new Second Life username and no last name then use “Resident” as the last name.
+
+Login to Second Life with your primary account (the account with which you created your Sine Wave account, not the alt accounts) and activate your Actorbot at http://slurl.com/secondlife/Sine%20Wave%20Island/131/108/29 .
+
+When you activate your Actorbot at Sine Wave Island you will receive an Actorbot Base Prim. You will need to copy the Actorbot Location Script from this prim:
+
+    * Rez the Actorbot Base Prim
+    * Copy the Actorbot Location Script from the rezzed prim to your inventory
+    * Delete the Actorbot Base Prim
+
+REZ THE PANDORABOT ACTORBOT BASE PRIM AND EDIT CONFIGURATION NOTECARDS (step 4)
+
+Select a location for your Actorbot and rez the Pandorabot Actorbot Base Prim there. Right click the Pandorabot Actorbot base prim and select “Edit”.
+
+There are three configuration notecards in the Actorbot base prim – Actorabot_Config, the Actorabot configuration card, Greeter_Config, the Greeter configuration card, and Configuration, the Pandorabot configuration notecard.
+
+The Actorabot_Config notecard can be edited to configure the default settings for:
+
+    * The chat channel
+    * Duration of each animation
+    * Dance only mode
+    * Sit only mode
+    * Stand only mode
+    * The default outfit trigger phrase
+    * Outfit trigger phrases
+    * Whether to resize the base prim
+    * The texture applied to the base prim
+    * Whether to notify the owner when payments are made to the bot
+
+If you are deploying multiple Pandorabot Actorbots then edit the Actorabot_Config notecard and give each Actorbot a unique channel (one of them can use the default channel). The Actorabot_Config variables and their default settings follow:
+
+CHANNEL = 25
+The chat channel, defaults to 25 and must match what you have set in the Actorbot's advanced settings for chat commands. Multiple Pandorabot Actorbots will need unique channel settings. If you are only deploying a single Pandorabot Actorbot then the default setting should suffice.
+
+DURATION = 120.0
+The duration, in seconds, of each animation
+
+DANCE_ONLY = FALSE
+If TRUE, only play dance animations, no stands or sits
+
+SIT_ONLY = FALSE
+If TRUE, only play sit animations, no dances or stands
+
+STAND_ONLY = FALSE
+If TRUE, only play stand animations, no dances or sits
+
+OUTFIT_TRIGGER = _Wear Default Outfit
+Set OUTFIT_TRIGGER to the phrase to trigger the Actorbot to get dressed
+
+OUTFITS = Blue Dress,Cyber Harness,Bikini
+Names of outfit folders to wear in the Actorbot avatar's inventory. The above settings are examples only, the default setting for outfit folder names is empty and no outfits will be displayed in the dialog menu unless set here. The settings (e.g. “Blue Dress” above) must match a trigger setting in the Actorbot's advanced settings. This process is described in greater detail below.
+
+RESIZE = TRUE
+Should the base prim be resized and textured ?
+
+TEXTURE = 407c327e-d79e-9ad6-1772-9caf01e07316
+Texture uuid to use on base prim if RESIZE = TRUE
+
+NOTIFY_OWNER = FALSE
+Send owner IM on payment received
+
+The Pandorabot Configuration Notecard – Configuration
+
+Consult the Pandorabots Owner Manual for the extensive Pandorabot configuration defaults that can be set by editing the Pandorabot Configuration notecard. When running a Pandorabot in an Actorbot the following settings are recommended:
+
+	FIRST_NAME = Your bot's first name
+	LAST_NAME = Your bot's last name
+	TEXT_ENABLED = FALSE
+	RESTRICTED_ACCESS = 1
+	HOVER_ENABLED = FALSE
+
+Note that the BOT_ID setting in the Configuration notecard does not refer to your Actorbot key but rather to the pandorabot.com bot ID to use. You should not need to set the BOT_ID but will need to put your Actorbot's key in the Configure_Key notecard if you choose to use the TimedSitAndNotify script described below.
+
+The Pandorabot Greeter Notecard – Greeter_Config
+
+The Pandorabots Owner Manual also covers the settings in the Greeter_Config notecard allowing you to customize your bot's greeting to new arrivals.
+
+COPY THE ACTORBOT LOCATION SCRIPT INTO PANDORABOT ACTORBOT BASE PRIM (step 5)
+
+While still editing the Pandorabot Actorbot Base Prim:
+
+    * Drag and drop the Actorbot Location Script from your inventory into the base prim's Contents tab
+    * Enter the name of the alt account you wish to use in the Description field of the General tab
+
+COPY DESIRED ANIMATIONS INTO PANDORABOT ACTORBOT BASE PRIM (step 6)
+
+If you want your Actorbot to dance and/or utilize sit and stand animations, drag whatever and as many animations as you like into the base prim contents. In order for the preconfigured dance, sit, and stand commands to function properly the dances must contain the string “dance” in their name, the sits must contain the string “sit” in their name, and the stands must contain the string “stand” in their name. The strings “dance”, “sit”, and “stand” are not case sensitive.
+
+RECOMPILE AND RESET THE SCRIPTS (step 7)
+
+Once you have finished editing the notecards, copied the Actorbot Location Script into the base prim, set the Description field to the alt's name, and copied desired animations into the prim you need to recompile and reset the base prim scripts. While still editing the Actorbot base prim, select from the viewer menu Tools ? Recompile Scripts in Selection ? Mono. When this completes, click “Done” closing the recompile window. While still in edit mode select from the viewer menu Tools ? Reset Scripts in Selection. You should see the following messages in local chat:
+	The target has been set up successfully.
+	Pandorabot ready to chat!
+
+You can now close the Pandorabot Actorbot Base Prim edit window.
+
+START THE ACTORBOT(S) (step 8)
+
+Return to the Sine Wave website http://www.sinewaverobots.com/ and login. Click on “MY ACTORBOTS” and click on the Actorbot you want to start. Prior to starting the Actorbot you may wish to configure it with the Actorabot Starter template. To do so, click on “Advanced settings” then click on “Import Template”. Check the box next to the “Actorabot Starter” template by Missy Restless and click “Ok”. This configures your Actorbot to respond to a few IM commands. If someone sends an Instant Message to your Actorbot the following will occur:
+	“Help” - the Actorbot will IM back a help message describing the commands
+	“Dance” - the Actorbot will enter dance only mode
+	“Sit” - the Actorbot will enter sit only mode
+	“Stand” - the Actorbot will enter stand only mode
+	“All” - the Actorbot will enter stand, sit, and dance combined mode
+
+Once you have configured the advanced settings you can start the Actorbot. Simply click “Start the Actorbot”. Repeat for any other Actorbots you wish to start. Return to Second Life and verify that your Actorbot has logged in and is responding to chat, dancing, standing, or whatever you have it configured to do. To verify the Actorbot is functioning as a Pandorabot, while standing within 20 meters of your Actorbot say in local chat “what is phi ?” and the bot should respond with the Wikipedia summary paragraph from the article on Phi. Note, if you have previously configured NAME_ENABLED = TRUE then you will have to say “<first name of bot>, what is phi ?”. To verify the advanced settings took effect, IM your bot and say “Help”.
+
+ADDITIONAL SCRIPTS FOR ADVANCED DEPLOYMENT
+
+Included in the Pandorabot Actorbot Add-On package is a script which can serve as the basis for more advanced Actorbot deployment. Through the Advanced settings, Actorbots can be programmed to sit on another prim and do whatever that scripted prim does to seated avatars.
+
+The script TimedSitAndNotify can be placed in a target prim and used to unseat the Actorbot after a specified time or to notify the Actorbot when someone sits on that prim. The configuration notecard Configure_Key should also be copied into the target prim and edited specifying the Actorbot's key and (optionally) the channel, duration, notify string, and end trigger string.
+
+Setup of a target prim is described in the Advanced settings and entails copying an Actorbot Location Script into the prim as well as any other scripts and animations you may need.
+
+The TimedSitAndNotify script must be used in conjunction with Advanced settings programming for the Actorbot. For example, the script IM's the Actorbot when someone sits on the prim it is in. The message must be recognized by the Actorbot through prior programming in the Advanced settings and a response to the message (e.g. sit on the prim with the client) programmed as well.
+
+The advanced public template “Liquid Felon Anya” can be used as a starting point to program your Actorbot in conjunction with the Pandorabot Actorbot Add-On scripts. To do so click on “Advanced settings” then click on “Import Template”. Check the box next to the “Liquid Felon Anya” template by Missy Restless and click “Ok”. You will then need to modify some of the entries to correspond to your outfit folders and desired settings. This template was designed for use with the free Liquid Felon couples dance available at Sine Wave Island but can be used with any other couples “sit and animate” prims you setup to work with your Actorbot. 
+
+Advanced deployment of an Actorbot is non-trivial and may require some expert assistance. Custom Actorbot programming may be available through Restless Studio for a significant fee. If interested, email slpandorabots@gmail.com .
+
+Pandorabot Actorbot Add-On Lite Setup
+
+If you purchased the Pandorabot V5 and Pandorabot Actorbot Add-On Lite separately then setup is slightly different. Follow steps 1-3 above then for step 4 you will use the Pandorabot V5 as the Pandorabot Actorbot Base Prim. Rez and configure your Pandorabot V5 following the instructions in the Pandorabots Owner Manual. Follow the instructions in step 4 above using the Pandorabot V5 as your base prim.
+
+Copy the Actorabot script and Actorabot_Config notecard into the Contents of the Pandorabot V5 (these two items are included in the Pandorabot Actorbot Add-On Lite package and will be in your inventory after opening the package and copying the contents). You may wish to reposition the base prim at this point. Once you have finished editing the configuration notecards you can then follow steps 5-8 above.
+
+NOTES ON SINE WAVE ACTORBOTS
+
+Sine Wave Actorbots can be run in two ways – via the Sine Wave server for L$5 per bot per hour, or locally on your own desktop for free (up to 3 free local bots then L$3000 per bot up to 10 total local bots). Which type of Actorbot should you use ? Here are some considerations.
+
+Running 3 free bots locally does not seem to over stress my average modern desktop system. The Sine Wave Actorbot desktop application doesn't have to send and receive graphical input/output like the Viewer does so it is very lightweight compared to the Second Life Viewers. However, it does increase the load on your system, as well as consume bandwidth over your Internet connection and some electrical power.
+
+The benefits of paying Sine Wave to run your Actorbots at their server include:
+
+    * You can run a lot of Actorbots
+    * It's only L$5 per hour per bot (that's about $0.02 U.S. - two cents)
+    * No local resources are consumed (cpu, memory, bandwidth, electricity, etc)
+    * Hopefully their bandwidth is larger than yours so your bots may respond more quickly (my subjective observations indicate just the opposite!)
+    * You can turn your system off when not in use
+
+I would say if you plan on running more than 3 Actorbots, or your system/bandwidth are not sufficiently robust, or you do not wish to leave your system on at all times then pay Sine Wave to run your Actorbots. On the other hand, if you only need to run a couple of Actorbots, your system and bandwidth can handle it, you don't mind leaving your computer on continually, and two cents times thousands of hours is out of your budget then I see nothing wrong with running your Actorbots locally. To install the Sine Wave Actorbot desktop application, go to http://www.sinewaverobots.com/home/desktopinstall.php
+
+An alternative to the Sine Wave Actorbot is the METAbolt client. A brief comparison of the two is available in this post at the Pandorabot Blog. The Pandorabot METAbolt Add-On is available on the Second Life Marketplace at https://marketplace.secondlife.com/p/Pandorabot-METAbolt-Add-On/1793057 .
+
+NOTES ON PANDORABOT CONFIGURATION IN ACTORBOT MODE
+
+One way to activate the Pandorabot or bring up the Pandorabot configuration menu is to left-click (touch) the Pandorabot object. However, when an Actorbot is active on a base Pandorabot prim the prim is invisible making it difficult to touch. There are a few ways to circumvent this. If the Pandorabot is active and you want to bring up the configuration dialog, rather than clicking the prim you can simply say in local chat “configure”. If the Pandorabot is inactive and you wish to activate it there is no chat command to do so (since an inactive Pandorabot is not listening to chat). In this case you must click the Pandorabot prim. To do so, highlight transparent objects by either using the keyboard shortcut CTRL-ALT-T or going to View -> Highlight Transparent in the viewer menu. The base prim whould now be hightlighted in red. Click the base prim to activate your Pandorabot and toggle Highlight Transparent back with the same action (keyboard shortcut or viewer menu). Alternatively, you can stop the Actorbot and the base prim will be visible.
+
+FURTHER INFORMATION
+
+The Pandorabot Actorbot Add-On Manual (this document), Pandorabot Actorbot Diagram, Pandorabots Owner Manual, and Pandorabots User Guide are available in PDF format at http://www.scribd.com/missyrestless
+
+Visit the Pandorabot blog at http://pandorabot.blogspot.com where you can find many How-To tutorials on Pandorabot use, configuration, and deployment at http://pandorabot.blogspot.com/p/how-to.html
+
+You can create a Sine Wave Actorbot at http://www.sinewaverobots.com/
+A tutorial on how to integrate a Pandorabot with your Actorbot is available at http://pandorabot.blogspot.com/p/how-to.html
+
+The Pandorabot METAbolt Add-On Manual is available in PDF format at http://www.scribd.com/doc/46353356/Pandorabot-METAbolt-Add-On-Manual. The METAbolt client can be downloaded at http://metabolt.net/
+
+View and interact with the Restless Studio Actorabot integrated Pandorabots at http://slurl.com/secondlife/Gualdo/210/226/42/ and http://slurl.com/secondlife/Gualdo/204/224/43 (mature).
+
+Have fun and email missyrestless@gmail.com with any questions, comments, suggestions, requests for custom configurations or AIML programming.
+
+View other Restless Studio creations in the Second Life Marketplace at http://tinyurl.com/2bq6o3p 
+
