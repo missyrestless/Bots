@@ -9,6 +9,16 @@
 //                                                //
 ////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////
+// Copyright (c) 2025-2026 Truth & Beauty Lab     //
+// All rights reserved.                           //
+//                                                //
+// Author: Missy Restless missyrestless@gmail.com //
+////////////////////////////////////////////////////
+
+string PRODUCT = "LifeBots Control Panel™";
+string VERSION = "1.0.0";
+
 //////// LIFEBOTS COMMAND & CONTROL CODES ////////
 // Setup and startup                            //
 integer BOT_SETUP_SETBOT            = 280101;   //
@@ -367,12 +377,12 @@ ShowMainMenu( key aAvatarKey ) {
 
 MenuStarter( string aMenu, key aID, integer aPush ) {
 
-    string DialogMessage = "LifeBots Control Panel Dialog";
+    string DialogMessage = PRODUCT + ", version " + VERSION ;
     list   DialogOptions;
 
     if ( aMenu == _MAIN ) {
         DialogOptions = [];
-        DialogMessage = "Main Menu - LifeBots Control Panel";
+        DialogMessage = "Main Menu - " +  PRODUCT;
         if (handle)
             DialogOptions = DialogOptions + [ _OFF ];
         else
@@ -903,7 +913,7 @@ default {
             llOwnerSay("Sending bot status request...");
             LifeBotsAPI("status", [ ]);
         } else if (num == BOT_RESET_TOTALCONTROL) {
-            llOwnerSay("Resetting LifeBots Control Panel...");
+            llOwnerSay("Resetting " + PRODUCT);
             llResetScript();
         } else if (num == BOT_LOGIN) {
             llOwnerSay("Sending bot login request...");
