@@ -14,15 +14,6 @@ LB_BOT_NAME = ''
 # UUID to sit on when logging in, OPTIONAL
 #LOGIN_SITON = "uuid-of-siton-object"
 #
-# First and Last name are used to determine whether to respond to chat
-# Does not need to match your LifeBot's real name
-# If these are not set then the first and last names in LB_BOT_NAME are used
-#FIRST_NAME = 'Some'
-#LAST_NAME = 'Trigger'
-# Should the bot only respond to chat which includes its first or last name
-NAME_ENABLED = TRUE
-# Should the bot be able to send email
-EMAIL_ENABLED = TRUE
 END_SETTINGS
 #
 # Configuration notecard for the LifeBots Control Panel
@@ -90,12 +81,6 @@ END_SETTINGS
 #UUID_dancepole = "dance-pole-object-uuid"
 #UUID_couch = "couch-object-uuid"
 #
-# If FALSE the bot will attempt to respond to all local chat
-# If TRUE the bot will attempt to respond only to local chat containing
-# her name. Regardless, all email and shutoff triggers in local chat are
-# responded to if EMAIL_ENABLED and/or SHUTOFF_ENABLED are TRUE.
-#NAME_ENABLED = TRUE
-#
 # Owner only bot menu ?
 #OWNER_BOT_MENU = FALSE
 #
@@ -105,20 +90,10 @@ END_SETTINGS
 # Make the bot invisible ?
 #INVISIBLE = FALSE
 #
-# Does the bot rotate ?
-#ROTATE = FALSE
-#
 # A non-zero positive integer sets a private owner only channel.
 # If set, bot will only respond to queries like "/4 who is lincoln ?" by owner
 # where CHANNEL = 4. Default is public channel 0.
 #CHANNEL = 0
-#
-# If TRUE you can use the bot to send email! See the EMAIL_TRIGGERS below
-# Set to FALSE if you don't want to allow people to use the bot to send email
-#EMAIL_ENABLED = TRUE
-#
-# Time, in seconds, you have to compose your email
-#EMAIL_TIMEOUT = 300
 #
 # If TRUE the bot will shutoff when hearing one of these phrases.
 # See SHUTOFF_TRIGGERS below. Touch the bot to wake her up.
@@ -130,10 +105,5 @@ END_SETTINGS
 # Restrict shutoff/configuration menu access to all (0), owner (1), group (2)
 #RESTRICTED_ACCESS = 1
 #
-# If EMAIL_ENABLED is TRUE these phrases indicate the resident
-# wishes to send email
-#EMAIL_TRIGGERS =i want to email ,i would like to email ,i want to send an email to ,i would like to send an email to ,email ,send an email to
-#
 # If SHUTOFF_ENABLED is TRUE these phrases will shut the bot off until touched
 #SHUTOFF_TRIGGERS =shut up,shut up.,shut up!,be quiet.,be quiet
-#
