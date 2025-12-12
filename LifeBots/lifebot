@@ -807,6 +807,13 @@ shift $(( OPTIND - 1 ))
     botuuid=$(echo "${AVATAR_UUID}" | sed -e "s/ /_/g")
     envuuid="UUID_${botuuid}"
     [ "${!envuuid}" ] && AVATAR_UUID="${!envuuid}"
+    is_valid_uuid "${AVATAR_UUID}" || {
+      [ "${have_jq}" ] && {
+        # Avatar name can be provided, convert name to key
+        SL_NAME="${AVATAR_UUID}"
+        AVATAR_UUID=$(send_request "name2key" | jq -r '.key')
+      }
+    }
   }
 }
 
