@@ -131,7 +131,6 @@ string API_KEY = "";
 string BOT_NAME = "";
 string BOT_SECRET = "";
 
-string _BOTNAME = "";
 string DEVICE_NAME = "";
 string LOGIN_SITON = "";
 
