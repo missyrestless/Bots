@@ -47,6 +47,7 @@ integer enabled = 1;
 float range = 20.0;
 
 // Reused strings
+string _BOTNAME = "";
 string _DEFAULT = "default";
 string _RESET = "Reset";
 string _EXIT = "<<< Exit >>>";
