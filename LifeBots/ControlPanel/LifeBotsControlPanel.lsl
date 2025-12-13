@@ -227,21 +227,24 @@ default {
                     if ( value == "TRUE" ) value = "1";
                     if ( value == "FALSE" ) value = "0";
                     if ( name == "LB_API_KEY" ) {
+                        if (DEBUG == 1) {
+                          llOwnerSay("Setting API Key to " + value);
+                        }
                         API_KEY = value;
                     } else if ( name == "LB_SECRET" ) {
+                        if (DEBUG == 1) {
+                          llOwnerSay("Setting Bot Secret to " + value);
+                        }
                         BOT_SECRET = value;
                     } else if ( name == "LB_BOT_NAME" ) {
+                        if (DEBUG == 1) {
+                          llOwnerSay("Setting Bot Name to " + value);
+                        }
                         BOT_NAME = value;
                     } else if ( name == "LOGIN_SITON" ) {
                         LOGIN_SITON = value;
-                    } else if ( name == "OWNER_BOT_MENU" ) {
-                        OWNER_BOT_MENU = (integer)value;
-                    } else if ( name == "SHOW_BOT_MENU" ) {
-                        SHOW_BOT_MENU = (integer)value;
-                    } else if ( name == "INVISIBLE" ) {
-                        INVISIBLE = (integer)value;
-                    } else if ( name == "RESTRICTED_ACCESS" ) {
-                        RESTRICTED_ACCESS = (integer)value;
+                    } else if ( name == "DEBUG" ) {
+                        DEBUG = (integer)value;
                     }
                 }
                 NotecardLine++;
@@ -277,8 +280,19 @@ default {
 
     link_message(integer sender, integer num, string message, key trigger)
     {
+        if (DEBUG == 1) {
+          llOwnerSay("API Num = " + (string)num);
+          llOwnerSay("Message = " + message);
+          llOwnerSay("Trigger = " + (string)trigger);
+        }
         if (num == BOT_SETUP_SETBOT) {
+            if (DEBUG == 1) {
+              llOwnerSay("Setting Bot Name to " + message);
+            }
             BOT_NAME = message;
+            if (DEBUG == 1) {
+              llOwnerSay("Setting Bot Secret to " + (string)trigger);
+            }
             BOT_SECRET = (string)trigger;
             // TODO: Check Bot status and send bot setup success/failure link message
             // Check_Bot_Status();
