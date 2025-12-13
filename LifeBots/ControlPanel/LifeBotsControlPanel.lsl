@@ -172,7 +172,7 @@ string _ENABLE = "ENABLE";
 string _DISABLE = "DISABLE";
 string _OFF = "OFF";
 string _ON = "ON";
-string _GUIDE = "LifeBots User Guide";
+string _GUIDE = "LifeBots Control Panel User Guide";
 string OWNER_MANUAL = "LifeBots Owner Manual";
 string ADDON_MANUAL = "LifeBots Add-On Manual";
 string _OMAN = "Owner Doc";
@@ -960,16 +960,64 @@ default {
               "avatar", (string)trigger,
               "message", message
             ]);
-        } else if (num == BOT_LISTEN_LOCAL_CHAT) {
-            llOwnerSay("Bot listen local chat NOT IMPLEMENTED");
-        } else if (num == BOT_LISTEN_IM) {
-            llOwnerSay("Bot listen instant message NOT IMPLEMENTED");
-        } else if (num == BOT_GIVE_INVENTORY) {
-            // llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
-            llOwnerSay("Sending give_inventory request...");
-            LifeBotsAPI("give_inventory", [
-              "avatar", (string)trigger,
-              "object", message
+        } else if (num == BOT_SIT) {
+            llOwnerSay("Sending bot sit request...");
+            LifeBotsAPI("sit", [
+              "uuid", (string)trigger,
+              "save", message
+            ]);
+        } else if (num == BOT_STAND) {
+            llOwnerSay("Sending bot stand request...");
+            LifeBotsAPI("stand", [ ]);
+        } else if (num == BOT_FLY) {
+            llOwnerSay("Sending bot fly request...");
+            LifeBotsAPI("fly", [
+              "fly", message
+            ]);
+        } else if (num == BOT_TELEPORT) {
+            llOwnerSay("Sending bot teleport request...");
+            LifeBotsAPI("teleport", [
+              "location", message
+            ]);
+        } else if (num == BOT_WALKTO) {
+            llOwnerSay("Sending bot walk to request...");
+            LifeBotsAPI("walkto", [
+              "coords", message
+            ]);
+        } else if (num == BOT_LIST_GROUPS) {
+            llOwnerSay("Sending bot group list request...");
+            LifeBotsAPI("listgroups", [ ]);
+        } else if (num == BOT_LIST_GROUP_ROLES) {
+            llOwnerSay("Sending bot list group roles request...");
+            LifeBotsAPI("list_group_roles", [
+              "groupuuid", (string)trigger
+            ]);
+        } else if (num == BOT_GROUP_JOIN) {
+            llOwnerSay("Sending bot group join request...");
+            LifeBotsAPI("group_join", [
+              "groupuuid", (string)trigger
+            ]);
+        } else if (num == BOT_GROUP_LEAVE) {
+            llOwnerSay("Sending bot group leave request...");
+            LifeBotsAPI("group_leave", [
+              "groupuuid", (string)trigger
+            ]);
+        } else if (num == BOT_ACTIVATE_GROUP) {
+            llOwnerSay("Sending bot activate group request...");
+            LifeBotsAPI("activate_group", [
+              "groupuuid", (string)trigger
+            ]);
+        } else if (num == BOT_GROUP_SET_ROLE) {
+            llOwnerSay("Sending bot activate group role request...");
+            LifeBotsAPI("activate_role", [
+              "groupuuid", (string)trigger,
+              "roleuuid", message
+            ]);
+        } else if (num == BOT_GROUP_EJECT) {
+            llOwnerSay("Sending bot group eject request...");
+            LifeBotsAPI("group_eject", [
+              "groupuuid", (string)trigger,
+              "avatar", message
             ]);
         } else if (num == BOT_GROUP_INVITE) {
             // llMessageLinked(LINK_SET, BOT_GROUP_INVITE, groupID + "\n" + roleID, llDetectedKey(0));
@@ -984,6 +1032,13 @@ default {
               "avatar", (string)trigger,
               "groupuuid", GROUPUUID,
               "roleuuid", ROLEUUID
+            ]);
+        } else if (num == BOT_GIVE_INVENTORY) {
+            // llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
+            llOwnerSay("Sending give_inventory request...");
+            LifeBotsAPI("give_inventory", [
+              "avatar", (string)trigger,
+              "object", message
             ]);
         } else if (num == MENU_ACCESS) {
             if (OWNER_BOT_MENU) {
