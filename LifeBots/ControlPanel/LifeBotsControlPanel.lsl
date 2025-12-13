@@ -23,6 +23,7 @@ string VERSION = "1.0.0";
 // Setup and startup                            //
 integer BOT_SETUP_SETBOT            = 280101;   //
 integer BOT_STATUS_QUERY            = 280106;   //
+integer BOT_RESET_CONTROLPANEL      = 9997770;  //
 integer BOT_RESET_TOTALCONTROL      = 9997770;  //
                                                 //
 // Bot Status                                   //
@@ -120,7 +121,7 @@ integer BOT_EVENT_LISTEN_DIALOG     = 280212;   //
 integer BOT_ATTACHMENTS_REPLY       = 280213;   //
 integer BOT_LOCATION_REPLY          = 290233;   //
 integer BOT_NOTECARD_READ_REPLY     = 290238;   //
-integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
+integer BOT_NOTECARD_CREATE_REPLY   = 290239;   //
                                                 //
 // LifeBots API Extensions                      //
 integer BOT_LIST_GROUP_MEMBERS      = 299000;   //
