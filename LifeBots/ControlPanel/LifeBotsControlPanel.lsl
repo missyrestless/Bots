@@ -123,6 +123,7 @@ integer BOT_NOTECARD_READ_REPLY     = 290238;   //
 integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
                                                 //
 // LifeBots API Extensions                      //
+integer BOT_ACTIVATE_ROLE           = 298999;   //
 integer BOT_LIST_GROUP_MEMBERS      = 299000;   //
 integer BOT_LIST_INVENTORY          = 299001;   //
 integer BOT_WEAR_INVENTORY_ITEM     = 299002;   //
@@ -441,11 +442,24 @@ default {
             LifeBotsAPI("activate_group", [
               "groupuuid", (string)trigger
             ]);
-        } else if (num == BOT_GROUP_SET_ROLE) {
+        } else if (num == BOT_ACTIVATE_ROLE) {
             llOwnerSay("Sending bot activate group role request...");
             LifeBotsAPI("activate_role", [
               "groupuuid", (string)trigger,
               "roleuuid", message
+            ]);
+        } else if (num == BOT_GROUP_SET_ROLE) {
+            // llMessageLinked(LINK_SET, BOT_GROUP_SET_ROLE, groupID + "," + roleID, uuid of member);
+            // Split the message parameter into list
+            list rolestr=llParseString2List(message,[","],[]);
+            // The first line is the group id, the second line is the role id
+            string grpuuid = llList2String(rolestr,0);
+            string roluuid = llList2String(rolestr,1);
+            llOwnerSay("Sending bot set group role request...");
+            LifeBotsAPI("setrole", [
+              "groupuuid", grpuuid,
+              "roleuuid", roluuid,
+              "member", (string)trigger
             ]);
         } else if (num == BOT_GROUP_EJECT) {
             llOwnerSay("Sending bot group eject request...");
