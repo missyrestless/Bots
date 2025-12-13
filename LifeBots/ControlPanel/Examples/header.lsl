@@ -1,7 +1,8 @@
-///////// LIFEBOTS COMMAND & CONTROL /////////////
+//////// LIFEBOTS COMMAND & CONTROL CODES ////////
 // Setup and startup                            //
 integer BOT_SETUP_SETBOT            = 280101;   //
 integer BOT_STATUS_QUERY            = 280106;   //
+integer BOT_RESET_CONTROLPANEL      = 9997770;  //
 integer BOT_RESET_TOTALCONTROL      = 9997770;  //
                                                 //
 // Bot Status                                   //
@@ -82,7 +83,7 @@ integer BOT_TOUCH_OBJECT            = 280148;   //
 integer BOT_ATTACHMENT_OBJECT       = 280149;   //
 integer BOT_DIALOG_REPLY            = 280154;   //
                                                 //
-// EVENTS                                       //
+// Events                                       //
 integer BOT_SETUP_SUCCESS           = 280201;   //
 integer BOT_SETUP_FAILED            = 280202;   //
 integer BOT_COMMAND_FAILED          = 280203;   //
@@ -99,6 +100,26 @@ integer BOT_EVENT_LISTEN_DIALOG     = 280212;   //
 integer BOT_ATTACHMENTS_REPLY       = 280213;   //
 integer BOT_LOCATION_REPLY          = 290233;   //
 integer BOT_NOTECARD_READ_REPLY     = 290238;   //
-integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
+integer BOT_NOTECARD_CREATE_REPLY   = 290239;   //
                                                 //
+// LifeBots API Extensions                      //
+integer BOT_LIST_GROUP_MEMBERS      = 299000;   //
+integer BOT_LIST_INVENTORY          = 299001;   //
+integer BOT_ACTIVATE_ROLE           = 299002;   //
+integer BOT_TAKE_DELETE_OBJECT      = 299003;   //
+integer BOT_INVENTORY_TO_OBJECT     = 299004;   //
+integer BOT_ADJUST_HOVER_HEIGHT     = 299005;   //
+integer BOT_LIST_OUTFITS            = 299006;   //
+integer BOT_WEAR_OUTFIT             = 299007;   //
+integer BOT_GET_WORN_OUTFIT         = 299008;   //
+integer BOT_FIND_OBJECTS            = 299009;   //
+integer BOT_FIND_OBJECTS_WITH_PROP  = 299010;   //
+integer BOT_FIND_OBJECTS_PARCEL     = 299011;   //
+integer BOT_FIND_OBJECT_UUID        = 299012;   //
+integer BOT_GROUP_INFO              = 299013;   //
+integer BOT_LIST_GROUPS_UUID        = 299014;   //
+integer BOT_LIST_GROUPS_NAME        = 299015;   //
+integer BOT_GROUP_VISIBILITY        = 299016;   //
+integer BOT_GROUP_OFFER_ACCEPT      = 299017;   //
+integer BOT_GROUP_OFFER_DECLINE     = 299018;   //
 //////////////////////////////////////////////////
