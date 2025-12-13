@@ -166,7 +166,6 @@ float range = 20.0;
 // Reused strings
 string _DEFAULT = "default";
 string _RESET = "Reset";
-string _UPGRADE = "Upgrade";
 string _EXIT = "<<< Exit >>>";
 string _ENABLE = "ENABLE";
 string _DISABLE = "DISABLE";
@@ -180,7 +179,6 @@ string _AMAN = "Addon Doc";
 string _UMAN = "User Guide";
 string _LM = "Landmark";
 string _INFO = "Info";
-string _VERBAL = "Verbal ";
 string _ABLE = "You can enable/disable";
 string _EDIT = "here\nor edit the Configuration notecard to change\nthe default setting.";
 string _SELECT = ".\nSelect one of the";
@@ -269,7 +267,7 @@ list SLOW_FAST = [ _SPACE, _EXIT, _SLOWEST, _SLOWER, _SLOW, _FAST, _FASTER, _FAS
 list ON_OFF = [ _SPACE, _EXIT, _ON, _SPACE, _OFF ];
 
 // List of the menus in the system
-list _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
+list _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
 
 list _NavigationStack;        // Manages the menus calling submenus
 
@@ -395,7 +393,7 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             DialogOptions = DialogOptions + [ _SCAN, _TARGET ];
         if ((SHOW_BOT_MENU) && (_BOTNAME != "")) {
             if ((aID == Owner) || ((RESTRICTED_ACCESS == 2) && llSameGroup(aID))) {
-                DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
+                DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _RESET ];
             } else {
                 DialogOptions = [ _EXIT, _DOC ];
                 if (llGetInventoryType(OWNER_MANUAL)==7)
@@ -414,7 +412,7 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
                     DialogOptions = DialogOptions + [ _COMMANDS ];
             }
           } else {
-              DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
+              DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _RESET ];
           }
     } else if ( aMenu == _INNER ) {
         DialogMessage = _IS + " menu: configure rotating display.";
@@ -563,15 +561,6 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
             llResetScript();
             return FALSE;
-        } else if ( aButton == _UPGRADE ) {
-            if (aAvatarKey == Owner) {
-                llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
-                return FALSE;
-            }
-            else {
-                llInstantMessage(aAvatarKey,
-                   "Only the owner of the LifeBot can initiate an upgrade.");
-            }
         }
     } else if ( aMenu == _INNER ) {
         if ( aButton == _STOP ) {
@@ -768,13 +757,13 @@ default {
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             PART_ENABLED = TRUE;
         if (llGetInventoryType(_IS) == INVENTORY_SCRIPT) {
-            _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
+            _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
         }
         else {
             if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
-                _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _PARTICLES, _VISIBLE ];
+                _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _PARTICLES, _VISIBLE ];
             else
-                _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _VISIBLE ];
+                _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _VISIBLE ];
         }
         llMessageLinked(LINK_THIS, 154, "Get Commands", "");
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
@@ -813,7 +802,7 @@ default {
             if ( data != EOF ) {
                 if (data == "END_SETTINGS") {
                     if ((API_KEY == "") || (API_KEY == "your-api-key")) {
-                        llOwnerSay("ERROR: LB_API_KEY not set.";
+                        llOwnerSay("ERROR: LB_API_KEY not set.");
                         llOwnerSay("Edit the Configuration notecard to set your LifeBots API Key.");
                         llSetScriptState(llGetScriptName(), FALSE);
                     }
@@ -1085,12 +1074,6 @@ default {
                 Prep_Restart();
                 state default;
             }
-            else if (message == "Upgrade") {
-                // Set the remote access pin
-                llSetRemoteScriptAccessPin(3961837);
-                // Chat the object key on the upgrade channel
-                llSay(-2739164, "ObjectKey=" + (string)ObjectKey);
-            }
             else if (message == "Reset") {
                 if (handle)
                     llListenRemove(handle);
@@ -1106,12 +1089,6 @@ default {
                 if (!INVISIBLE)
                     llSetLinkAlpha(LINK_SET, 0.0, ALL_SIDES);
                 INVISIBLE = TRUE;
-            }
-            else if (message == _VERBAL + _OFF) {
-                VERBAL_SHUTOFF_ENABLED = FALSE;
-            }
-            else if (message == _VERBAL + _ON) {
-                VERBAL_SHUTOFF_ENABLED = TRUE;
             }
             else if ( message == "Owner Only" ) {
                 RESTRICTED_ACCESS = 1;
@@ -1170,7 +1147,7 @@ state off {
         integer i = 0;
         for (; i<num; ++i) {
             if (RESTRICTED_ACCESS == 1) { // Only owner can turn me back on
-                if (llDetectedKey(i) == owner) {
+                if (llDetectedKey(i) == Owner) {
                     llMessageLinked(LINK_THIS, 13, _ON, "");
                     Prep_Restart();
                     state default;
