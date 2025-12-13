@@ -93,8 +93,8 @@ integer BOT_GIVE_INVENTORY          = 280150;      //
 // integer BOT_DIALOG_REPLY            = 280154;   //
                                                    //
 // EVENTS                                          //
-// integer BOT_SETUP_SUCCESS           = 280201;   //
-// integer BOT_SETUP_FAILED            = 280202;   //
+integer BOT_SETUP_SUCCESS              = 280201;   //
+integer BOT_SETUP_FAILED               = 280202;   //
 // integer BOT_COMMAND_FAILED          = 280203;   //
 // integer BOT_EVENT_LISTEN_LOCAL_CHAT = 280204;   //
 // integer BOT_EVENT_LISTEN_IM         = 280205;   //
@@ -124,14 +124,35 @@ default {
     state_entry() {
         // Setup Device
         llMessageLinked(LINK_SET, BOT_SETUP_DEVICENAME, deviceName, llGetOwner());
-        
-        // Setup Bot
-        llMessageLinked(LINK_SET, BOT_SETUP_SETBOT, botName, botCode);
     }
     
     touch_start(integer num) {
-        // Send inventory item to whoever touched the prim
-        llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
+        // Setup Bot
+        llMessageLinked(LINK_SET, BOT_SETUP_SETBOT, botName, botCode);
+    }
+
+    link_message( integer sender_num, integer num, string str, key id ) {
+        /////////////////// Bot setup success event
+        if(num==BOT_SETUP_SUCCESS) {
+            // We added our bot fine
+            llOwnerSay("Successfully setup bot: " + str);
+            
+            // Send inventory item to whoever touched the prim
+            llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
+        }
+        else if(num==BOT_SETUP_FAILED) {
+            // We split the string parameter to the lines
+            list parts=llParseString2List(str,["\n"],[]);
+
+            // The first line is a status code, and second line is the bot expiration date
+            string code=llList2String(parts,0);
+            string expires=llList2String(parts,1);
+            
+            // Setup failed somehow
+            llOwnerSay("Bot setup failed:\n"+
+              "error code: "+code+"\n"+
+              "expired: "+expires);
+        }
     }
     
 }
