@@ -136,6 +136,12 @@ integer BOT_FIND_OBJECTS            = 299009;   //
 integer BOT_FIND_OBJECTS_WITH_PROP  = 299010;   //
 integer BOT_FIND_OBJECTS_PARCEL     = 299011;   //
 integer BOT_FIND_OBJECT_UUID        = 299012;   //
+integer BOT_GROUP_INFO              = 299013;   //
+integer BOT_LIST_GROUPS_UUID        = 299014;   //
+integer BOT_LIST_GROUPS_NAME        = 299015;   //
+integer BOT_GROUP_VISIBILITY        = 299016;   //
+integer BOT_GROUP_OFFER_ACCEPT      = 299017;   //
+integer BOT_GROUP_OFFER_DECLINE     = 299018;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 // LifeBots Control Panel Command & Control Bridge
@@ -156,6 +162,10 @@ key QueryID;
 
 key Owner = NULL_KEY;
 
+// LifeBots Control Panel sends events to LINK_SET by default
+// You can specify the exact link number of the prim to optimize performance
+integer LINK = LINK_SET;
+
 // 0 = debug off, 1 = debug on
 integer DEBUG = 0;
 
@@ -163,9 +173,9 @@ integer DEBUG = 0;
 LifeBotsAPI(string command, list params) {
 
   if (DEBUG == 1) {
-    llOwnerSay("API_KEY = " + API_KEY);
-    llOwnerSay("BOT_NAME = " + BOT_NAME);
-    llOwnerSay("BOT_SECRET = " + BOT_SECRET);
+    llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
+    llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
+    llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
   }
   // Populate the query data
   list query = [
@@ -175,9 +185,9 @@ LifeBotsAPI(string command, list params) {
     "secret="  + llEscapeURL(BOT_SECRET)
   ];
   if (DEBUG == 1) {
-    llOwnerSay("API_KEY = " + API_KEY);
-    llOwnerSay("BOT_NAME = " + BOT_NAME);
-    llOwnerSay("BOT_SECRET = " + BOT_SECRET);
+    llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
+    llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
+    llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
   }
 
   integer i;
@@ -188,8 +198,8 @@ LifeBotsAPI(string command, list params) {
   string queryString = llDumpList2String(query, "&");
 
   if (DEBUG == 1) {
-    llOwnerSay("API_URL = " + API_URL);
-    llOwnerSay("queryString = " + queryString);
+    llSay(DEBUG_CHANNEL, "API_URL = " + API_URL);
+    llSay(DEBUG_CHANNEL, "queryString = " + queryString);
   }
  
   llHTTPRequest(API_URL, [HTTP_METHOD,"POST"], queryString);
@@ -258,17 +268,17 @@ default {
                     if ( value == "FALSE" ) value = "0";
                     if ( name == "LB_API_KEY" ) {
                         if (DEBUG == 1) {
-                          llOwnerSay("Setting API Key to " + value);
+                          llSay(DEBUG_CHANNEL, "Setting API Key to " + value);
                         }
                         API_KEY = value;
                     } else if ( name == "LB_SECRET" ) {
                         if (DEBUG == 1) {
-                          llOwnerSay("Setting Bot Secret to " + value);
+                          llSay(DEBUG_CHANNEL, "Setting Bot Secret to " + value);
                         }
                         BOT_SECRET = value;
                     } else if ( name == "LB_BOT_NAME" ) {
                         if (DEBUG == 1) {
-                          llOwnerSay("Setting Bot Name to " + value);
+                          llSay(DEBUG_CHANNEL, "Setting Bot Name to " + value);
                         }
                         BOT_NAME = value;
                     } else if ( name == "LOGIN_SITON" ) {
@@ -311,24 +321,29 @@ default {
     link_message(integer sender, integer num, string message, key trigger)
     {
         if (DEBUG == 1) {
-          llOwnerSay("API Num = " + (string)num);
-          llOwnerSay("Message = " + message);
-          llOwnerSay("Trigger = " + (string)trigger);
+          llSay(DEBUG_CHANNEL, llList2CSV([sender, num, message, trigger]));
+          llSay(DEBUG_CHANNEL, "API Num = " + (string)num);
+          llSay(DEBUG_CHANNEL, "Message = " + message);
+          llSay(DEBUG_CHANNEL, "Trigger = " + (string)trigger);
         }
         // Setup and startup
         if (num == BOT_SETUP_SETBOT) {
             if (DEBUG == 1) {
-              llOwnerSay("Setting Bot Name to " + message);
+              llSay(DEBUG_CHANNEL, "Setting Bot Name to " + message);
             }
             BOT_NAME = message;
             if (DEBUG == 1) {
-              llOwnerSay("Setting Bot Secret to " + (string)trigger);
+              llSay(DEBUG_CHANNEL, "Setting Bot Secret to " + (string)trigger);
             }
             BOT_SECRET = (string)trigger;
             // TODO: Check Bot status and send bot setup success/failure link message
             // Check_Bot_Status();
-            llMessageLinked(LINK_SET, BOT_SETUP_SUCCESS, BOT_NAME, trigger);
-            // llMessageLinked(LINK_SET, BOT_SETUP_FAILED, BOT_NAME, trigger);
+            llMessageLinked(LINK, BOT_SETUP_SUCCESS, BOT_NAME, trigger);
+            // llMessageLinked(LINK, BOT_SETUP_FAILED, BOT_NAME, trigger);
+        } else if (num == BOT_SETUP_SETLINK) {
+            // TODO: validate this is a proper link number for the prim
+            llOwnerSay("Setting link number for llMessageLinked calls to: " + message);
+            LINK = (integer)message;
         } else if (num == BOT_RESET_TOTALCONTROL) {
             llOwnerSay("Resetting " + PRODUCT);
             llResetScript();
@@ -346,16 +361,19 @@ default {
             llOwnerSay("Sending bot location request...");
             LifeBotsAPI("bot_location", [ ]);
         // Device Settings
-        // TODO:
-        // BOT_SETUP_SETOPTIONS
-        // BOT_SETUP_DEBUG
-        // BOT_SETUP_SETLINK
+        // TODO: BOT_SETUP_SETOPTIONS
+        } else if (num == BOT_SETUP_DEBUG) {
+            if (message == "1") {
+                DEBUG = 1;
+            } else {
+                DEBUG = 0;
+            }
         } else if (num == BOT_SETUP_DEVICENAME) {
             DEVICE_NAME = message;
         // Communication commands
         // TODO:
-        // BOT_LISTEN_LOCAL_CHAT
-        // BOT_LISTEN_IM
+        //   BOT_LISTEN_LOCAL_CHAT
+        //   BOT_LISTEN_IM
         } else if (num == BOT_SAY_CHAT) {
             llOwnerSay("Sending bot say chat request...");
             LifeBotsAPI("say_chat_channel", [
@@ -393,8 +411,6 @@ default {
               "message", message
             ]);
         // Movement
-        // TODO:
-        // BOT_WALK
         } else if (num == BOT_SIT) {
             llOwnerSay("Sending bot sit request...");
             LifeBotsAPI("sit", [
@@ -414,14 +430,21 @@ default {
             LifeBotsAPI("teleport", [
               "location", message
             ]);
+        } else if (num == BOT_WALK) {
+        // TODO: validate instruction is one of FORWARD, BACKWARD, LEFT, RIGHT, TURNLEFT, TURNRIGHT, FLY, or STOP
+        // TODO: validate param1 is one of START or STOP (not needed for STOP instruction)
+            llOwnerSay("Sending bot walk request...");
+            LifeBotsAPI("move", [
+              "instruction", message,
+              "param1", (string)trigger
+            ]);
         } else if (num == BOT_WALKTO) {
             llOwnerSay("Sending bot walk to request...");
             LifeBotsAPI("walkto", [
               "coords", message
             ]);
         // Group Management
-        // TODO:
-        // BOT_SELECT_GROUP_TAG
+        // TODO: BOT_SELECT_GROUP_TAG
         } else if (num == BOT_LIST_GROUPS) {
             llOwnerSay("Sending bot group list request...");
             LifeBotsAPI("listgroups", [ ]);
@@ -452,7 +475,6 @@ default {
               "roleuuid", message
             ]);
         } else if (num == BOT_GROUP_SET_ROLE) {
-            // llMessageLinked(LINK_SET, BOT_GROUP_SET_ROLE, groupID + "," + roleID, uuid of member);
             // Split the message parameter into list
             list rolestr=llParseString2List(message,[","],[]);
             // The first line is the group id, the second line is the role id
@@ -471,7 +493,6 @@ default {
               "avatar", message
             ]);
         } else if (num == BOT_GROUP_INVITE) {
-            // llMessageLinked(LINK_SET, BOT_GROUP_INVITE, groupID + "\n" + roleID, llDetectedKey(0));
             // Split the message parameter into list
             list msgstr=llParseString2List(message,["\n"],[]);
             // The first line is the group id, the second line is the role id
@@ -483,12 +504,6 @@ default {
               "avatar", (string)trigger,
               "groupuuid", GROUPUUID,
               "roleuuid", ROLEUUID
-            ]);
-        // LifeBots Extended API requests
-        } else if (num == BOT_LIST_GROUP_MEMBERS) {
-            llOwnerSay("Sending bot list group members request...");
-            LifeBotsAPI("get_group_members", [
-              "groupuuid", (string)trigger
             ]);
         // Friendship                                   //
         } else if (num == BOT_UNFRIEND) {
@@ -522,8 +537,8 @@ default {
             ]);
         // Money
         // TODO:
-        // BOT_LISTEN_INVENTORY_OFFER
-        // BOT_LISTEN_MONEY_PAYMENTS
+        //   BOT_LISTEN_INVENTORY_OFFER
+        //   BOT_LISTEN_MONEY_PAYMENTS
         } else if (num == BOT_GIVE_MONEY_OBJECT) {
             llOwnerSay("Sending bot give money object request...");
             LifeBotsAPI("give_money_object", [
@@ -575,10 +590,11 @@ default {
         } else if (num == BOT_REBAKE) {
             llOwnerSay("Sending bot rebake request...");
             LifeBotsAPI("rebake", [ ]);
-        } else if (num == BOT_WEAR_OUTFIT) {
-            llOwnerSay("Sending bot wear outfit request...");
-            LifeBotsAPI("wear_outfit", [
-              "outfitname", message
+        } else if (num == BOT_WEAR) {
+            llOwnerSay("Sending bot wear inventory item request...");
+            LifeBotsAPI("wear", [
+              "uuid", (string)trigger,
+              "wear", message
             ]);
         } else if (num == BOT_TAKEOFF) {
             llOwnerSay("Sending bot remove worn item request...");
@@ -586,7 +602,13 @@ default {
               "uuid", (string)trigger
             ]);
         // Sim Management
-        // BOT_SIM_ACCESS_ALL_ESTATES
+        // TODO: BOT_SIM_ACCESS_ALL_ESTATES
+        } else if (num == BOT_SIM_ACCESS) {
+            llOwnerSay("Sending bot sim access request...");
+            LifeBotsAPI("sim_access", [
+              "avatar", (string)trigger,
+              "operation", message
+            ]);
         } else if (num == BOT_SIM_SEND_MESSAGE) {
             llOwnerSay("Sending bot sim send message request...");
             LifeBotsAPI("sim_send_message", [
@@ -615,7 +637,7 @@ default {
             LifeBotsAPI("sim_kick", [
               "avatar", (string)trigger,
             ]);
-        // Misc. commands
+        // Miscellaneous commands
         // TODO: BOT_LISTEN_DIALOG
         } else if (num == BOT_DIALOG_REPLY) {
             // Split the message parameter into list
@@ -670,16 +692,57 @@ default {
             LifeBotsAPI("find_objects", [
               "uuid", (string)trigger
             ]);
+        // Groups
+        } else if (num == BOT_GROUP_OFFER_ACCEPT) {
+            llOwnerSay("Sending bot group offer accept request...");
+            LifeBotsAPI("group_offer_accept", [
+              "session_id", (string)trigger,
+              "avatar_uuid", message,
+              "accept", "1"
+            ]);
+        } else if (num == BOT_GROUP_OFFER_DECLINE) {
+            llOwnerSay("Sending bot group offer decline request...");
+            LifeBotsAPI("group_offer_accept", [
+              "session_id", (string)trigger,
+              "avatar_uuid", message,
+              "accept", "0"
+            ]);
+        } else if (num == BOT_GROUP_VISIBILITY) {
+            string profile = "1";
+            if (messsage == "0") {
+                profile = message;
+            }
+            llOwnerSay("Sending bot group visibility request...");
+            LifeBotsAPI("group_visibility", [
+              "groupuuid", (string)trigger,
+              "profile", profile
+            ]);
+        } else if (num == BOT_LIST_GROUPS_UUID) {
+            llOwnerSay("Sending bot list groups by uuid request...");
+            LifeBotsAPI("listgroups", [
+              "limit_uuid", (string)trigger
+            ]);
+        } else if (num == BOT_LIST_GROUPS_NAME) {
+            llOwnerSay("Sending bot list groups by name request...");
+            LifeBotsAPI("listgroups", [
+              "limit_name", message
+            ]);
+        } else if (num == BOT_GROUP_INFO) {
+            llOwnerSay("Sending bot group info request...");
+            LifeBotsAPI("group_info", [
+              "groupuuid", (string)trigger
+            ]);
+        } else if (num == BOT_LIST_GROUP_MEMBERS) {
+            llOwnerSay("Sending bot list group members request...");
+            LifeBotsAPI("get_group_members", [
+              "groupuuid", (string)trigger
+            ]);
+        // Inventory
         } else if (num == BOT_TAKE_DELETE_OBJECT) {
             llOwnerSay("Sending bot take or delete object request...");
             LifeBotsAPI("inworld_prim_take", [
               "uuid", (string)trigger,
               "operation", message
-            ]);
-        } else if (num == BOT_ADJUST_HOVER_HEIGHT) {
-            llOwnerSay("Sending bot adjust hover height request...");
-            LifeBotsAPI("set_hoverheight", [
-              "height", (float)message
             ]);
         } else if (num == BOT_LIST_OUTFITS) {
             llOwnerSay("Sending bot list outfits request...");
@@ -687,11 +750,10 @@ default {
         } else if (num == BOT_GET_WORN_OUTFIT) {
             llOwnerSay("Sending bot get worn outfit request...");
             LifeBotsAPI("get_outfit", [ ]);
-        } else if (num == BOT_WEAR) {
-            llOwnerSay("Sending bot wear inventory item request...");
-            LifeBotsAPI("wear", [
-              "uuid", (string)trigger,
-              "wear", message
+        } else if (num == BOT_WEAR_OUTFIT) {
+            llOwnerSay("Sending bot wear outfit request...");
+            LifeBotsAPI("wear_outfit", [
+              "outfitname", message
             ]);
         } else if (num == BOT_INVENTORY_TO_OBJECT) {
             llOwnerSay("Sending bot transfer inventory to object request...");
@@ -712,6 +774,14 @@ default {
                   "extended", ext
                 ]);
             }
+        // Miscellaneous
+        } else if (num == BOT_ADJUST_HOVER_HEIGHT) {
+            llOwnerSay("Sending bot adjust hover height request...");
+            LifeBotsAPI("set_hoverheight", [
+              "height", (float)message
+            ]);
+        } else {
+            llOwnerSay("Unsupported API request: num=" + (string)num + ", message=" + message);
         }
     }
 
