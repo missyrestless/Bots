@@ -121,6 +121,17 @@ integer BOT_ATTACHMENTS_REPLY       = 280213;   //
 integer BOT_LOCATION_REPLY          = 290233;   //
 integer BOT_NOTECARD_READ_REPLY     = 290238;   //
 integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
+                                                //
+// LifeBots API Extensions                      //
+integer BOT_LIST_GROUP_MEMBERS      = 299000;   //
+integer BOT_LIST_INVENTORY          = 299001;   //
+integer BOT_WEAR_INVENTORY_ITEM     = 299002;   //
+integer BOT_REMOVE_WORN_ITEM        = 299003;   //
+integer BOT_INVENTORY_TO_OBJECT     = 299004;   //
+integer BOT_ADJUST_HOVER_HEIGHT     = 299005;   //
+integer BOT_LIST_OUTFITS            = 299006;   //
+integer BOT_WEAR_OUTFIT             = 299007;   //
+integer BOT_GET_WORN_OUTFIT         = 299008;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 // LifeBots Command & Control Bridge
@@ -178,6 +189,21 @@ LifeBotsAPI(string command, list params) {
   }
  
   llHTTPRequest(API_URL, [HTTP_METHOD,"POST"], queryString);
+}
+
+// Function to convert a string to a boolean (case-insensitive, basic values)
+// Usage examples:
+//   string input1 = "TRUE";
+//   string input2 = "fAlSe";
+//   boolean bool1 = stringToBoolean(input1); // bool1 becomes TRUE
+//   boolean bool2 = stringToBoolean(input2); // bool2 becomes FALSE
+boolean stringToBoolean(string str) {
+    string lowerStr = llToLower(str); // Convert to lowercase for case-insensitivity
+    if (lowerStr == "true" || lowerStr == "yes" || lowerStr == "on" || lowerStr == "1") {
+        return TRUE;
+    } else {
+        return FALSE; // Handles "false", "no", "off", "0", "" and any other string
+    }
 }
 
 default {
@@ -285,6 +311,7 @@ default {
           llOwnerSay("Message = " + message);
           llOwnerSay("Trigger = " + (string)trigger);
         }
+        // Setup and startup
         if (num == BOT_SETUP_SETBOT) {
             if (DEBUG == 1) {
               llOwnerSay("Setting Bot Name to " + message);
@@ -298,14 +325,13 @@ default {
             // Check_Bot_Status();
             llMessageLinked(LINK_SET, BOT_SETUP_SUCCESS, BOT_NAME, trigger);
             // llMessageLinked(LINK_SET, BOT_SETUP_FAILED, BOT_NAME, trigger);
-        } else if (num == BOT_SETUP_DEVICENAME) {
-            DEVICE_NAME = message;
-        } else if (num == BOT_STATUS_QUERY) {
-            llOwnerSay("Sending bot status request...");
-            LifeBotsAPI("status", [ ]);
         } else if (num == BOT_RESET_TOTALCONTROL) {
             llOwnerSay("Resetting " + PRODUCT);
             llResetScript();
+        // Bot Status
+        } else if (num == BOT_STATUS_QUERY) {
+            llOwnerSay("Sending bot status request...");
+            LifeBotsAPI("status", [ ]);
         } else if (num == BOT_LOGIN) {
             llOwnerSay("Sending bot login request...");
             LifeBotsAPI("login", [ ]);
@@ -315,6 +341,17 @@ default {
         } else if (num == BOT_LOCATION) {
             llOwnerSay("Sending bot location request...");
             LifeBotsAPI("bot_location", [ ]);
+        // Device Settings
+        // TODO:
+        // BOT_SETUP_SETOPTIONS
+        // BOT_SETUP_DEBUG
+        // BOT_SETUP_SETLINK
+        } else if (num == BOT_SETUP_DEVICENAME) {
+            DEVICE_NAME = message;
+        // Communication commands
+        // TODO:
+        // BOT_LISTEN_LOCAL_CHAT
+        // BOT_LISTEN_IM
         } else if (num == BOT_SAY_CHAT) {
             llOwnerSay("Sending bot say chat request...");
             LifeBotsAPI("say_chat_channel", [
@@ -351,6 +388,9 @@ default {
               "avatar", (string)trigger,
               "message", message
             ]);
+        // Movement
+        // TODO:
+        // BOT_WALK
         } else if (num == BOT_SIT) {
             llOwnerSay("Sending bot sit request...");
             LifeBotsAPI("sit", [
@@ -375,6 +415,9 @@ default {
             LifeBotsAPI("walkto", [
               "coords", message
             ]);
+        // Group Management
+        // TODO:
+        // BOT_SELECT_GROUP_TAG
         } else if (num == BOT_LIST_GROUPS) {
             llOwnerSay("Sending bot group list request...");
             LifeBotsAPI("listgroups", [ ]);
@@ -424,13 +467,137 @@ default {
               "groupuuid", GROUPUUID,
               "roleuuid", ROLEUUID
             ]);
+        // LifeBots Extended API requests
+        } else if (num == BOT_LIST_GROUP_MEMBERS) {
+            llOwnerSay("Sending bot list group members request...");
+            LifeBotsAPI("get_group_members", [
+              "groupuuid", (string)trigger
+            ]);
+        // Friendship                                   //
+        } else if (num == BOT_UNFRIEND) {
+            llOwnerSay("Sending bot unfriend request...");
+            LifeBotsAPI("cancel_friendship", [
+              "slkey", (string)trigger
+            ]);
+        } else if (num == BOT_FRIENDSHIP_CAN_EDIT) {
+            llOwnerSay("Sending bot friendship can edit request...");
+            LifeBotsAPI("edit_friendship", [
+              "slkey", (string)trigger,
+              "can_edit", message
+            ]);
+        } else if (num == BOT_FRIENDSHIP_SEE_ONLINE) {
+            llOwnerSay("Sending bot friendship see online request...");
+            LifeBotsAPI("edit_friendship", [
+              "slkey", (string)trigger,
+              "see_online", message
+            ]);
+        } else if (num == BOT_FRIENDSHIP_SEE_ON_MAP) {
+            llOwnerSay("Sending bot friendship see on map request...");
+            LifeBotsAPI("edit_friendship", [
+              "slkey", (string)trigger,
+              "see_on_map", message
+            ]);
+        } else if (num == BOT_OFFER_FRIENDSHIP) {
+            llOwnerSay("Sending bot offer friendship request...");
+            LifeBotsAPI("offer_friendship", [
+              "avatar", (string)trigger,
+              "message", message
+            ]);
+        // Money
+        // TODO:
+        // BOT_LISTEN_INVENTORY_OFFER
+        // BOT_LISTEN_MONEY_PAYMENTS
+        } else if (num == BOT_GIVE_MONEY_OBJECT) {
+            llOwnerSay("Sending bot give money object request...");
+            LifeBotsAPI("give_money_object", [
+              "object_uuid", (string)trigger,
+              "amount", (integer)message
+            ]);
+        } else if (num == BOT_GIVE_MONEY) {
+            llOwnerSay("Sending bot give money request...");
+            LifeBotsAPI("give_money", [
+              "avatar", (string)trigger,
+              "amount", (integer)message
+            ]);
+        } else if (num == BOT_GET_BALANCE) {
+            llOwnerSay("Sending bot get balance request...");
+            LifeBotsAPI("get_balance", [ ]);
+        // Inventory
+        } else if (num == BOT_NOTECARD_EDIT) {
+            llOwnerSay("Sending bot notecard edit request...");
+            LifeBotsAPI("notecard_edit", [
+              "uuid", (string)trigger,
+              "text", message
+            ]);
+        } else if (num == BOT_NOTECARD_READ) {
+            llOwnerSay("Sending bot notecard read request...");
+            LifeBotsAPI("notecard_read", [
+              "uuid", (string)trigger
+            ]);
+        } else if (num == BOT_NOTECARD_CREATE) {
+            llOwnerSay("Sending bot notecard create request...");
+            LifeBotsAPI("notecard_create", [
+              "name", (string)trigger,
+              "text", message
+            ]);
+        } else if (num == BOT_INVENTORY_DELETE) {
+            llOwnerSay("Sending bot inventory delete request...");
+            LifeBotsAPI("inventory_delete", [
+              "uuid", (string)trigger
+            ]);
         } else if (num == BOT_GIVE_INVENTORY) {
-            // llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
             llOwnerSay("Sending give_inventory request...");
             LifeBotsAPI("give_inventory", [
               "avatar", (string)trigger,
               "object", message
             ]);
+        // LifeBots API Extensions
+        } else if (num == BOT_ADJUST_HOVER_HEIGHT) {
+            llOwnerSay("Sending bot adjust hover height request...");
+            LifeBotsAPI("set_hoverheight", [
+              "height", (float)message
+            ]);
+        } else if (num == BOT_LIST_OUTFITS) {
+            llOwnerSay("Sending bot list outfits request...");
+            LifeBotsAPI("get_outfits", [ ]);
+        } else if (num == BOT_WEAR_OUTFIT) {
+            llOwnerSay("Sending bot wear outfit request...");
+            LifeBotsAPI("wear_outfit", [
+              "outfitname", message
+            ]);
+        } else if (num == BOT_GET_WORN_OUTFIT) {
+            llOwnerSay("Sending bot get worn outfit request...");
+            LifeBotsAPI("get_outfit", [ ]);
+        } else if (num == BOT_WEAR_INVENTORY_ITEM) {
+            llOwnerSay("Sending bot wear inventory item request...");
+            LifeBotsAPI("wear", [
+              "uuid", (string)trigger,
+              "wear", message
+            ]);
+        } else if (num == BOT_REMOVE_WORN_ITEM) {
+            llOwnerSay("Sending bot remove worn item request...");
+            LifeBotsAPI("takeoff", [
+              "uuid", (string)trigger
+            ]);
+        } else if (num == BOT_INVENTORY_TO_OBJECT) {
+            llOwnerSay("Sending bot transfer inventory to object request...");
+            LifeBotsAPI("inventory_to_prim", [
+              "prim_uuid", (string)trigger,
+              "object_uuid", message
+            ]);
+        } else if (num == BOT_LIST_INVENTORY) {
+            llOwnerSay("Sending bot list inventory request...");
+            boolean ext = stringToBoolean(message);
+            if (trigger == NULL_KEY) {
+                LifeBotsAPI("listinventory", [
+                  "extended", ext
+                ]);
+            } else {
+                LifeBotsAPI("listinventory", [
+                  "uuid", (string)trigger,
+                  "extended", ext
+                ]);
+            }
         }
     }
 
