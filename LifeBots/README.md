@@ -150,6 +150,9 @@ The `LifeBots Control Panel` sends commands from your script => your bot.
 
 These are the commands you send to the bot (initialization, group invitation etc).
 
+See the full list of supported `LifeBots Control Panel` commands at
+https://github.com/missyrestless/Bots/blob/main/LifeBots/ControlPanel/Control_Panel_Commands.md
+
 #### How to Send Commands
 
 Use LSL `llMessageLinked` function to send commands to the bot. For example:
@@ -167,6 +170,9 @@ Was the command successful?
 The `LifeBots Control Panel` sends events from your bot => your script.
 
 Events are notifications being sent from the bot to your script (error messages, group chat IMs etc).
+
+View the full list of supported `LifeBots Control Panel` events at
+https://github.com/missyrestless/Bots/blob/main/LifeBots/ControlPanel/Control_Panel_Events.md
 
 #### How to Receive Events
 
