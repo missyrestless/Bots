@@ -1604,6 +1604,13 @@ esac
 
 ### Scheduling Bot Actions
 
+**[Note:]** A more modern approach to scheduled LifeBots activities is available
+as a `LifeBots Add-On` with the `Routine Planner Add-On` at
+[https://lifebots.cloud/store/addon/routine-planner](https://lifebots.cloud/store/addon/routine-planner).
+With `Routine Planner` you can build fully automated, interactive bot behaviors using
+routines that run on schedules, react to chat/IM triggers, execute actions step-by-step,
+and even branch routines based on user responses.
+
 The Truth & Beauty Lab utilizes the `Cron` subsystem on Linux and Macos to
 schedule `LifeBots` actions. Truth & Beauty Lab bots are logged in, teleported
 to various locations, seated on various objects, and engaged in a variety of
