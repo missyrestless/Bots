@@ -2,12 +2,20 @@ LIFEBOTS CONTROL PANEL FOR LINDEN SCRIPTING LANGUAGE (LSL)
 
 LifeBots Control Panel is an LSL script library to control LifeBots bots from an LSL script.
 
-MAJOR FEATURES
---------------
+FEATURES
+--------
 
    Login / Logout your Bot
+   Bot Movement Controls
+   Find/Take/Delete/Touch Objects
+   List and Wear Outfits
+   Manage Bot Groups
+   Pay Avatars/Objects
    Send IMs, chat messages with your Bot
    Send inventory
+   Sim Management
+   Trigger Bot actions on Events (e.g. Sit on object when Bot receives payment)
+   Much more, see Commands Reference for a full listing
 
 All you need is to call llMessageLinked LSL function. For example, to send a group invite when the Control Panel is touched:
 
