@@ -6,13 +6,13 @@ FEATURES
 --------
 
    Login / Logout your Bot
-   Bot Movement Controls
-   Find/Take/Delete/Touch Objects
+   Bot Movement Controls (e.g. Fly, Sit, Stand, Teleport, Walk, Walk To)
+   Object Interaction (e.g. Find/Take/Delete/Sit On/Touch Objects)
    List and Wear Outfits
    Manage Bot Groups
+   Manage Communication (Send & Receive IMs, Local, & Group Chat, Offer Teleport, etc)
    Pay Avatars/Objects
-   Send IMs, chat messages with your Bot
-   Send inventory
+   List, Manage, & Send Inventory
    Sim Management
    Trigger Bot actions on Events (e.g. Sit on object when Bot receives payment)
    Much more, see Commands Reference for a full listing
