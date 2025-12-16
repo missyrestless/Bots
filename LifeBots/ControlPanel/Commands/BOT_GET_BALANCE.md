@@ -1,6 +1,6 @@
-# BOT_FLY
+# BOT_GET_BALANCE
 
-Commands bot to start flying
+Requests the current L$ balance of the bot
 
 ## Variables
 
@@ -11,14 +11,14 @@ The following table shows input values (you send them with the API call) and ret
 | str      | yes      | --                        |
 | id       | yes      | --                        |
 
+## Result
+
+Raises the following event:
+
+- [BOT_GET_BALANCE_REPLY](https://github.com/missyrestless/Bots/blob/main/LifeBots/ControlPanel/Commands/BOT_GET_BALANCE_REPLY.md)
+
 ## Example
 
 ```lsl
-llMessageLinked(LINK_SET, BOT_FLY, "", "");
+llMessageLinked(LINK_SET, BOT_GET_BALANCE, "", "");
 ```
-
-## Related Commands
-
-Stops the bot from flying
-
-- [BOT_STAND](https://github.com/missyrestless/Bots/blob/main/LifeBots/ControlPanel/Commands/BOT_STAND.md)
