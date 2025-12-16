@@ -242,7 +242,7 @@ LifeBotsAPI(string command, list params) {
 //   string input2 = "fAlSe";
 //   boolean bool1 = stringToBoolean(input1); // bool1 becomes TRUE
 //   boolean bool2 = stringToBoolean(input2); // bool2 becomes FALSE
-boolean stringToBoolean(string str) {
+integer stringToBoolean(string str) {
     string lowerStr = llToLower(str); // Convert to lowercase for case-insensitivity
     if (lowerStr == "true" || lowerStr == "yes" || lowerStr == "on" || lowerStr == "1") {
         return TRUE;
@@ -661,7 +661,7 @@ default {
               "avatar", (string)trigger,
               "skipnames", message
             ]);
-        } else if (num == AVATAR_GROUPS_MATCH_AND_SKIP) {
+        } else if (num == AVATAR_GROUPS_MATCH_SKIP) {
             llOwnerSay("Sending bot avatar groups match and skip request...");
             // Split the message parameter into list
             list matstr=llParseString2List(message,["\n"],[]);
@@ -851,7 +851,7 @@ default {
         } else if (num == BOT_SIM_KICK) {
             llOwnerSay("Sending bot sim kick request...");
             LifeBotsAPI("sim_kick", [
-              "avatar", (string)trigger,
+              "avatar", (string)trigger
             ]);
         // Miscellaneous commands
         // TODO: BOT_LISTEN_DIALOG
@@ -913,7 +913,7 @@ default {
             llOwnerSay("Sending bot find objects with props request...");
             LifeBotsAPI("find_objects", [
               "range", prop,
-              "with_props": "1"
+              "with_props", "1"
             ]);
         } else if (num == FIND_OBJECTS_PARCEL) {
             llOwnerSay("Sending bot find objects parcel request...");
@@ -942,7 +942,7 @@ default {
             ]);
         } else if (num == GROUP_VISIBILITY) {
             string profile = "1";
-            if (messsage == "0") {
+            if (message == "0") {
                 profile = message;
             }
             llOwnerSay("Sending bot group visibility request...");
@@ -996,7 +996,7 @@ default {
             ]);
         } else if (num == LIST_INVENTORY) {
             llOwnerSay("Sending bot list inventory request...");
-            boolean ext = stringToBoolean(message);
+            integer ext = stringToBoolean(message);
             if (trigger == NULL_KEY) {
                 LifeBotsAPI("listinventory", [
                   "extended", ext
