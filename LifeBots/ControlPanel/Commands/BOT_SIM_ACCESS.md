@@ -10,7 +10,7 @@ The following table shows input values (you send them with the API call) and ret
 
 | Variable | Required | Description               |
 |:-------- |:-------- |:------------------------- |
-| str      | yes      | One of the following options:\n- ban - add to ban list\n- unban - remove from ban list\n- allow - add to allow list\n- disallow - remove from allow list |
+| str      | yes      | One of the following options:<br>&bull;ban - add to ban list<br>&bull;unban - remove from ban list<br>&bull;allow - add to allow list<br>&bull;disallow - remove from allow list |
 | id       | yes      | UUID of the avatar to manage access for |
 
 ## Example
