@@ -1,5 +1,7 @@
 // Simple script that returns the Profile Picks of whoever touches the object
 //
+// This example illustrates how to parse the JSON body returned by the API request
+//
 //////// LIFEBOTS COMMAND & CONTROL CODES ////////
 // Setup and startup                            //
 integer BOT_SETUP_SETBOT            = 280101;   //
@@ -150,14 +152,17 @@ integer SIM_RETURN_OBJECTS          = 299029;   //
 integer SIM_RETURN_SCRIPTED_OBJECTS = 299030;   //
 integer SIM_RETURN_OTHERS_OBJECTS   = 299031;   //
 integer REGION_INFO                 = 299032;   //
+// JSON body of response to parse
+integer BOT_JSON_RESPONSE           = 300000;   //
 //////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////
-// Land Inviter
+// Get Avatar Profile Picks
 ////////////////////////////////////////////////////
 string deviceName = "Avatar Picks";
 string botName = "Bot Name";
 string botCode = "Bot Access Code";
+key touchUUID = NULL_KEY;
     
 default {
     state_entry() {
@@ -170,15 +175,20 @@ default {
     
     // Send out group invite on touch
     touch_start(integer num) {
-        llMessageLinked(LINK_SET, AVATAR_PICKS, "", llDetectedKey(0));
+        touchUUID = llDetectedKey(0);
+        llMessageLinked(LINK_SET, AVATAR_PICKS, "", touchUUID);
     }
     
     // Notify owner if device was successfully initialized
     link_message( integer sender_num, integer num, string str, key id ) {
         /////////////////// Bot setup success event
-        if(num==BOT_SETUP_SUCCESS) {
+        if (num == BOT_SETUP_SUCCESS) {
             // Inform user
             llOwnerSay(deviceName + " ready!");
+        }
+        else if (num == BOT_JSON_RESPONSE) {
+            string displayName = llGetDisplayName(touchUUID);
+            llSay(0, displayName + " profile picks:\n" + llJsonGetValue(str, ["picks"]));
         }
     }
 }

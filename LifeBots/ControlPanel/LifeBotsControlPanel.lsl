@@ -169,6 +169,8 @@ integer SIM_RETURN_OBJECTS          = 299029;   //
 integer SIM_RETURN_SCRIPTED_OBJECTS = 299030;   //
 integer SIM_RETURN_OTHERS_OBJECTS   = 299031;   //
 integer REGION_INFO                 = 299032;   //
+// JSON body of response to parse
+integer BOT_JSON_RESPONSE           = 300000;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 // LifeBots Control Panel Command & Control Bridge
@@ -198,12 +200,12 @@ key Owner = NULL_KEY;
 integer LINK = LINK_SET;
 
 // 0 = debug off, 1 = debug on
-integer DEBUG = 0;
+integer LB_DEBUG = 0;
 
 // Send LifeBots HTTP API commands
 LifeBotsAPI(string command, list params) {
 
-    if (DEBUG == 1) {
+    if (LB_DEBUG == 1) {
         llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
         llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
         llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
@@ -213,9 +215,10 @@ LifeBotsAPI(string command, list params) {
         "action="  + command,
         "apikey="  + llEscapeURL(API_KEY),
         "botname=" + llEscapeURL(BOT_NAME),
-        "secret="  + llEscapeURL(BOT_SECRET)
+        "secret="  + llEscapeURL(BOT_SECRET),
+        "dataType=json"
     ];
-    if (DEBUG == 1) {
+    if (LB_DEBUG == 1) {
         llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
         llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
         llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
@@ -228,7 +231,7 @@ LifeBotsAPI(string command, list params) {
 
     string queryString = llDumpList2String(query, "&");
 
-    if (DEBUG == 1) {
+    if (LB_DEBUG == 1) {
         llSay(DEBUG_CHANNEL, "API_URL = " + API_URL);
         llSay(DEBUG_CHANNEL, "queryString = " + queryString);
     }
@@ -329,24 +332,24 @@ default {
                     if ( value == "TRUE" ) value = "1";
                     if ( value == "FALSE" ) value = "0";
                     if ( name == "LB_API_KEY" ) {
-                        if (DEBUG == 1) {
+                        if (LB_DEBUG == 1) {
                           llSay(DEBUG_CHANNEL, "Setting API Key to " + value);
                         }
                         API_KEY = value;
                     } else if ( name == "LB_SECRET" ) {
-                        if (DEBUG == 1) {
+                        if (LB_DEBUG == 1) {
                           llSay(DEBUG_CHANNEL, "Setting Bot Secret to " + value);
                         }
                         BOT_SECRET = value;
                     } else if ( name == "LB_BOT_NAME" ) {
-                        if (DEBUG == 1) {
+                        if (LB_DEBUG == 1) {
                           llSay(DEBUG_CHANNEL, "Setting Bot Name to " + value);
                         }
                         BOT_NAME = value;
                     } else if ( name == "LOGIN_SITON" ) {
                         LOGIN_SITON = value;
                     } else if ( name == "DEBUG" ) {
-                        DEBUG = (integer)value;
+                        LB_DEBUG = (integer)value;
                     }
                 }
                 NotecardLine++;
@@ -386,16 +389,20 @@ default {
         } else if (request_id == NULL_KEY) {
             throw_exception("Too many HTTP requests too fast!");
         } else if (status == 200) {
+            if (LB_DEBUG == 1) {
+                llSay(DEBUG_CHANNEL, "In http_response request_id = " + (string)request_id);
+            }
             llOwnerSay("✓ Success!");
             llOwnerSay("Response: " + body);
+            // In case the user wishes to parse the JSON body
+            llMessageLinked(LINK, BOT_JSON_RESPONSE, body, NULL_KEY);
             
-            // Parse JSON response (basic example)
-            // For complex parsing, consider using a JSON library
-            if (llSubStringIndex(body, "result=OK") != -1)
+            // Parse JSON response for success or failure
+            if (llJsonGetValue( body, ["result"]) == "OK")
             {
                 llOwnerSay("✓ Command executed successfully");
             }
-            else if (llSubStringIndex(body, "result=FAIL") != -1)
+            else if (llJsonGetValue( body, ["result"]) == "FAIL")
             {
                 llOwnerSay("✗ Command failed - check response");
             }
@@ -407,7 +414,7 @@ default {
 
     link_message(integer sender, integer num, string message, key trigger)
     {
-        if (DEBUG == 1) {
+        if (LB_DEBUG == 1) {
           llSay(DEBUG_CHANNEL, llList2CSV([sender, num, message, trigger]));
           llSay(DEBUG_CHANNEL, "API Num = " + (string)num);
           llSay(DEBUG_CHANNEL, "Message = " + message);
@@ -415,11 +422,11 @@ default {
         }
         // Setup and startup
         if (num == BOT_SETUP_SETBOT) {
-            if (DEBUG == 1) {
+            if (LB_DEBUG == 1) {
               llSay(DEBUG_CHANNEL, "Setting Bot Name to " + message);
             }
             BOT_NAME = message;
-            if (DEBUG == 1) {
+            if (LB_DEBUG == 1) {
               llSay(DEBUG_CHANNEL, "Setting Bot Secret to " + (string)trigger);
             }
             BOT_SECRET = (string)trigger;
@@ -451,9 +458,9 @@ default {
         // TODO: BOT_SETUP_SETOPTIONS
         } else if (num == BOT_SETUP_DEBUG) {
             if (message == "1") {
-                DEBUG = 1;
+                LB_DEBUG = 1;
             } else {
-                DEBUG = 0;
+                LB_DEBUG = 0;
             }
         } else if (num == BOT_SETUP_DEVICENAME) {
             DEVICE_NAME = message;
@@ -1015,8 +1022,10 @@ default {
             ]);
         } else {
             // TODO: which others did we not catch in this link_message event
-            if ((num != BOT_SETUP_SUCCESS) && (num != BOT_SETUP_FAILED) && (num > 250000)) {
+            if (num > 250000) {
+              if ((num != BOT_SETUP_SUCCESS) && (num != BOT_SETUP_FAILED) && (num != BOT_JSON_RESPONSE)) {
                 llOwnerSay("Unsupported API request: num=" + (string)num + ", message=" + message);
+              }
             }
         }
     }
