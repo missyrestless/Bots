@@ -150,7 +150,7 @@ default {
             string expires=llList2String(parts,1);
             
             // Setup failed somehow
-            llOwnerSay("AdminBot bot setup failed:\n"+
+            llOwnerSay("Bot setup failed:\n"+
               "error code: "+code+"\n"+
               "expired: "+expires);
         }
