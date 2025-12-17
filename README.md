@@ -27,7 +27,6 @@ the official product of either. The official `LifeBots` site can be found at
 - `Examples`: Some simple examples of how to use the Corrade system
 - `HUD`: The Corrade HUD, control bots in-world with this heads-up display
 - `LifeBots`: The lifebot command line management system for LifeBots
-  - `LifeBots/ControlPanel`: The LifeBots in-world Control Panel LSL management bridge
 - `Masters`: Script and configuration notecard to extend some privileges to the Corrade bot owner
 - `Pay2Play`: WDC Tipjar settings examples
 - `Select_Dialog_Option`: A dialog menu selector for the Corrade bot
@@ -39,9 +38,8 @@ the official product of either. The official `LifeBots` site can be found at
 `LifeBots Control Panel` is an LSL script library to control `LifeBots` bots from an LSL script.
 
 See the
-[LifeBots Control Panel](https://github.com/missyrestless/Bots/tree/main/LifeBots#lifebots-control-panel)
-section of the [LifeBots README](https://github.com/missyrestless/Bots/tree/main/LifeBots#readme)
-for details on the in-world LSL bridge for LifeBots.
+[LifeBots Control Panel repository](https://github.com/missyrestless/LifeBotsControlPanel)
+for details on the in-world LSL bridge for `LifeBots`.
 
 ## LifeBots Command Line
 
