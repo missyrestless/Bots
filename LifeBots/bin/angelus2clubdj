@@ -23,6 +23,7 @@ lifebot -a status -n Angel | jq -r '.status' | grep -i online >/dev/null || {
   sleep 20
 }
 
+lifebot -a stand -n Angel >/dev/null 2>&1
 lifebot -a teleport -n Angel -l club
 sleep 10
 lifebot -a sit -n Angel -u clubdj

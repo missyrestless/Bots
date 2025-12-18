@@ -50,6 +50,7 @@ done
 needsleep=
 for bot in ${BOTS}
 do
+  lifebot -a stand -n ${bot} >/dev/null 2>&1
   lifebot -a status -n ${bot} | jq -r '.location' | grep "${REGION}" >/dev/null || {
     lifebot -a teleport -n ${bot} -l "${LOC}"
     needsleep=1

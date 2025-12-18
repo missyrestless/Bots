@@ -222,10 +222,8 @@ examples() {
 is_valid_uuid() {
   local uuid="$1"
   if [[ $uuid =~ ^\{?[A-F0-9a-f]{8}-[A-F0-9a-f]{4}-[A-F0-9a-f]{4}-[A-F0-9a-f]{4}-[A-F0-9a-f]{12}\}?$ ]]; then
-    echo "${uuid} is valid"
     return 0 # Valid
   else
-    echo "${uuid} is invalid"
     return 1 # Invalid
   fi
 }
@@ -863,6 +861,7 @@ case "${ACTION}" in
       usage brief
     }
     if is_valid_coords "${LOCATION}"; then
+      send_request "stand" >/dev/null 2>&1
       if [ "${have_jq}" ]; then
         send_request "walkto" | jq -r .
       else
@@ -1152,6 +1151,7 @@ case "${ACTION}" in
       usage brief
     }
     if is_valid_slurl "${LOCATION}"; then
+      send_request "stand" >/dev/null 2>&1
       if [ "${have_jq}" ]; then
         send_request "teleport" | jq -r .
       else
@@ -1166,6 +1166,7 @@ case "${ACTION}" in
       echo "The sit action requires a UUID specified with -u uuid"
       usage brief
     }
+    send_request "stand" >/dev/null 2>&1
     if [ "${have_jq}" ]; then
       send_request "sit" | jq -r .
     else
