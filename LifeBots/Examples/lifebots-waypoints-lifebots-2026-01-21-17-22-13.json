@@ -1,0 +1,172 @@
+{
+  "version": "1.0.0",
+  "creator": "LifeBots Waypoint System",
+  "created": "2026-01-21T01:22:06.661Z",
+  "type": "waypoint-sequence",
+  "checksum": "1yyn",
+  "sequence": [
+    {
+      "idx": 0,
+      "type": "stand",
+      "active": true,
+      "params": {},
+      "_uid": "wp_24558b88_mknc8erp"
+    },
+    {
+      "idx": 1,
+      "type": "teleport",
+      "active": true,
+      "params": {
+        "location": "Scylla",
+        "coords": {
+          "x": 226,
+          "y": 32,
+          "z": 77
+        }
+      },
+      "_uid": "wp_11fb5fa0_mknc8erp"
+    },
+    {
+      "idx": 2,
+      "type": "wait",
+      "active": true,
+      "params": {
+        "duration": 5,
+        "randomFactor": 0
+      },
+      "_uid": "wp_50f8d1b0_mknc8erp"
+    },
+    {
+      "idx": 3,
+      "type": "walk",
+      "active": true,
+      "params": {
+        "destination": {
+          "x": 229,
+          "y": 13,
+          "z": 77
+        },
+        "speed": "normal"
+      },
+      "_uid": "wp_13ea5b96_mknc8erp"
+    },
+    {
+      "idx": 4,
+      "type": "wait",
+      "active": true,
+      "params": {
+        "duration": 5,
+        "randomFactor": 0
+      },
+      "_uid": "wp_50f8d172_mknc8erp"
+    },
+    {
+      "idx": 5,
+      "type": "sit",
+      "active": true,
+      "params": {
+        "objectId": "b5ccbda0-d708-7698-ec8b-b54068c3dbe1"
+      },
+      "_uid": "wp_6c2bf64c_mknc8erp"
+    },
+    {
+      "idx": 6,
+      "type": "wait",
+      "active": true,
+      "params": {
+        "duration": 60,
+        "randomFactor": 0
+      },
+      "_uid": "wp_335d8069_mknc8erp"
+    },
+    {
+      "idx": 7,
+      "type": "walk",
+      "active": true,
+      "params": {
+        "destination": {
+          "x": 231,
+          "y": 53,
+          "z": 77
+        },
+        "speed": "normal"
+      },
+      "_uid": "wp_51b1382d_mknc8erp"
+    },
+    {
+      "idx": 8,
+      "type": "sit",
+      "active": true,
+      "params": {
+        "objectId": "fb2d9b84-868d-db30-d487-43228009b4ae"
+      },
+      "_uid": "wp_720e3d98_mknc8erp"
+    },
+    {
+      "idx": 9,
+      "type": "wait",
+      "active": true,
+      "params": {
+        "duration": 120,
+        "randomFactor": 0
+      },
+      "_uid": "wp_66dc272f_mknc8erp"
+    },
+    {
+      "idx": 10,
+      "type": "stand",
+      "active": true,
+      "params": {},
+      "_uid": "wp_665be063_mknc8erq"
+    },
+    {
+      "idx": 11,
+      "type": "walk",
+      "active": true,
+      "params": {
+        "destination": {
+          "x": 213,
+          "y": 49,
+          "z": 78
+        },
+        "speed": "normal"
+      },
+      "_uid": "wp_e638878_mknc8erq"
+    },
+    {
+      "idx": 12,
+      "type": "sit",
+      "active": true,
+      "params": {
+        "objectId": "dd159ab2-750f-41f2-3605-81dfa55f7ac8"
+      },
+      "_uid": "wp_13a06b6a_mknc8erq"
+    },
+    {
+      "idx": 13,
+      "type": "wait",
+      "active": true,
+      "params": {
+        "duration": 3600,
+        "randomFactor": 0
+      },
+      "_uid": "wp_40495dde_mknc8erq"
+    },
+    {
+      "idx": 14,
+      "type": "repeat",
+      "active": true,
+      "params": {
+        "target": 0,
+        "iterations": 0,
+        "infinite": true
+      },
+      "_uid": "wp_35358675_mknc8erq"
+    }
+  ],
+  "totalSteps": 15,
+  "signature": {
+    "id": "lb-wp-mknc8err-54541x9",
+    "hash": "32z7"
+  }
+}
