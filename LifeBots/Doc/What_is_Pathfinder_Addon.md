@@ -13,6 +13,8 @@ The Pathfinder add-on is an advanced navigation system for your bot with waypoin
 patrol routes, and obstacle avoidance.
 
 The **LifeBots Pathfinder** add-on works with both Lite and Full LifeBots Bot plans.
+LifeBots Full Bots can also use the [Routine Planner Add-On](https://lifebots.cloud/store/addon/routine-planner)
+which includes all of the features of the Pathfinder add-on and much more.
 
 Features of the Pathfinder add-on include:
 
