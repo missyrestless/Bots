@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Bots are online and if not, login
+needsleep=
+lifebot -a stand -n Easy >/dev/null 2>&1
+lifebot -a status -n Easy | jq -r '.status' | grep -i online >/dev/null || {
+  lifebot -a login -n Easy -l beach
+  needsleep=1
+}
+[ "${needsleep}" ] && sleep 20
+
+# Send Easy to the right lounge chair
+lifebot -a teleport -n Easy -l beach >/dev/null 2>&1
+sleep 7
+lifebot -a sit -n Easy -u bpool
