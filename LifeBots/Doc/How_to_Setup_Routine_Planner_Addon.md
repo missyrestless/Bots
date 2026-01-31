@@ -54,6 +54,16 @@ You are now ready to create your first routine:
   - Enter the **Basic Information** for the routine - a routine name, description, and optionally a start position
   - Click the **Next** button
     - Depending on the **Operation Mode** selected in Global Settings, this will open Trigger or Schedule configuration
+- **Schedule**
+  - If Scheduled Mode was selected in Global Settings then you will see the Schedule Configuration
+  - Click the **Enable automatic scheduling** box to enable the routine to run automatically at specified times
+  - Select either **Exact Time** or **Time Window** to schedule automatic execution of this routine
+  - Select the days of the week for the schedule
+  - If **Exact Time** is selected then set the time to execute the routine and the repeat interval
+  - If **Time Window** is selected set the Start Time and End Time for the routine
+    - Set the **Repeat interval** in minutes
+    - Leave empty to run only once. Set to repeat every X minutes within the time window.
+  - Click the **Next** button
 - **Triggers**
   - If Trigger Mode was selected in Global Settings then you will see the Trigger Configuration
     - Enter keywords or phrases that will trigger this routine
