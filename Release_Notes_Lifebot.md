@@ -4,64 +4,6 @@ This release of the `lifebot` command line management system for `LifeBots` adds
 
 The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [Install lifebot](#install-lifebot) section below for installation instructions. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
 
-## Supported Commands
-
-Support for additional `LifeBots` API requests and commands is being extended rapidly. This listing of supported commands is complete with respect to this release but may quickly be out of date. Currently the supported commands and their categories are as follows:
-
-### Basic Commands
-
-- `bot_location` : get precise bot location
-- `key2name` : convert an avatar name to avatar UUID
-- `login` : login bot
-- `logout` : logout bot
-- `name2key` : convert an avatar UUID to avatar name
-- `status` : get bot status
-
-### Movement Commands
-
-- `sit` : sit on a specified object UUID
-- `stand` : make bot stand up
-- `teleport` : teleport bot to specified location
-- `walkto` : walk bot to a location
-
-### Communication
-
-- `im` : send an instant message to an avatar
-- `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
-- `say_chat_channel` : send a message to the specified chat channel
-- `send_group_im` : send an instant message to a group
-- `send_notice` : send an official group notice to all group members
-
-### Inventory Management
-
-- `get_outfit` : list currently worn bot outfit
-- `get_outfits` : list available bot outfits
-- `listinventory` : list bot inventory, optionally specify an inventory folder UUID
-- `set_hoverheight` : adjust bot hover height
-- `takeoff` : remove a worn item
-- `wear` : wear an inventory item (uses "add" rather than "wear")
-- `wear_outfit` : wear a specified outfit
-
-### Group Management
-
-- `activate_group` : activate a group tag
-
-### Money &amp; Transactions
-
-- `get_balance` : get your bot's L$ balance
-- `give_money` : pay another avatar L$ from your bot
-- `give_money_object` : pay an object L$ from your bot
-
-### Object Interaction
-
-- `attachments` : list bot attachments, optionally specify a filter to match
-- `touch_attachment` : touch a specified bot attachment
-- `touch_prim` : touch a specified object by UUID
-
-### Lifebot Configuration
-
-- `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
-
 ## Install lifebot
 
 To install `lifebot`:
@@ -122,17 +64,20 @@ See `LifeBots/crontab.in` for example crontab entries to schedule bot activities
 </summary>
 
 ```
-Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
-	 [-C channel] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
+Usage: lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
-	  Supported actions: login, logout, status (default), bot_location, walkto, sit, teleport,
-	        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,
-	        attachments, touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit
+	Supported actions:
+	  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,
+	  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+	  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
+	  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
 	-l location specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
 	-k apikey specifies an API Key, use environment instead
+	-A avatar specifies an avatar UUID for use with giving money or objects
 	-B text specifies the dialog button text for replies to dialog menus
 	-C channel specifies the channel for a message [default: 0]
 	-F filter specifies a filter to match when listing attachments
@@ -143,7 +88,9 @@ Where:
 	-s secret specifies a Bot secret, use environment instead
 	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
 	-z num specifies a hover height adjustment size [default: -0.05]
+		can also be used to specify a payment amount
 	-d indicates dryrun mode - tell me what you would do without doing anything
+	-e displays a list of supported commands and examples then exits
 	-i retrieves Bot details
 	-h displays this usage message and exits
 Environment:
