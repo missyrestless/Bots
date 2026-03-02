@@ -2,7 +2,9 @@
 #
 # keys2names - convert a list of avatar UUIDs to a list of avatar names
 #
-# Usage: keys2names [-n name] [-f /path/to/file ] [-u uuid]
+# Reads a file with avatar UUIds, one per line, and outputs the avatar names
+#
+# Usage: keys2names [-n name] [-f /path/to/file ]
 #
 # Default Bot
 DEF_BOT="Easy"
