@@ -5,7 +5,7 @@
 # Bot, location, and uuid can be specified on the command line
 #
 # Set to the name of bot to check, full name or bot name alias
-DEF_BOT="Easy"
+DEF_BOT="Anya"
 # Set to the location the bot should be, slurl or slurl alias
 DEF_LOC="club"
 # Set to object UUID bot should sit on, UUID or UUID alias
@@ -81,10 +81,10 @@ shift $(( OPTIND - 1 ))
 [ "${REGION}" ] || REGION="${DEF_REGION}"
 [ "${UUID}" ] || UUID="${DEF_UUID}"
 
-# If bot is Easy and location is club then sit on dancepole
-echo "${BOT}" | grep Easy >/dev/null && {
+# If bot is Anya and location is club then sit on dancepole
+echo "${BOT}" | grep Anya >/dev/null && {
   [ "${UUID}" ] || {
-    [ "${LOC}" == "club" ] && UUID="dancepole"
+    [ "${LOC}" == "club" ] && UUID="lpole"
   }
 }
 

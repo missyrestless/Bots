@@ -19,7 +19,8 @@ have_jq=$(type -p jq)
 
 # Check if Bots are online and if not, login
 needsleep=
-for bot in Angel Anya Easy
+#for bot in Angel Anya Easy
+for bot in Anya
 do
   lifebot -a stand -n ${bot} >/dev/null 2>&1
   lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
@@ -29,7 +30,8 @@ do
 done
 [ "${needsleep}" ] && sleep 20
 
-for bot in Anya Easy Angel
+#for bot in Anya Easy Angel
+for bot in Anya
 do
   lifebot -a stand -n ${bot} >/dev/null 2>&1
   sleep 1

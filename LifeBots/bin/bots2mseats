@@ -5,7 +5,8 @@
 #               arguments can specify which bots
 
 # Aliases for the bots that are going to sit
-BOTS="Angel Anya Easy"
+#BOTS="Angel Anya Easy"
+BOTS="Anya"
 # Set to region where your bots need to be
 REGION="Brightbrook Isle"
 # Set to object UUID to touch or sit
