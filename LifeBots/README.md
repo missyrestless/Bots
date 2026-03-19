@@ -1,5 +1,9 @@
 # LifeBots Second Life Bots
 
+**NEW** The `lifebot` command now supports management of both `LifeBots` and `Corrade` bots.
+To manage a `Corrade` bot simply replace the `-n <bot name or alias>` command line argument
+with `-c <bot name or alias>`.
+
 [LifeBots](https://lifebots.cloud) bills itself as:
 
 > The most advanced bot platform for Second Life. From AI characters to
