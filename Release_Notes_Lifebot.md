@@ -1,6 +1,8 @@
 # Lifebot
 
-This release of the `lifebot` command line management system for `LifeBots` adds support for additional LifeBots API commands, provides examples for each command, adds a `lifebot` man page, fixes several bugs, and simplifies installation and updates.
+This major new release of the `lifebot` command line management system adds support for controlling `Corrade` bots from the command line.
+
+The previous release of the `lifebot` command line management system for `LifeBots` added support for additional LifeBots API commands, provides examples for each command, adds a `lifebot` man page, fixes several bugs, and simplifies installation and updates.
 
 The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [Install lifebot](#install-lifebot) section below for installation instructions. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
 
@@ -38,7 +40,7 @@ Configure `lifebot` by adding and editing the file `${HOME}/.lifebots`.
 
 At a minimum, you must configure your `LifeBots` developer API key and bot secrets for the `LifeBots` bots you wish to control using the `lifebot` command.
 
-The following example entries in `$HOME/.lifebots` will allow you to control your `LifeBots` bot named "Your Botname" using the `lifebot` command:
+The following example entries in `$HOME/.lifebots` will allow you to control your `LifeBots` bot named "LifeBots Botname" and a `Corrade` bot named "Corrade Botname" using the `lifebot` command:
 
 ```bash
 ## Minimum contents of $HOME/.lifebots
@@ -46,7 +48,13 @@ The following example entries in `$HOME/.lifebots` will allow you to control you
 # LifeBots Developer API Key
 export LB_API_KEY='<your-lifebots-api-key>'
 # LifeBots bot secret
-export LB_SECRET_Your_Botname='<your-bot-secret>'
+export LB_SECRET_LifeBots_Botname='<your-bot-secret>'
+# Corrade command control via LifeBots
+export CORRADE_GROUP="<your-corrade-bot-group-name>"
+export CORRADE_PASSW="<your-corrade-bot-group-password>"
+export CORRADE_URL="https://your.corrade.server"
+# Assuming a reverse proxy is configured for the /corrade/ location
+export API_URL_Corrade_Botname="${CORRADE_URL}/corrade/"
 ```
 
 Add an entry of the form `export LB_SECRET_Firstname_Lastname='<bot-secret>'` to `$HOME/.lifebots` for each of your `LifeBots` bots.
@@ -65,7 +73,7 @@ See `LifeBots/crontab.in` for example crontab entries to schedule bot activities
 
 ```
 Usage: lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
-	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
+  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	Supported actions:
@@ -80,6 +88,7 @@ Where:
 	-A avatar specifies an avatar UUID for use with giving money or objects
 	-B text specifies the dialog button text for replies to dialog menus
 	-C channel specifies the channel for a message [default: 0]
+	-c corrade specifies a Corrade bot name to act upon
 	-F filter specifies a filter to match when listing attachments
 	-M message specifies the message body for a group notice/im
 	-N name specifies the SL name of the recipient of an IM
@@ -106,6 +115,7 @@ Examples:
   lifebot  # Displays the status of the default Bot
   lifebot -a login -l Home # Default Bot login to Home location
   lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
+  lifebot -a stand -n Jane -c John # Jane bot sends the stand command to Corrade bot John
   lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots
 ```
 

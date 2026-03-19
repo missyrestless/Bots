@@ -53,3 +53,10 @@ export SLURL_club="http://maps.secondlife.com/secondlife/CLUB_REGION%20NAME/X/Y/
 # or -u couch to seat the bot on the specified object
 export UUID_dancepole="dance-pole-object-uuid"
 export UUID_couch="couch-object-uuid"
+
+# Corrade command control via LifeBots
+export CORRADE_GROUP="<your-corrade-bot-group-name>"
+export CORRADE_PASSW="<your-corrade-bot-group-password>"
+export CORRADE_URL="https://your.corrade.server"
+export API_URL_bot1_name="${CORRADE_URL}/bot1/"
+export API_URL_bot2_name="${CORRADE_URL}/bot2/"

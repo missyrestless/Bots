@@ -1,6 +1,6 @@
 
 [1m[4mUsage:(B[m [1mlifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
-	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num](B[m
+  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num](B[m
 [1m[4mWhere:(B[m
 	[1m[4m-a action(B[m specifies the API action (sit, teleport, login, ...)
 	Supported actions:
@@ -15,6 +15,7 @@
 	[1m[4m-A avatar(B[m specifies an avatar UUID for use with giving money or objects
 	[1m[4m-B text(B[m specifies the dialog button text for replies to dialog menus
 	[1m[4m-C channel(B[m specifies the channel for a message [default: 0]
+	[1m[4m-c corrade(B[m specifies a Corrade bot name to act upon
 	[1m[4m-F filter(B[m specifies a filter to match when listing attachments
 	[1m[4m-M message(B[m specifies the message body for a group notice/im
 	[1m[4m-N name(B[m specifies the SL name of the recipient of an IM
@@ -41,4 +42,5 @@
   lifebot  # Displays the status of the default Bot
   lifebot -a login -l Home # Default Bot login to Home location
   lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
+  lifebot -a stand -n Jane -c John # Jane bot sends the stand command to Corrade bot John
   lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots

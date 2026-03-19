@@ -14,18 +14,26 @@ lifebot - Manage LifeBots Second Life bots from the command line
 
 ## SYNOPSIS
 
-lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
-[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
+lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 
 See the [Bots Github repository README](https://github.com/missyrestless/Bots)
 article for additional information on the `lifebot` command and associated tools.
 
 ## DESCRIPTION
 
-A command line management system for `LifeBots` Second Life scripted agents (bots).
-The `lifebot` command can be used to manage either `Lite` or `Full` bots from `LifeBots`.
+A command line management system for `LifeBots` and `Corrade` Second Life scripted agents (bots).
+The `lifebot` command can be used to manage either `Lite` or `Full` bots from `LifeBots` as well
+as `Corrade` bots configured with the built-in Corrade HTTP service enabled.
+
+**NEW** The `lifebot` command now supports management of both `LifeBots` and `Corrade` bots.
+To manage a `Corrade` bot simply replace the `-n <bot name or alias>` command line argument
+with `-c <bot name or alias>`.
 
 See [https://lifebots.cloud](https://lifebots.cloud) for more information on `LifeBots`.
+
+See [https://grimore.org/secondlife/scripted_agents/corrade](https://grimore.org/secondlife/scripted_agents/corrade)
+for more information on `Corrade`.
 
 ## CONFIGURATION
 
@@ -115,6 +123,13 @@ export SLURL_club="http://maps.secondlife.com/secondlife/CLUB_REGION%20NAME/X/Y/
 # or -u couch to seat the bot on the specified object
 export UUID_dancepole="dance-pole-object-uuid"
 export UUID_couch="couch-object-uuid"
+
+# Corrade command control via LifeBots
+export CORRADE_GROUP="<your-corrade-bot-group-name>"
+export CORRADE_PASSW="<your-corrade-bot-group-password>"
+export CORRADE_URL="https://your.corrade.server"
+export API_URL_bot1_name="${CORRADE_URL}/bot1/"
+export API_URL_bot2_name="${CORRADE_URL}/bot2/"
 ```
 
 ## OPTIONS
@@ -132,7 +147,9 @@ Supported actions:
 
 `-l location` : specifies a location for login and teleport actions
 
-`-n name` : specifies a Bot name, Default: Easy Islay
+`-n name` : specifies a LifeBots Bot name, Default: Anya Ordinary
+
+`-c name` : specifies a Corrade Bot name, Default: Easy Islay
 
 `-k apikey` : specifies an API Key, use environment instead
 
