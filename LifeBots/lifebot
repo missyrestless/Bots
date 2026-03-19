@@ -388,6 +388,9 @@ send_corrade_request() {
     stand)
       COMMAND="command=stand&group=${cgroup}&password=${cpassw}"
       ;;
+    status)
+      COMMAND="command=getmembersonline&group=${cgroup}&password=${cpassw}"
+      ;;
     teleport)
       local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
       local REGION=$(echo "${loc}" | awk -F '/' '{ print $1 }' | sed -e "s/%20/ /g")

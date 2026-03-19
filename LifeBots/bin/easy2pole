@@ -11,19 +11,37 @@ have_lb=$(type -p lifebot)
   exit 1
 }
 
-have_jq=$(type -p jq)
-[ "${have_jq}" ] || {
-  echo "ERROR: cannot locate jq in PATH"
-  exit 1
-}
+# Run with -l argument to control Easy Islay as a LifeBots Bot
+# Default operation is to treat her like a Corrade bot
+if [ "$1" == "-l" ]; then
+  have_jq=$(type -p jq)
+  [ "${have_jq}" ] || {
+    echo "ERROR: cannot locate jq in PATH"
+    exit 1
+  }
 
-# Check if Bot is online and if not, login
-lifebot -a status -n Easy | jq -r '.status' | grep -i online >/dev/null || {
-  lifebot -a login -n Easy -l club
-  sleep 20
-}
+  # Check if Bot is online and if not, login
+  lifebot -a status -n Easy | jq -r '.status' | grep -i online >/dev/null || {
+    lifebot -a login -n Easy -l club
+    sleep 10
+  }
 
-lifebot -a stand -n Easy >/dev/null 2>&1
-lifebot -a teleport -n Easy -l club
-sleep 10
-lifebot -a sit -n Easy -u dancepole
+  lifebot -a stand -n Easy >/dev/null 2>&1
+  lifebot -a teleport -n Easy -l club
+  sleep 5
+  lifebot -a sit -n Easy -u dancepole
+else
+  # Check if online
+  lifebot -a status -c Angel | grep Easy+Islay >/dev/null || {
+    # Maybe Angel is not online
+    lifebot -a status -c Easy | grep Easy+Islay >/dev/null || {
+      echo "Easy Islay does not appear to be online"
+      exit 1
+    }
+  }
+
+  lifebot -a stand -c Easy >/dev/null 2>&1
+  lifebot -a teleport -c Easy -l club >/dev/null 2>&1
+  sleep 5
+  lifebot -a sit -c Easy -u dancepole
+fi
