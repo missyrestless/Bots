@@ -70,7 +70,7 @@ usage() {
     NORM=
   }
   printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
-  printf "\n\t[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
+  printf "\n  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
   [ "$1" == "brief" ] && {
     printf "\n\n"
     exit 1
@@ -89,6 +89,7 @@ usage() {
   printf "\n\t${BOLD}${LINE}-A avatar${NORM} specifies an avatar UUID for use with giving money or objects"
   printf "\n\t${BOLD}${LINE}-B text${NORM} specifies the dialog button text for replies to dialog menus"
   printf "\n\t${BOLD}${LINE}-C channel${NORM} specifies the channel for a message [default: 0]"
+  printf "\n\t${BOLD}${LINE}-c corrade${NORM} specifies a Corrade bot name to act upon"
   printf "\n\t${BOLD}${LINE}-F filter${NORM} specifies a filter to match when listing attachments"
   printf "\n\t${BOLD}${LINE}-M message${NORM} specifies the message body for a group notice/im"
   printf "\n\t${BOLD}${LINE}-N name${NORM} specifies the SL name of the recipient of an IM"
@@ -115,6 +116,7 @@ usage() {
   printf "\n  lifebot  # Displays the status of the default Bot"
   printf "\n  lifebot -a login -l Home # Default Bot login to Home location"
   printf "\n  lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID"
+  printf "\n  lifebot -a stand -n Jane -c John # Jane bot sends the stand command to Corrade bot John"
   printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots\n"
   exit 1
 }
@@ -343,7 +345,77 @@ list_aliases() {
   echo ""
 }
 
-send_request() {
+wasURLEscape() {
+  printf %s "$1" | sed -e "s/ /+/g" \
+                  -e "s%/%\%2F%g" \
+                  -e "s/&/%26/g" \
+                  -e "s/%/%25/g" \
+                  -e "s/=/%3D/g" \
+                  -e "s/|/%7C/g" \
+                  -e "s/\n/%0D%0A/g"
+}
+
+send_corrade_request() {
+  local cmd="$1"
+  local cgroup="${CORRADE_GROUP}"
+  local cpassw="${CORRADE_PASSW}"
+  local cuuid=
+  [ "${cmd}" ] || {
+    echo "Empty command. Exiting."
+    usage
+  }
+  if [ "${CORRADE_BOT_ID}" ]; then
+    SL_NAME="${CORRADE_BOT_ID}"
+  else
+    SL_NAME="${corrade}"
+  fi
+  cgroup=$(wasURLEscape "${CORRADE_GROUP}")
+  cpassw=$(wasURLEscape "${CORRADE_PASSW}")
+  case "${cmd}" in
+    sit)
+      if [ "${UUID}" ]; then
+        cuuid=$(wasURLEscape "${UUID}")
+      else
+        if [ "${OBJ_NAME}" ]; then
+          cuuid=$(wasURLEscape "${OBJ_NAME}")
+        else
+          echo "Corrade command ${cmd} requires object uuid or name"
+          usage brief
+        fi
+      fi
+      COMMAND="command=sit&group=${cgroup}&password=${cpassw}&item=${cuuid}&range=64"
+      ;;
+    stand)
+      COMMAND="command=stand&group=${cgroup}&password=${cpassw}"
+      ;;
+    teleport)
+      local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
+      local REGION=$(echo "${loc}" | awk -F '/' '{ print $1 }' | sed -e "s/%20/ /g")
+      local POS=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $2, $3, $4 }')
+      local region=$(wasURLEscape "${REGION}")
+      local position=$(wasURLEscape "<${POS}>")
+      COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&entity=region&region=${region}&position=${position}"
+      ;;
+    *)
+      COMMAND=
+      ;;
+  esac
+  [ "${COMMAND}" ] || {
+    echo "Corrade command ${cmd} not yet supported"
+    usage brief
+  }
+  [ "${CORRADE_BOT_URL}" ] || {
+    echo "Corrade bot URL not set!"
+    usage brief
+  }
+  if [ "${dryrun}" ]; then
+    echo "curl -s -X POST ${CORRADE_BOT_URL} -d \"${COMMAND}\""
+  else
+    curl -s -X POST ${CORRADE_BOT_URL} -d "${COMMAND}"
+  fi
+}
+
+send_lifebot_request() {
   local act="$1"
   [ "${act}" ] || {
     echo "Empty action. Exiting."
@@ -715,16 +787,30 @@ send_request() {
   esac
 }
 
+send_request() {
+  if [ "$1" == "-l" ]; then
+    shift
+    send_lifebot_request "$@"
+  else
+    if [ "${corrade}" ]; then
+      send_corrade_request "$@"
+    else
+      send_lifebot_request "$@"
+    fi
+  fi
+}
+
 ACTION_STR= AMOUNT= AVATAR_UUID= BOT_NAME= BUTTON= FILTER= GROUP_ID=
 LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
+CORRADE_BOT_ID= CORRADE_BOT_NAME= CORRADE_BOT_URL=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
 # Use jq to format JSON return if it is available
 have_jq=$(type -p jq)
 
-command_line_secret= details= dryrun= nobold=
-while getopts ":a:A:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
+command_line_secret= details= dryrun= nobold= corrade=
+while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
   case $flag in
     a)
       ACTION_STR="${OPTARG}"
@@ -737,6 +823,10 @@ while getopts ":a:A:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
       ;;
     C)
       CHANNEL="${OPTARG}"
+      ;;
+    c)
+      CORRADE_BOT_NAME="${OPTARG}"
+      have_jq=
       ;;
     d)
       dryrun=1
@@ -807,6 +897,24 @@ shift $(( OPTIND - 1 ))
   botname=$(echo "${BOT_NAME}" | sed -e "s/ /_/g")
   envname="BOT_NAME_${botname}"
   [ "${!envname}" ] && LB_BOT_NAME="${!envname}"
+}
+
+# Setup Corrade variables if Corrade bot was specified with -c bot
+[ "${CORRADE_BOT_NAME}" ] && {
+  botname=$(echo "${CORRADE_BOT_NAME}" | sed -e "s/ /_/g")
+  envname="BOT_NAME_${botname}"
+  [ "${!envname}" ] && botname="${!envname}"
+  corrade=$(echo "${botname}" | sed -e "s/ /_/g")
+  envid="BOT_ID_${corrade}"
+  envurl="API_URL_${corrade}"
+  [ "${!envurl}" ] && CORRADE_BOT_URL="${!envurl}"
+  [ "${!envid}" ] && CORRADE_BOT_ID="${!envid}"
+  is_valid_uuid "${CORRADE_BOT_ID}" || {
+    [ "${have_jq}" ] && {
+      SL_NAME="${corrade}"
+      CORRADE_BOT_ID=$(send_request -l "name2key" | jq -r '.key')
+    }
+  }
 }
 
 # Check for a bot specific secret
