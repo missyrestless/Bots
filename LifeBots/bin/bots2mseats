@@ -5,8 +5,8 @@
 #               arguments can specify which bots
 
 # Aliases for the bots that are going to sit
-#BOTS="Angel Anya Easy"
-BOTS="Anya"
+CBOTS="Angel Easy"
+LBOTS="Anya"
 # Set to region where your bots need to be
 REGION="Brightbrook Isle"
 # Set to object UUID to touch or sit
@@ -33,12 +33,9 @@ have_jq=$(type -p jq)
   exit 1
 }
 
-# If arguments are supplied they must be bot names or aliases
-[ "$1" ] && BOTS="$*"
-
 # Check if Bots are online and if not, login
 needsleep=
-for bot in ${BOTS}
+for bot in ${LBOTS}
 do
   lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
     lifebot -a login -n ${bot} -l "${LOC}"
@@ -49,7 +46,7 @@ done
 
 # Send all Bots to the media sphere and sit
 needsleep=
-for bot in ${BOTS}
+for bot in ${LBOTS}
 do
   lifebot -a stand -n ${bot} >/dev/null 2>&1
   lifebot -a status -n ${bot} | jq -r '.location' | grep "${REGION}" >/dev/null || {
@@ -60,7 +57,29 @@ done
 [ "${needsleep}" ] && sleep 10
 
 # Sit or Touch the object
-for bot in ${BOTS}
+for bot in ${LBOTS}
 do
   lifebot -a ${ACTION} -n ${bot} -u ${UUID}
+done
+
+for bot in ${CBOTS}
+do
+  # Check if online
+  if [ "${bot}" == "Angel" ]; then
+    use="Easy"
+  else
+    use="Angel"
+  fi
+  lifebot -a status -c ${use} | grep ${bot} >/dev/null || {
+    lifebot -a status -c ${bot} | grep ${bot} >/dev/null || {
+      echo "${bot} does not appear to be online"
+      continue
+    }
+  }
+
+  lifebot -a stand -c ${bot} >/dev/null 2>&1
+  sleep 1
+  lifebot -a teleport -c ${bot} -l "${LOC}" >/dev/null 2>&1
+  sleep 5
+  lifebot -a ${ACTION} -c ${bot} -u ${UUID}
 done

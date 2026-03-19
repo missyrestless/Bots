@@ -28,19 +28,19 @@ do
     needsleep=1
   }
 done
-[ "${needsleep}" ] && sleep 20
+[ "${needsleep}" ] && sleep 10
 
 # Send Angelus to his dance pole
-#lifebot -a teleport -n Angel -l club
-#sleep 7
-#lifebot -a sit -n Angel -u rpole
+lifebot -a teleport -c Angel -l club
+sleep 5
+lifebot -a sit -c Angel -u rpole
 
 # Send Anya to her dance pole
 lifebot -a teleport -n Anya -l club
-sleep 7
+sleep 5
 lifebot -a sit -n Anya -u lpole
 
 # Send Easy to her dance pole
-#lifebot -a teleport -n Easy -l club
-#sleep 7
-#lifebot -a sit -n Easy -u dancepole
+lifebot -a teleport -c Easy -l club
+sleep 5
+lifebot -a sit -c Easy -u dancepole

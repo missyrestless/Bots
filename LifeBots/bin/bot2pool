@@ -28,13 +28,44 @@ have_jq=$(type -p jq)
 
 bot="$*"
 
-# Check if Bot is online and if not, login
-lifebot -a status -n "${bot}" | jq -r '.status' | grep -i online >/dev/null || {
-  lifebot -a login -n "${bot}" -l zen
-  sleep 10
-}
-
-lifebot -a stand -n "${bot}" >/dev/null 2>&1
-lifebot -a teleport -n "${bot}" -l zen >/dev/null 2>&1
-sleep 5
-lifebot -a sit -n "${bot}" -u zpool
+case "${bot}" in
+  Anya*|anya*)
+    # Check if Bot is online and if not, login
+    lifebot -a status -n Anya | jq -r '.status' | grep -i online >/dev/null || {
+      lifebot -a login -n Anya -l zen
+      sleep 10
+    }
+    lifebot -a stand -n Anya >/dev/null 2>&1
+    lifebot -a teleport -n Anya -l zen >/dev/null 2>&1
+    sleep 5
+    lifebot -a sit -n Anya -u zpool
+    ;;
+  Angel*|angel*)
+    # Check if online
+    lifebot -a status -c Easy | grep Angel >/dev/null || {
+      lifebot -a status -c Angel | grep Angel >/dev/null || {
+        echo "Angelus does not appear to be online"
+        exit 1
+      }
+    }
+    lifebot -a stand -c Angel >/dev/null 2>&1
+    sleep 1
+    lifebot -a teleport -c Angel -l zen >/dev/null 2>&1
+    sleep 5
+    lifebot -a sit -c Angel -u zpool
+    ;;
+  Easy*|easy*)
+    # Check if online
+    lifebot -a status -c Angel | grep Easy >/dev/null || {
+      lifebot -a status -c Easy | grep Easy >/dev/null || {
+        echo "Easy does not appear to be online"
+        exit 1
+      }
+    }
+    lifebot -a stand -c Easy >/dev/null 2>&1
+    sleep 1
+    lifebot -a teleport -c Easy -l zen >/dev/null 2>&1
+    sleep 5
+    lifebot -a sit -c Easy -u zpool
+    ;;
+esac
