@@ -16,17 +16,6 @@
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
-# TODO: add commands to send chat commands to Corrade bots, for example:
-# llInstantMessage(CORRADE,
-#   wasKeyValueEncode(
-#       [
-#           "command", "stand",
-#           "group", wasURLEscape(GROUP),
-#           "password", wasURLEscape(PASSWORD)
-#       ]
-#   )
-# );
-#
 # ----------------- $HOME/.lifebots Format ----------------------
 # Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
 # of the form LB_SECRET_BOT_NAME in order to support multiple bots
@@ -345,6 +334,25 @@ list_aliases() {
   echo ""
 }
 
+get_coords() {
+  local loc="$1"
+  # Convert position coordinates from x/y/z to x,y,z
+  echo "${loc}" | grep / >/dev/null && {
+    loc=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $(NF-2), $(NF-1), $NF }')
+  }
+  loc=$(echo "${loc}" | awk -F ',' -v OFS=',' '{ print $(NF-2), $(NF-1), $NF }')
+  echo "${loc}"
+}
+
+set_lb_coords() {
+  local loc="$1"
+  # Convert position coordinates to x/y/z
+  echo "${loc}" | grep , >/dev/null && {
+    loc=$(echo "${loc}" | awk -F ',' -v OFS='/' '{ print $(NF-2), $(NF-1), $NF }')
+  }
+  echo "${loc}"
+}
+
 wasURLEscape() {
   printf %s "$1" | sed -e "s/ /+/g" \
                   -e "s%/%\%2F%g" \
@@ -369,45 +377,87 @@ send_corrade_request() {
   else
     SL_NAME="${corrade}"
   fi
-  cgroup=$(wasURLEscape "${CORRADE_GROUP}")
-  cpassw=$(wasURLEscape "${CORRADE_PASSW}")
+  # If the Corrade configuration specifies WAS ScriptLanguage:
+  # cgroup=$(wasURLEscape "${CORRADE_GROUP}")
+  # cpassw=$(wasURLEscape "${CORRADE_PASSW}")
+  # If the Corrade configuration specifies JSON ScriptLanguage:
+  cgroup="${CORRADE_GROUP}"
+  cpassw="${CORRADE_PASSW}"
   case "${cmd}" in
     listinventory)
-      COMMAND="command=inventory&group=${cgroup}&password=${cpassw}&action=ls"
+      # If the Corrade configuration specifies WAS ScriptLanguage:
+      # COMMAND="command=inventory&group=${cgroup}&password=${cpassw}&action=ls"
+      # If the Corrade configuration specifies JSON ScriptLanguage:
+      COMMAND="{ \
+          \"command\": \"inventory\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"action\": \"ls\" }"
       ;;
     sit|touch*)
       if [ "${UUID}" ]; then
-        cuuid=$(wasURLEscape "${UUID}")
+        # cuuid=$(wasURLEscape "${UUID}")
+        cuuid="${UUID}"
       else
         if [ "${OBJ_NAME}" ]; then
-          cuuid=$(wasURLEscape "${OBJ_NAME}")
+          # cuuid=$(wasURLEscape "${OBJ_NAME}")
+          cuuid="${OBJ_NAME}"
         else
           echo "Corrade command ${cmd} requires object uuid or name"
           usage brief
         fi
       fi
       [ "${cmd}" == "sit" ] || cmd="touch"
-      COMMAND="command=${cmd}&group=${cgroup}&password=${cpassw}&item=${cuuid}&range=64"
+      # COMMAND="command=${cmd}&group=${cgroup}&password=${cpassw}&item=${cuuid}&range=64"
+      COMMAND="{ \
+          \"command\": \"${cmd}\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"item\": \"${cuuid}\", \
+          \"range\": \"64\" }"
       ;;
     stand)
-      COMMAND="command=stand&group=${cgroup}&password=${cpassw}"
+      # COMMAND="command=stand&group=${cgroup}&password=${cpassw}"
+      COMMAND="{ \
+          \"command\": \"stand\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\" }"
       ;;
     status)
-      COMMAND="command=getmembersonline&group=${cgroup}&password=${cpassw}"
+      # COMMAND="command=getmembersonline&group=${cgroup}&password=${cpassw}"
+      COMMAND="{ \
+          \"command\": \"getmembersonline\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\" }"
       ;;
     teleport)
       local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
       local REGION=$(echo "${loc}" | awk -F '/' '{ print $1 }' | sed -e "s/%20/ /g")
       local POS=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $2, $3, $4 }')
-      local region=$(wasURLEscape "${REGION}")
-      local position=$(wasURLEscape "<${POS}>")
-      COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&entity=region&region=${region}&position=${position}"
+      # local region=$(wasURLEscape "${REGION}")
+      # local position=$(wasURLEscape "<${POS}>")
+      local region="${REGION}"
+      local position="<${POS}>"
+      #COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&entity=region&region=${region}&position=${position}"
+      COMMAND="{ \
+          \"command\": \"teleport\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"entity\": \"region\", \
+          \"region\": \"${region}\", \
+          \"position\": \"${position}\" }"
       ;;
     walk*)
-      local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
-      local POS=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $2, $3, $4 }')
-      local position=$(wasURLEscape "<${POS}>")
-      COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&position=${position}"
+      # local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
+      local POS=$(get_coords "${LOCATION}")
+      # local position=$(wasURLEscape "<${POS}>")
+      local position="<${POS}>"
+      #COMMAND="command=walkto&group=${cgroup}&password=${cpassw}&position=${position}"
+      COMMAND="{ \
+          \"command\": \"walkto\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"position\": \"${position}\" }"
       ;;
     *)
       COMMAND=
@@ -743,6 +793,8 @@ send_lifebot_request() {
       fi
       ;;
     walkto)
+      # LifeBots walkto API seems to require x/y/z even though x,y,z is documented
+      LOCATION=$(set_lb_coords "${LOCATION}")
       if [ "${dryrun}" ]; then
         echo "curl -s -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
@@ -839,7 +891,7 @@ while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
       ;;
     c)
       CORRADE_BOT_NAME="${OPTARG}"
-      have_jq=
+      # have_jq=
       ;;
     d)
       dryrun=1
@@ -946,9 +998,11 @@ shift $(( OPTIND - 1 ))
 
 # Check for location alias in ~/.lifebots
 [ "${LOCATION}" ] && {
-  botloc=$(echo "${LOCATION}" | sed -e "s/ /_/g")
-  envloc="SLURL_${botloc}"
-  [ "${!envloc}" ] && LOCATION="${!envloc}"
+  echo "${LOCATION}" | grep maps.secondlife.com/secondlife >/dev/null || {
+    botloc=$(echo "${LOCATION}" | sed -e "s/ /_/g")
+    envloc="SLURL_${botloc}"
+    [ "${!envloc}" ] && LOCATION="${!envloc}"
+  }
 }
 
 # Check for avatar UUID alias in ~/.lifebots
@@ -1013,6 +1067,8 @@ case "${ACTION}" in
       echo "The ${ACTION} action requires coordinates specified with -l coords"
       usage brief
     }
+    # Strip all but last 3 fields from the location variable to get just the coordinates
+    LOCATION=$(get_coords "${LOCATION}")
     if is_valid_coords "${LOCATION}"; then
       send_request "stand" >/dev/null 2>&1
       sleep 2
