@@ -92,10 +92,14 @@ https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
 
 ## Corrade Setup for use with the LifeBots Command Line tools
 
-In order to use the `lifebot` command to manage your `Corrade` bot(s),
-the HTTP server must be enabled in the `Corrade` configuration:
+In order to use the `lifebot` command to manage your `Corrade` bot(s):
 
-```
+- The HTTP server must be enabled in the `Corrade` configuration
+- `ScriptLanguage` must be set to `JSON` in the `Corrade` configuration
+
+Example snippet to enable the HTTP server in `CorradeConfiguration.xml`:
+
+```xml
 <Servers>
     <HTTPServer>
         <Enable>1</Enable>
@@ -109,6 +113,12 @@ the HTTP server must be enabled in the `Corrade` configuration:
 
 Set the port number in the `Prefix` configuration to an open unused port.
 If you have more than one `Corrade` bot then use a different port for each.
+
+To set the `ScriptLanguage` to JSON in `CorradeConfiguration.xml`:
+
+```xml
+  <ScriptLanguage>JSON</ScriptLanguage>
+```
 
 ### Nginx Reverse Proxy
 

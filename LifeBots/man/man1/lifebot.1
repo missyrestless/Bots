@@ -19,7 +19,8 @@
 .SH LIFEBOT
 .SS NAME
 .PP
-lifebot - Manage LifeBots Second Life bots from the command line
+lifebot - Manage LifeBots and Corrade Second Life bots from the command
+line
 .SS SYNOPSIS
 .PP
 lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k
@@ -38,18 +39,58 @@ The \f[V]lifebot\f[R] command can be used to manage either
 \f[V]Corrade\f[R] bots configured with the built-in Corrade HTTP service
 enabled.
 .PP
-\f[B]NEW\f[R] The \f[V]lifebot\f[R] command now supports management of
-both \f[V]LifeBots\f[R] and \f[V]Corrade\f[R] bots.
-To manage a \f[V]Corrade\f[R] bot simply replace the
-\f[V]-n <bot name or alias>\f[R] command line argument with
-\f[V]-c <bot name or alias>\f[R].
-.PP
 See <https://lifebots.cloud> (https://lifebots.cloud) for more
 information on \f[V]LifeBots\f[R].
 .PP
 See
 <https://grimore.org/secondlife/scripted_agents/corrade> (https://grimore.org/secondlife/scripted_agents/corrade)
 for more information on \f[V]Corrade\f[R].
+.SS CORRADE CONFIGURATION
+.PP
+\f[B]NEW\f[R] The \f[V]lifebot\f[R] command now supports management of
+both \f[V]LifeBots\f[R] and \f[V]Corrade\f[R] bots.
+To manage a \f[V]Corrade\f[R] bot simply replace the
+\f[V]-n <bot name or alias>\f[R] command line argument with
+\f[V]-c <bot name or alias>\f[R].
+.PP
+In order to use the \f[V]lifebot\f[R] command to manage your
+\f[V]Corrade\f[R] bot(s):
+.IP \[bu] 2
+The HTTP server must be enabled in the \f[V]Corrade\f[R] configuration
+.IP \[bu] 2
+\f[V]ScriptLanguage\f[R] must be set to \f[V]JSON\f[R] in the
+\f[V]Corrade\f[R] configuration
+.PP
+Example snippet to enable the HTTP server in
+\f[V]CorradeConfiguration.xml\f[R]:
+.IP
+.nf
+\f[C]
+<Servers>
+    <HTTPServer>
+        <Enable>1</Enable>
+        <Prefixes>
+            <Prefix>http://+:8082/</Prefix>
+        </Prefixes>
+    </HTTPServer>
+    ...
+</Servers>
+\f[R]
+.fi
+.PP
+Set the port number in the \f[V]Prefix\f[R] configuration to an open
+unused port.
+If you have more than one \f[V]Corrade\f[R] bot then use a different
+port for each.
+.PP
+To set the \f[V]ScriptLanguage\f[R] to JSON in
+\f[V]CorradeConfiguration.xml\f[R]:
+.IP
+.nf
+\f[C]
+  <ScriptLanguage>JSON</ScriptLanguage>
+\f[R]
+.fi
 .SS CONFIGURATION
 .PP
 The \f[V]lifebot\f[R] command is installed in \f[V]/usr/local/bin\f[R]
@@ -660,7 +701,7 @@ Written by Missy Restless \f[V]missyrestless\[at]gmail.com\f[R]
 .PP
 MIT License
 .PP
-Copyright (c) 2025 Truth & Beauty Lab
+Copyright (c) 2025-2026 Truth & Beauty Lab
 .PP
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
@@ -686,9 +727,6 @@ Submit bug reports online at:
 .PP
 <https://github.com/missyrestless/Bots/issues>
 .SS SEE ALSO
-.PP
-\f[B]bot2dj\f[R](1), \f[B]bot2login\f[R](1), \f[B]bot2logout\f[R](1),
-\f[B]send_bot_balance\f[R](1)
 .PP
 Full documentation and sources at:
 .PP
