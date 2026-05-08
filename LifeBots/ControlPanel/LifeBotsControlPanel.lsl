@@ -112,18 +112,30 @@ integer BOT_LOCATION_REPLY          = 290233;   //
 integer BOT_NOTECARD_READ_REPLY     = 290238;   //
 integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
                                                 //
+// Internal                                     //
+integer CONTROL_PANEL_MANAGE        = 300000;   //
+integer MENU_ACCESS                 = 300001;   //
+integer SET_VISIBILITY              = 300002;   //
+integer SET_RESTRICTED_ACCESS       = 300003;   //
+integer SET_LISTEN_HANDLE           = 300004;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 // LifeBots Command & Control Bridge
 //////////////////////////////////////////////////
 
 string API_URL = "https://api.lifebots.cloud/api/bot.html";
-string API_KEY = "your-lifebots-developer-api-key";
+string API_KEY = "";
 string BOT_NAME = "";
 string BOT_SECRET = "";
 
 string _BOTNAME = "";
 string DEVICE_NAME = "";
+string LOGIN_SITON = "";
+
+// Configuration Notecard
+string CONFIG_CARD = "Configuration";
+integer NotecardLine;
+key QueryID;
 
 key Owner = NULL_KEY;
 
@@ -133,31 +145,19 @@ list COMMAND_NAMES = [];
 
 integer SHOW_BOT_MENU = TRUE;
 integer OWNER_BOT_MENU = FALSE;
-integer AI_ENABLED = TRUE;
 integer INVISIBLE = FALSE; // Enable making the bot invisible
 integer PART_ENABLED = FALSE; // Does the bot emit particles etc ?
-integer EMAIL_ENABLED = TRUE; // Send emails
-integer VERBAL_SHUTOFF_ENABLED = TRUE;
 integer RESTRICTED_ACCESS = 1;
-integer chat_channel = 0;
 integer dialog_handle = 0;
 integer handle = 1;
 integer enabled = 1;
-integer duo = 0;
 float range = 20.0;
-vector offset = ZERO_VECTOR;
 
 // Reused strings
 string _DEFAULT = "default";
 string _RESET = "Reset";
 string _UPGRADE = "Upgrade";
 string _EXIT = "<<< Exit >>>";
-string _GOHOME = "Go Home";
-string _HOME = "Set Home";
-string _FIRE = "Fire Laser";
-string _PHYS = "Physical";
-string _PHAN = "Phantom";
-string _COME = "Come Here";
 string _ENABLE = "ENABLE";
 string _DISABLE = "DISABLE";
 string _OFF = "OFF";
@@ -177,7 +177,6 @@ string _SELECT = ".\nSelect one of the";
 string _CURRENT = "is currently ";
 string _ENBLED = "ENABLED\n";
 string _DSBLED = "DISABLED\n";
-string _IDENT = "[LifeBot]";
 
 string  _DialogMessage;
 integer _DialogChannel;
@@ -201,9 +200,6 @@ string _SPARKLE = "Scan_n_Sparkle";
 string _POSITION = "Position";
 string _ADJUST = "Adjust";
 string _DOC = "Help";
-string _EMAIL = "Email";
-string _CHAT = "AI Chat";
-string _SHUTOFF = "Access";
 string _VISIBLE = "Visibility";
 string _COMMANDS = "Commands";
 string _INNER = "InnerSpheres";
@@ -263,7 +259,7 @@ list SLOW_FAST = [ _SPACE, _EXIT, _SLOWEST, _SLOWER, _SLOW, _FAST, _FASTER, _FAS
 list ON_OFF = [ _SPACE, _EXIT, _ON, _SPACE, _OFF ];
 
 // List of the menus in the system
-list _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _CHAT, _SHUTOFF, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
+list _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
 
 list _NavigationStack;        // Manages the menus calling submenus
 
@@ -371,23 +367,16 @@ ShowMainMenu( key aAvatarKey ) {
 
 MenuStarter( string aMenu, key aID, integer aPush ) {
 
-    string DialogMessage = "LifeBot Configuration Dialog";
+    string DialogMessage = "LifeBots Control Panel Dialog";
     list   DialogOptions;
-    integer pandora = 0;
 
     if ( aMenu == _MAIN ) {
-        if (llGetInventoryType("pandorabot") == INVENTORY_SCRIPT)
-            pandora = 1;
         DialogOptions = [];
-        if (pandora) {
-            DialogMessage = "Main Menu - LifeBot Configuration";
-            if (handle)
-                DialogOptions = DialogOptions + [ _OFF ];
-            else
-                DialogOptions = DialogOptions + [ _ON ];
-        }
+        DialogMessage = "Main Menu - LifeBots Control Panel";
+        if (handle)
+            DialogOptions = DialogOptions + [ _OFF ];
         else
-            DialogMessage = "Main Menu";
+            DialogOptions = DialogOptions + [ _ON ];
         if (llGetInventoryType(_IS) == INVENTORY_SCRIPT)
             DialogOptions = DialogOptions + [ _INNER ];
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
@@ -395,12 +384,8 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             DialogOptions = DialogOptions + [ _SCAN, _TARGET ];
         if ((SHOW_BOT_MENU) && (_BOTNAME != "")) {
-            if ((aID == Owner) || 
-                ((RESTRICTED_ACCESS == 2) && llSameGroup(aID))) {
-              if (pandora)
-                  DialogOptions = DialogOptions + [ _CHAT, _EMAIL, _SHUTOFF, _VISIBLE, _DOC, _UPGRADE, _RESET ];
-              else
-                  DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
+            if ((aID == Owner) || ((RESTRICTED_ACCESS == 2) && llSameGroup(aID))) {
+                DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
             } else {
                 DialogOptions = [ _EXIT, _DOC ];
                 if (llGetInventoryType(OWNER_MANUAL)==7)
@@ -419,10 +404,7 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
                     DialogOptions = DialogOptions + [ _COMMANDS ];
             }
           } else {
-            if (pandora)
-                DialogOptions = DialogOptions + [ _CHAT, _EMAIL, _SHUTOFF, _VISIBLE, _DOC, _UPGRADE, _RESET ];
-            else
-                DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
+              DialogOptions = DialogOptions + [ _VISIBLE, _DOC, _UPGRADE, _RESET ];
           }
     } else if ( aMenu == _INNER ) {
         DialogMessage = _IS + " menu: configure rotating display.";
@@ -502,45 +484,6 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             DialogOptions = DialogOptions + ["Visible"];
         else
             DialogOptions = DialogOptions + ["Invisible"];
-    } else if ( aMenu == _SHUTOFF ) {
-        DialogMessage = "Menu Access: set LifeBot access";
-        DialogMessage = DialogMessage + "\n\nVerbal shutoff " + _CURRENT;
-        if (VERBAL_SHUTOFF_ENABLED) {
-          DialogMessage = DialogMessage + _ENBLED;
-          if (RESTRICTED_ACCESS == 1)
-            DialogMessage = DialogMessage + " by Owner only";
-          else if (RESTRICTED_ACCESS == 2)
-            DialogMessage = DialogMessage + " by Group only";
-          else
-            DialogMessage = DialogMessage + " by All";
-        }
-        else
-          DialogMessage = DialogMessage + _DSBLED;
-        DialogMessage = DialogMessage + "\nMenu access " + _CURRENT;
-        if (RESTRICTED_ACCESS == 1)
-            DialogMessage = DialogMessage + " set to Owner only";
-        else if (RESTRICTED_ACCESS == 2)
-            DialogMessage = DialogMessage + " set to Group only";
-        else
-            DialogMessage = DialogMessage + " set to All";
-        DialogOptions = [];
-        if (VERBAL_SHUTOFF_ENABLED)
-            DialogOptions = DialogOptions + [_VERBAL + _OFF];
-        else
-            DialogOptions = DialogOptions + [_VERBAL + _ON];
-        DialogOptions = DialogOptions + ["Owner Only", "Group Only", _ALL ];
-    } else if ( aMenu == _EMAIL ) {
-        DialogMessage = "\nEmail " + _CURRENT;
-        if (EMAIL_ENABLED)
-          DialogMessage = DialogMessage + _ENBLED;
-        else
-          DialogMessage = DialogMessage + _DSBLED;
-        DialogMessage = DialogMessage + _ABLE + " sending of email " + _EDIT;
-        DialogOptions = [];
-        if (EMAIL_ENABLED)
-            DialogOptions = DialogOptions + [_EMAIL + _SPACE + _OFF];
-        else
-            DialogOptions = DialogOptions + [_EMAIL + _SPACE + _ON];
     } else if ( aMenu == _RANGE ) {
         DialogMessage = "\nSelect the range of scans (in meters).\nRange " + _CURRENT + (string)range + " meters.";
         DialogOptions = ["2.0", "5.0", "10.0", "20.0", "30.0", "40.0", "50.0", "60.0", "70.0", "80.0", "90.0"];
@@ -559,18 +502,6 @@ MenuStarter( string aMenu, key aID, integer aPush ) {
             DialogOptions = DialogOptions + [ _DISABLE ];
         else
             DialogOptions = DialogOptions + [ _ENABLE ];
-    } else if ( aMenu == _CHAT ) {
-        DialogMessage = "\nAI chat " + _CURRENT;
-        if (AI_ENABLED)
-          DialogMessage = DialogMessage + _ENBLED;
-        else
-          DialogMessage = DialogMessage + _DSBLED;
-        DialogMessage = DialogMessage + _ABLE + " AI chat " + _EDIT;
-        DialogOptions = [];
-        if (AI_ENABLED)
-            DialogOptions = DialogOptions + ["Chat OFF"];
-        else
-            DialogOptions = DialogOptions + ["Chat ON"];
     } else if ( aMenu == _COMMANDS ) {
         DialogMessage = _SELECT + _SPACE + _BOTNAME + " command";
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT) {
@@ -595,48 +526,36 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             return FALSE;
     }
     if ( aMenu == _MAIN ) {
-        if ( aButton == _OFF ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+        if (( aButton == _OFF ) || ( aButton == _ON )) {
+            llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
             return FALSE;
-        }
-        else if ( aButton == _ON ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            return FALSE;
-        }
-        else if ( aButton == _DOC ) {
+        } else if ( aButton == _DOC ) {
             if (llGetInventoryType(OWNER_MANUAL) == 7)
                  llGiveInventory(aAvatarKey, OWNER_MANUAL);
             if (llGetInventoryType(ADDON_MANUAL) == 7)
                  llGiveInventory(aAvatarKey, ADDON_MANUAL);
             if (llGetInventoryType(_GUIDE) == 7)
                  llGiveInventory(aAvatarKey, _GUIDE);
-        }
-        else if ( aButton == _OMAN ) {
+        } else if ( aButton == _OMAN ) {
             llGiveInventory(aAvatarKey, OWNER_MANUAL);
-        }
-        else if ( aButton == _AMAN ) {
+        } else if ( aButton == _AMAN ) {
             if (llGetInventoryType(ADDON_MANUAL) == 7)
                 llGiveInventory(aAvatarKey, ADDON_MANUAL);
-        }
-        else if ( aButton == _UMAN ) {
+        } else if ( aButton == _UMAN ) {
             llGiveInventory(aAvatarKey, _GUIDE);
-        }
-        else if ( aButton == _LM ) {
+        } else if ( aButton == _LM ) {
             llGiveInventory(aAvatarKey,
                             llGetInventoryName(INVENTORY_LANDMARK, 0));
-        }
-        else if ( aButton == _INFO ) {
+        } else if ( aButton == _INFO ) {
             llGiveInventory(aAvatarKey,
                             llGetInventoryName(INVENTORY_NOTECARD, 0));
-        }
-        else if ( aButton == _RESET ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+        } else if ( aButton == _RESET ) {
+            llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
             llResetScript();
             return FALSE;
-        }
-        else if ( aButton == _UPGRADE ) {
+        } else if ( aButton == _UPGRADE ) {
             if (aAvatarKey == Owner) {
-                llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+                llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
                 return FALSE;
             }
             else {
@@ -738,7 +657,7 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
         } else {
             if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT) {
                 if ( aButton == _EXIT ) {
-                    llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+                    llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
                     return FALSE;
                 }
                 if ( aButton == _SPACE ) {
@@ -746,8 +665,6 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
                 }
                 else {
                     llMessageLinked(LINK_SET, 103, aButton, aMenu);
-                    if (duo)
-                        llWhisper(chat_channel, aButton);
                 }
             }
             else if (llGetInventoryType(_IS) == INVENTORY_SCRIPT)
@@ -767,44 +684,14 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
             llMessageLinked(LINK_THIS, 348, aButton, aMenu);
     } else if ( aMenu == _BUBBLES ) {
         llMessageLinked(LINK_THIS, 349, aButton, aMenu);
-    } else if ( aMenu == _EMAIL ) {
-        if ( aButton == _EMAIL + _SPACE + _OFF ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            EMAIL_ENABLED = FALSE;
-        }
-        else if ( aButton == _EMAIL + _SPACE + _ON ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            EMAIL_ENABLED = TRUE;
-        }
     } else if ( aMenu == _VISIBLE ) {
         if ( aButton == "Visible" ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+            llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
             INVISIBLE = FALSE;
         }
         else if ( aButton == "Invisible" ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+            llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
             INVISIBLE = TRUE;
-        }
-    } else if ( aMenu == _SHUTOFF ) {
-        if ( aButton == _VERBAL + _OFF ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            VERBAL_SHUTOFF_ENABLED = FALSE;
-        }
-        else if ( aButton == _VERBAL + _ON ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            VERBAL_SHUTOFF_ENABLED = TRUE;
-        }
-        else if ( aButton == "Owner Only" ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            RESTRICTED_ACCESS = 1;
-        }
-        else if ( aButton == "Group Only" ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            RESTRICTED_ACCESS = 2;
-        }
-        else if ( aButton == _ALL ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            RESTRICTED_ACCESS = 0;
         }
     } else if ( aMenu == _RANGE ) {
         range = (float)aButton;
@@ -812,17 +699,9 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
         llMessageLinked(LINK_THIS, 155, aButton, aMenu);
     } else if ( aMenu == _ADJUST ) {
         llMessageLinked(LINK_THIS, 156, aButton, aMenu);
-    } else if ( aMenu == _CHAT ) {
-        if ( aButton == "Chat ON" ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            AI_ENABLED = TRUE;
-        } else if ( aButton == "Chat OFF" ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
-            AI_ENABLED = FALSE;
-        }
     } else if ( aMenu == _COMMANDS ) {
         if ( aButton == _EXIT ) {
-            llMessageLinked(LINK_THIS, 53, aButton, aMenu);
+            llMessageLinked(LINK_THIS, CONTROL_PANEL_MANAGE, aButton, aMenu);
             return FALSE;
         }
         if ( aButton == _SPACE ) {
@@ -830,33 +709,42 @@ integer MenuListen( string aMenu, string aButton, string aAvatarName, key aAvata
         }
         else {
             llMessageLinked(LINK_SET, 103, aButton, aMenu);
-            if (duo)
-                llWhisper(chat_channel, aButton);
         }
     }
     return RESHOWDIALOG;
 }
 
-// Give_Bot_Inventory(bot name, bot secret, inventory UUID, recipient key)
-Give_Bot_Inventory(string botname, string secret, string uuid, string avatar) {
-    // Build JSON payload
-    string json = "{"
-        + "\"action\":\"" + "give_inventory" + "\""
-        + ",\"apikey\":\"" + API_KEY + "\""
-        + ",\"botname\":\"" + botname + "\""
-        + ",\"secret\":\"" + secret + "\""
-        + ",\"avatar\":\"" + avatar + "\""
-        + ",\"object\":\"" + uuid + "\""
-        + "}";
-    
-    // Send HTTP POST request
-    llHTTPRequest(API_URL, [
-        HTTP_METHOD, "POST",
-        HTTP_MIMETYPE, "application/json"
-    ], json);
-    
-    llOwnerSay("Sending give_inventory request...");
-    
+SetScriptState(string script, integer action) {
+    if (llGetInventoryType(script) == INVENTORY_SCRIPT)
+        llSetScriptState(script, action);
+}
+
+Prep_Restart() {
+    SetScriptState(_SCAN, TRUE);
+    if (handle)
+        llListenRemove(handle);
+    handle = 0;
+}
+
+// Send LifeBots HTTP API commands
+LifeBotsAPI(string command, list params) {
+
+  // Populate the query data
+  list query = [
+    "action="  + command,
+    "apikey="  + llEscapeURL(API_KEY),
+    "botname=" + llEscapeURL(BOT_NAME),
+    "secret="  + llEscapeURL(BOT_SECRET)
+  ];
+
+  integer i;
+  for(i = 0; i<llGetListLength(params); i += 2) {
+    query += [ llList2String(params, i) + "=" + llEscapeURL(llList2String(params, i+1)) ];
+  }
+
+  string queryString = llDumpList2String(query, "&");
+ 
+  llHTTPRequest(API_URL, [HTTP_METHOD,"POST"], queryString);
 }
 
 default {
@@ -870,17 +758,24 @@ default {
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             PART_ENABLED = TRUE;
         if (llGetInventoryType(_IS) == INVENTORY_SCRIPT) {
-            _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _CHAT, _SHUTOFF, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
+            _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _VISIBLE, _INNER, _FLEX, _SIZE, _SPEED, _FADE, _SOUND, _BUBBLES, _SNOW, _RAIN, _PARTICLES, _TEXTURE, _GEOMETRY, _GRAV, _SOFT, _FRIC, _WIND, _FORCE, _TENSION ];
         }
         else {
             if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
-                _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _PARTICLES, _CHAT, _SHUTOFF, _VISIBLE ];
+                _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _PARTICLES, _VISIBLE ];
             else
-                _NavigationMenus = [ _MAIN, _EMAIL, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _CHAT, _SHUTOFF, _VISIBLE ];
+                _NavigationMenus = [ _MAIN, _ADJUST, _POSITION, _RANGE, _SCAN, _UPGRADE, _VISIBLE ];
         }
         llMessageLinked(LINK_THIS, 154, "Get Commands", "");
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             _NavigationMenus = _NavigationMenus + [ _COMMANDS ];
+        if (llGetInventoryType(CONFIG_CARD) == INVENTORY_NOTECARD) {
+            NotecardLine = 0;
+            QueryID = llGetNotecardLine(CONFIG_CARD, NotecardLine);
+        }
+        else {
+            llOwnerSay("Configuration notecard missing, using defaults.");
+        }
     }
 
     on_rez(integer param)
@@ -895,6 +790,51 @@ default {
                 llListenRemove(dialog_handle);
             dialog_handle = 0;
             llResetScript();
+        }
+    }
+
+    dataserver( key queryid, string data )
+    {
+        integer lang_pos;
+        list temp;
+        string name;
+        string value;
+        if ( queryid == QueryID ) {
+            if ( data != EOF ) {
+                if (data == "END_SETTINGS") {
+                    if ((API_KEY == "") || (API_KEY == "your-api-key")) {
+                        llOwnerSay("ERROR: LB_API_KEY not set.";
+                        llOwnerSay("Edit the Configuration notecard to set your LifeBots API Key.");
+                        llSetScriptState(llGetScriptName(), FALSE);
+                    }
+                }
+                if ( llGetSubString(data, 0, 0) != "#" && llStringTrim(data, STRING_TRIM) != "" ) {
+                    temp = llParseString2List(data, ["="], []);
+                    name = llStringTrim(llList2String(temp, 0), STRING_TRIM);
+                    value = llStringTrim(llList2String(temp, 1), STRING_TRIM);
+                    if ( value == "TRUE" ) value = "1";
+                    if ( value == "FALSE" ) value = "0";
+                    if ( name == "LB_API_KEY" ) {
+                        API_KEY = value;
+                    } else if ( name == "LB_SECRET" ) {
+                        BOT_SECRET = value;
+                    } else if ( name == "LB_BOT_NAME" ) {
+                        BOT_NAME = value;
+                    } else if ( name == "LOGIN_SITON" ) {
+                        LOGIN_SITON = value;
+                    } else if ( name == "OWNER_BOT_MENU" ) {
+                        OWNER_BOT_MENU = (integer)value;
+                    } else if ( name == "SHOW_BOT_MENU" ) {
+                        SHOW_BOT_MENU = (integer)value;
+                    } else if ( name == "INVISIBLE" ) {
+                        INVISIBLE = (integer)value;
+                    } else if ( name == "RESTRICTED_ACCESS" ) {
+                        RESTRICTED_ACCESS = (integer)value;
+                    }
+                }
+                NotecardLine++;
+                QueryID = llGetNotecardLine( CONFIG_CARD, NotecardLine );
+            }
         }
     }
 
@@ -947,23 +887,95 @@ default {
       }
     }
 
-    //  llMessageLinked(LINK_SET, BOT_SETUP_SETBOT, botName, botCode);
-    //  llMessageLinked(LINK_SET, BOT_SETUP_DEVICENAME, deviceName, llGetOwner());
-    //  llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
-
     link_message(integer sender, integer num, string message, key trigger)
     {
         // TODO: Cleanup legacy link messages
         if (num == BOT_SETUP_SETBOT) {
             BOT_NAME = message;
             BOT_SECRET = (string)trigger;
+            // TODO: Check Bot status and send bot setup success/failure link message
+            // Check_Bot_Status();
+            llMessageLinked(LINK_SET, BOT_SETUP_SUCCESS, BOT_NAME, trigger);
+            // llMessageLinked(LINK_SET, BOT_SETUP_FAILED, BOT_NAME, trigger);
         } else if (num == BOT_SETUP_DEVICENAME) {
             DEVICE_NAME = message;
-            Owner = trigger;
+        } else if (num == BOT_STATUS_QUERY) {
+            llOwnerSay("Sending bot status request...");
+            LifeBotsAPI("status", [ ]);
+        } else if (num == BOT_RESET_TOTALCONTROL) {
+            llOwnerSay("Resetting LifeBots Control Panel...");
+            llResetScript();
+        } else if (num == BOT_LOGIN) {
+            llOwnerSay("Sending bot login request...");
+            LifeBotsAPI("login", [ ]);
+        } else if (num == BOT_LOGOUT) {
+            llOwnerSay("Sending bot logout request...");
+            LifeBotsAPI("logout", [ ]);
+        } else if (num == BOT_LOCATION) {
+            llOwnerSay("Sending bot location request...");
+            LifeBotsAPI("bot_location", [ ]);
+        } else if (num == BOT_SAY_CHAT) {
+            llOwnerSay("Sending bot say chat request...");
+            LifeBotsAPI("say_chat_channel", [
+              "channel", "0",
+              "message", message
+            ]);
+        } else if (num == BOT_INSTANT_MESSAGE) {
+            llOwnerSay("Sending bot instant message request...");
+            LifeBotsAPI("im", [
+              "slname", (string)trigger,
+              "message", message
+            ]);
+        } else if (num == BOT_SAY_GROUP_CHAT) {
+            llOwnerSay("Sending bot say group chat request...");
+            LifeBotsAPI("send_group_im", [
+              "groupuuid", (string)trigger,
+              "message", message
+            ]);
+        } else if (num == BOT_SEND_NOTICE) {
+            // Split the message parameter into list
+            list msgstr=llParseString2List(message,["\n"],[]);
+            // The first line is the subject, the second line is the text
+            string SUBJECT = llList2String(msgstr,0);
+            string TEXT = llList2String(msgstr,1);
+            llOwnerSay("Sending bot send notice request...");
+            LifeBotsAPI("send_notice", [
+              "groupuuid", (string)trigger,
+              "subject", SUBJECT,
+              "text", TEXT
+            ]);
+        } else if (num == BOT_OFFER_TELEPORT) {
+            llOwnerSay("Sending bot offer teleport request...");
+            LifeBotsAPI("offer_teleport", [
+              "avatar", (string)trigger,
+              "message", message
+            ]);
+        } else if (num == BOT_LISTEN_LOCAL_CHAT) {
+            llOwnerSay("Bot listen local chat NOT IMPLEMENTED");
+        } else if (num == BOT_LISTEN_IM) {
+            llOwnerSay("Bot listen instant message NOT IMPLEMENTED");
         } else if (num == BOT_GIVE_INVENTORY) {
-            // Give_Bot_Inventory(bot name, bot secret, inventory UUID, recipient key)
-            Give_Bot_Inventory(BOT_NAME, BOT_SECRET, message, (string)trigger);
-        } else if (num == 93) {
+            // llMessageLinked(LINK_SET, BOT_GIVE_INVENTORY, inventoryID, llDetectedKey(0));
+            llOwnerSay("Sending give_inventory request...");
+            LifeBotsAPI("give_inventory", [
+              "avatar", (string)trigger,
+              "object", message
+            ]);
+        } else if (num == BOT_GROUP_INVITE) {
+            // llMessageLinked(LINK_SET, BOT_GROUP_INVITE, groupID + "\n" + roleID, llDetectedKey(0));
+            // Split the message parameter into list
+            list msgstr=llParseString2List(message,["\n"],[]);
+            // The first line is the group id, the second line is the role id
+            string GROUPUUID = llList2String(msgstr,0);
+            string ROLEUUID = llList2String(msgstr,1);
+
+            llOwnerSay("Sending group_invite request...");
+            LifeBotsAPI("group_invite", [
+              "avatar", (string)trigger,
+              "groupuuid", GROUPUUID,
+              "roleuuid", ROLEUUID
+            ]);
+        } else if (num == MENU_ACCESS) {
             if (OWNER_BOT_MENU) {
               if ((trigger == Owner) ||
                   ((RESTRICTED_ACCESS == 2) && llSameGroup(trigger))) {
@@ -973,22 +985,12 @@ default {
             else {
               ShowMainMenu(trigger);
             }
-        } else if (num == 70) {
-            chat_channel = (integer)message;
-        } else if (num == 78) {
+        } else if (num == SET_VISIBILITY) {
             INVISIBLE = (integer)message;
-        } else if (num == 180) {
-            offset = (vector)message;
-        } else if (num == 80) {
-            EMAIL_ENABLED = (integer)message;
-        } else if (num == 81) {
-            VERBAL_SHUTOFF_ENABLED = (integer)message;
-        } else if (num == 82) {
+        } else if (num == SET_RESTRICTED_ACCESS) {
             RESTRICTED_ACCESS = (integer)message;
-        } else if (num == 85) {
+        } else if (num == SET_LISTEN_HANDLE) {
             handle = (integer)message;
-        } else if (num == 86) {
-            AI_ENABLED = (integer)message;
         } else if (num == 87) {
             SHOW_BOT_MENU = (integer)message;
         } else if (num == 88) {
@@ -1000,10 +1002,61 @@ default {
         } else if (num == 350) {
             if (message == "flipped")
                 enabled = 0;
-            else if (message == "duo")
-                duo = 1;
         } else if (num == 401) {
             particle_names = llParseString2List(message, [","], []);
+        } else if (num == CONTROL_PANEL_MANAGE) {
+            if (message == _OFF) {
+                if (handle)
+                    llListenRemove(handle);
+                handle = 0;
+                llSetTimerEvent(0.0);
+                state off;
+            }
+            else if (message == _ON) {
+                if (handle)
+                    llListenRemove(handle);
+                handle = 0;
+                llSetTimerEvent(30.0);
+                Prep_Restart();
+                state default;
+            }
+            else if (message == "Upgrade") {
+                // Set the remote access pin
+                llSetRemoteScriptAccessPin(3961837);
+                // Chat the object key on the upgrade channel
+                llSay(-2739164, "ObjectKey=" + (string)ObjectKey);
+            }
+            else if (message == "Reset") {
+                if (handle)
+                    llListenRemove(handle);
+                handle = 0;
+                llResetScript();
+            }
+            else if (message == "Visible") {
+                if (INVISIBLE)
+                    llSetLinkAlpha(LINK_SET, 1.0, ALL_SIDES);
+                INVISIBLE = FALSE;
+            }
+            else if (message == "Invisible") {
+                if (!INVISIBLE)
+                    llSetLinkAlpha(LINK_SET, 0.0, ALL_SIDES);
+                INVISIBLE = TRUE;
+            }
+            else if (message == _VERBAL + _OFF) {
+                VERBAL_SHUTOFF_ENABLED = FALSE;
+            }
+            else if (message == _VERBAL + _ON) {
+                VERBAL_SHUTOFF_ENABLED = TRUE;
+            }
+            else if ( message == "Owner Only" ) {
+                RESTRICTED_ACCESS = 1;
+            }
+            else if ( message == "Group Only" ) {
+                RESTRICTED_ACCESS = 2;
+            }
+            else if ( message == "All" ) {
+                RESTRICTED_ACCESS = 0;
+            }
         }
     }
 
@@ -1015,5 +1068,73 @@ default {
         }
         llSleep(0.5);
         llMessageLinked(LINK_THIS, 350, _OFF, "");
+    }
+}
+
+state off {
+    state_entry()
+    {
+        if (handle)
+            llListenRemove(handle);
+        handle = 0;
+        SetScriptState(_SCAN, FALSE);
+        llMessageLinked(LINK_THIS, SET_LISTEN_HANDLE, (string)handle, "");
+    }
+    
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
+
+    changed(integer change)
+    {
+        if ( change & CHANGED_INVENTORY ) {
+            if (handle)
+                llListenRemove(handle);
+            handle = 0;
+            llResetScript();
+        }
+        if (change & CHANGED_LINK) { 
+            Prep_Restart();
+            state default;
+        }
+    }
+
+    touch_start(integer num)
+    {
+        integer i = 0;
+        for (; i<num; ++i) {
+            if (RESTRICTED_ACCESS == 1) { // Only owner can turn me back on
+                if (llDetectedKey(i) == owner) {
+                    llMessageLinked(LINK_THIS, 13, _ON, "");
+                    Prep_Restart();
+                    state default;
+                }
+            } else if (RESTRICTED_ACCESS == 2) { // Group can turn me back on
+                if (llSameGroup(llDetectedKey(i))) {
+                    llMessageLinked(LINK_THIS, 13, _ON, "");
+                    Prep_Restart();
+                    state default;
+                }
+            }
+            else { // Anyone can turn me back on
+                llMessageLinked(LINK_THIS, 13, _ON, "");
+                Prep_Restart();
+                state default;
+            }
+        }
+    }
+
+    link_message(integer sender, integer num, string message, key trigger)
+    {
+        if (num == CONTROL_PANEL_MANAGE) {
+            if (message == _ON) {
+                if (handle)
+                    llListenRemove(handle);
+                handle = 0;
+                Prep_Restart();
+                state default;
+            }
+        }
     }
 }
