@@ -10,7 +10,7 @@
 #
 # Currently supported actions:
 #   login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,
-#   name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+#   avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
 #   touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
 #   get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
 #
@@ -68,7 +68,7 @@ usage() {
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\tSupported actions:"
   printf "\n\t  login, logout, status (default), bot_location, walkto, sit, stand, teleport, listalias, key2name,"
-  printf "\n\t  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+  printf "\n\t  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
   printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
   printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
@@ -435,7 +435,8 @@ send_request() {
           -H \"Content-Type: application/json\" \
           -d \"{
           ${COMMON},
-          \"key\": \"${UUID}\"
+          \"key\": \"${UUID}\",
+          \"request_case\": \"1\"
         }\""
       else
         curl -s -X POST ${ENDPOINT} \
@@ -443,7 +444,8 @@ send_request() {
           -H "Content-Type: application/json" \
           -d "{
           ${COMMON},
-          \"key\": \"${UUID}\"
+          \"key\": \"${UUID}\",
+          \"request_case\": \"1\"
         }"
       fi
       ;;
@@ -465,6 +467,25 @@ send_request() {
           ${COMMON},
           \"name\": \"${SL_NAME}\",
           \"request_case\": \"1\"
+        }"
+      fi
+      ;;
+    avatar_picks)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"avatar\": \"${AVATAR_UUID}\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"avatar\": \"${AVATAR_UUID}\"
         }"
       fi
       ;;
@@ -862,6 +883,7 @@ case "${ACTION}" in
     }
     if is_valid_coords "${LOCATION}"; then
       send_request "stand" >/dev/null 2>&1
+      sleep 2
       if [ "${have_jq}" ]; then
         send_request "walkto" | jq -r .
       else
@@ -1152,6 +1174,7 @@ case "${ACTION}" in
     }
     if is_valid_slurl "${LOCATION}"; then
       send_request "stand" >/dev/null 2>&1
+      sleep 2
       if [ "${have_jq}" ]; then
         send_request "teleport" | jq -r .
       else
@@ -1167,10 +1190,21 @@ case "${ACTION}" in
       usage brief
     }
     send_request "stand" >/dev/null 2>&1
+    sleep 2
     if [ "${have_jq}" ]; then
       send_request "sit" | jq -r .
     else
       send_request "sit"
+    fi
+    ;;
+  avatar_picks|picks)
+    if [ "${have_jq}" ]; then
+      UUID="${AVATAR_UUID}"
+      AVATAR_NAME=$(send_request "key2name" | jq -r '.name')
+      printf "\nAvatar ${AVATAR_NAME} picks:\n\n"
+      send_request "avatar_picks" | jq -r '.picks'
+    else
+      send_request "avatar_picks"
     fi
     ;;
   stand)
@@ -1185,6 +1219,13 @@ case "${ACTION}" in
       send_request "status" | jq -r .
     else
       send_request "status"
+    fi
+    ;;
+  listgroups|groups)
+    if [ "${have_jq}" ]; then
+      send_request "listgroups" | jq -r .
+    else
+      send_request "listgroups"
     fi
     ;;
   listinventory|inventory)
@@ -1244,7 +1285,7 @@ case "${ACTION}" in
     echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
     echo "  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,"
-    echo "  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+    echo "  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
     echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
     echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
     ;;
