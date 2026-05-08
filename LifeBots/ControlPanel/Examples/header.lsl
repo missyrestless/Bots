@@ -148,4 +148,6 @@ integer SIM_RETURN_OBJECTS          = 299029;   //
 integer SIM_RETURN_SCRIPTED_OBJECTS = 299030;   //
 integer SIM_RETURN_OTHERS_OBJECTS   = 299031;   //
 integer REGION_INFO                 = 299032;   //
+// JSON body of response to parse
+integer BOT_JSON_RESPONSE           = 300000;   //
 //////////////////////////////////////////////////
