@@ -1,42 +1,27 @@
-# How to Setup the Pathfinder Addon
+# How to Setup the Pathfinder Add-On
 
-You can extend your **LifeBots** bot's capabilities with our growing library of specialized add-ons.
+You can extend your **LifeBots** bot's capabilities with the growing library of LifeBots specialized add-ons.
+
 **LifeBots** add-ons can be purchased in the **LifeBots Add-On Store** at
 [https://lifebots.cloud/store](https://lifebots.cloud/store).
 
-This article describes how to setup the **LifeBots Pathfinder** add-on. The Pathfinder add-on is an
-advanced navigation system for your bot with waypoint management, patrol routes, and obstacle avoidance.
+This article describes how to setup the **LifeBots Pathfinder** add-on.
+
+The Pathfinder add-on is an advanced navigation system for your bot with waypoint management,
+patrol routes, and obstacle avoidance. See the related article on **What is the Pathfinder Add-On**
+for additional details and description of this LifeBots Add-On.
 
 ## Getting Started
 
-The **LifeBots Pathfinder** add-on works with both Lite and Full LifeBots Bot plans.
-Features of the Pathfinder add-on include:
-
-- ✅ Multiple waypoint management
-- ✅ Scheduled patrol routes
-- ✅ Basic obstacle avoidance
-- ✅ Create guide/quest bots
-
 To get started:
 
-- Purchase the **LifeBots Pathfinder Addon** at [https://lifebots.cloud/store/addon/pathfinder](https://lifebots.cloud/store/addon/pathfinder)
-- Attach the **LifeBots Pathfinder Addon** to one of your LifeBots bots.
-  - **Note:** Purchase additional **LifeBots Pathfinder Addons** for each bot you wish to configure
-
-## Waypoint Navigator
-
-Use the **Waypoint Navigator** to create a sequence of movements and actions for your bot to follow automatically.
-
-The **Pathfinder Addon** allows you to:
-
-- ✅ Create sequences of locations for your bot to visit
-- ✅ Add actions like chatting, sitting, animations, and touch interactions
-- ✅ Set up patrol routes with timing options
-- ✅ Create complex automated behaviors
+- Purchase the **LifeBots Pathfinder Add-On** at [https://lifebots.cloud/store/addon/pathfinder](https://lifebots.cloud/store/addon/pathfinder)
+- Attach the **LifeBots Pathfinder Add-On** to one of your LifeBots bots.
+  - **Note:** Purchase additional **LifeBots Pathfinder Add-On** for each bot you wish to configure
 
 ### Create Your First Waypoint
 
-After purchasing and attaching it to a bot, the **Pathfinder Addon** will now appear listed on your LifeBots Dashboard:
+After purchasing and attaching it to a bot, the **Pathfinder Add-On** will now appear listed on your LifeBots Dashboard:
 
 - Visit your **LifeBots Dashboard** at [https://lifebots.cloud/dashboard](https://lifebots.cloud/dashboard)
 - Click the **Pathfinder** entry in the **ADDONS** section of the Dashboard left panel
@@ -84,7 +69,7 @@ Perform the following sequence for each new Waypoint you wish to add to this Pat
 
 ### Save Waypoints
 
-**[IMPORTANT:]** After adding all Waypoints for a **Pathfinder Addon** path, save your configured Waypoints!!
+**[IMPORTANT:]** After adding all Waypoints for a **Pathfinder Add-On** path, save your configured Waypoints!!
 
 - Click the **Save Waypoints** button to save your configured Waypoints
 
