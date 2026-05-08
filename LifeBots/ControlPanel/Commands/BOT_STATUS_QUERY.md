@@ -23,9 +23,10 @@ The result of this command will be returned to your script using `BOT_EVENT_STAT
 ```lsl
 link_message( integer sender, integer num, string str, key id )
 ```
+| Argument     | Description             |
 |:------------ |:----------------------- |
-| sender       | link number of a sender prim
-| num          | BOT_EVENT_STATUS_REPLY
+| sender       | link number of a sender prim |
+| num          | BOT_EVENT_STATUS_REPLY       |
 | str          | String representing the bot's status:<br>&bull;first line - bot status code<br>&bull;second line - bot expiration date<br>&bull;third line - bot online status<br><br>Online statuses:<br>&bull;ONLINE - Bot is online<br>&bull;LOGGED OUT - Bot was logged out by gracefully<br>&bull;CONNECTING - The bot is logging in<br>&bull;OFFLINE - Bot is expired or has an error<br><br>Example:<br><br>OK<br>2019-03-10 00:00<br>LOGGED OUT |
 | id        | Bot UUID    |
 
