@@ -4,6 +4,8 @@ This is an example of how one could automate Corrade such that it evades region 
 
 This is available for L$0 on the SL Marketplace at https://marketplace.secondlife.com/p/WaS-Corrade-Region-Restart-Evader/8323879
 
+**NOTE:** `Evade_Restart.lsl` is from the website, `Evade_Restart_MP.lsl` is from the Marketplace.
+
 ## Requirements
 
 The script requires that for the configured group, the following permissions to be enabled:

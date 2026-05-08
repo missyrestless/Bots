@@ -24,6 +24,7 @@ https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
 - `Evade_Region_Restart`: Script and configuration notecard to evade region restarts
 - `Examples`: some simple examples of how to use the Corrade system
 - `HUD`: the Corrade HUD, control bots in-world with this heads-up display
+- `Masters`: Script and configuration notecard to extend some privileges to the Corrade bot owner
 - `Pay2Play`: WDC Tipjar settings examples
 - `Select_Dialog_Option`: a dialog menu selector for the Corrade bot
 - `Sit_Animate`: example sit on object and animate a Corrade bot
