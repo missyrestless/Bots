@@ -365,6 +365,10 @@ wasURLEscape() {
 
 send_corrade_request() {
   local cmd="$1"
+  # If the Corrade configuration specifies WAS ScriptLanguage:
+  # cgroup=$(wasURLEscape "${CORRADE_GROUP}")
+  # cpassw=$(wasURLEscape "${CORRADE_PASSW}")
+  # If the Corrade configuration specifies JSON ScriptLanguage:
   local cgroup="${CORRADE_GROUP}"
   local cpassw="${CORRADE_PASSW}"
   local cuuid=
@@ -377,66 +381,36 @@ send_corrade_request() {
   else
     SL_NAME="${corrade}"
   fi
-  # If the Corrade configuration specifies WAS ScriptLanguage:
-  # cgroup=$(wasURLEscape "${CORRADE_GROUP}")
-  # cpassw=$(wasURLEscape "${CORRADE_PASSW}")
-  # If the Corrade configuration specifies JSON ScriptLanguage:
-  cgroup="${CORRADE_GROUP}"
-  cpassw="${CORRADE_PASSW}"
+  COMMON="\"group\": \"${cgroup}\", \"password\": \"${cpassw}\""
   case "${cmd}" in
     fly|nofly)
       local action="start"
       [ "${cmd}" == "nofly" ] && action="stop"
-      COMMAND="{ \
-          \"command\": \"fly\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"action\": \"${action}\" }"
+      COMMAND="\"command\": \"fly\", \"action\": \"${action}\""
       ;;
     flyto|fly_to)
       local POS=$(get_coords "${LOCATION}")
       local position="<${POS}>"
-      COMMAND="{ \
-          \"command\": \"flyto\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"fly\": \"False\", \
-          \"position\": \"${position} + <0,0,5>\" }"
+      COMMAND="\"command\": \"flyto\", \"fly\": \"False\", \"position\": \"${position} + <0,0,5>\""
       ;;
     getattachments*)
       local comm="getattachments"
       echo "${cmd}" | grep attachmentspath >/dev/null && comm="getattachmentspath"
-      COMMAND="{ \
-          \"command\": \"${comm}\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\" }"
+      COMMAND="\"command\": \"${comm}\""
       ;;
     getcwd|cwd)
-      COMMAND="{ \
-          \"command\": \"inventory\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"action\": \"cwd\" }"
+      COMMAND="\"command\": \"inventory\", \"action\": \"cwd\""
       ;;
     get_outfit*)
       local path="/My Inventory/Current Outfit"
       echo "${cmd}" | grep get_outfits >/dev/null && path="/My Inventory/My Outfits"
-      COMMAND="{ \
-          \"command\": \"inventory\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"path\": \"${path}\", \
-          \"action\": \"ls\" }"
+      COMMAND="\"command\": \"inventory\", \"path\": \"${path}\", \"action\": \"ls\""
       ;;
     listinventory)
       # If the Corrade configuration specifies WAS ScriptLanguage:
       # COMMAND="command=inventory&group=${cgroup}&password=${cpassw}&action=ls"
       # If the Corrade configuration specifies JSON ScriptLanguage:
-      COMMAND="{ \
-          \"command\": \"inventory\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"action\": \"ls\" }"
+      COMMAND="\"command\": \"inventory\", \"action\": \"ls\""
       ;;
     sit|touch*)
       if [ "${UUID}" ]; then
@@ -452,27 +426,13 @@ send_corrade_request() {
         fi
       fi
       [ "${cmd}" == "sit" ] || cmd="touch"
-      # COMMAND="command=${cmd}&group=${cgroup}&password=${cpassw}&item=${cuuid}&range=64"
-      COMMAND="{ \
-          \"command\": \"${cmd}\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"item\": \"${cuuid}\", \
-          \"range\": \"64\" }"
+      COMMAND="\"command\": \"${cmd}\", \"item\": \"${cuuid}\", \"range\": \"64\""
       ;;
     stand)
-      # COMMAND="command=stand&group=${cgroup}&password=${cpassw}"
-      COMMAND="{ \
-          \"command\": \"stand\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\" }"
+      COMMAND="\"command\": \"stand\""
       ;;
-    status)
-      # COMMAND="command=getmembersonline&group=${cgroup}&password=${cpassw}"
-      COMMAND="{ \
-          \"command\": \"getmembersonline\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\" }"
+    getmembersonline|status)
+      COMMAND="\"command\": \"getmembersonline\""
       ;;
     teleport)
       local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
@@ -480,25 +440,18 @@ send_corrade_request() {
       local POS=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $2, $3, $4 }')
       # local region=$(wasURLEscape "${REGION}")
       # local position=$(wasURLEscape "<${POS}>")
-      local region="${REGION}"
-      local position="<${POS}>"
-      #COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&entity=region&region=${region}&position=${position}"
-      COMMAND="{ \
-          \"command\": \"teleport\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"entity\": \"region\", \
-          \"region\": \"${region}\", \
-          \"position\": \"${position}\" }"
+      local rgn="${REGION}"
+      local pos="<${POS}>"
+      COMMAND="\"command\": \"teleport\", \"entity\": \"region\", \"region\": \"${rgn}\", \"position\": \"${pos}\""
       ;;
     walk*)
       local POS=$(get_coords "${LOCATION}")
       local position="<${POS}>"
-      COMMAND="{ \
-          \"command\": \"walkto\", \
-          \"group\": \"${cgroup}\", \
-          \"password\": \"${cpassw}\", \
-          \"position\": \"${position}\" }"
+      COMMAND="\"command\": \"walkto\", \"position\": \"${position}\""
+      ;;
+    change*|wear*)
+      local outfit_folder="/My Inventory/My Outfits/${OUTFIT_NAME}"
+      COMMAND="\"command\": \"changeappearance\", \"folder\": \"${outfit_folder}\""
       ;;
     *)
       COMMAND=
@@ -513,9 +466,21 @@ send_corrade_request() {
     usage brief
   }
   if [ "${dryrun}" ]; then
-    echo "curl -s -X POST ${CORRADE_BOT_URL} -d \"${COMMAND}\""
+    echo "curl -s -X POST ${CORRADE_BOT_URL} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+            ${COMMON},
+            ${COMMAND}
+          }\""
   else
-    curl -s -X POST ${CORRADE_BOT_URL} -d "${COMMAND}"
+    curl -s -X POST ${CORRADE_BOT_URL} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+            ${COMMON},
+            ${COMMAND}
+          }"
   fi
 }
 
