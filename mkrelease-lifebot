@@ -55,33 +55,6 @@ gh release create v${VERSION} ${DRAFT} \
                   --title "${ANNO}" \
                   --target "${BRANCH}" \
                   --notes-file Release_Notes_Lifebot.md \
-		  install-lifebot \
-                  LifeBots/crontab.in \
-                  LifeBots/example_lifebots_notecard \
-                  LifeBots/OAuth/4_Refresh_Access_Token.js \
-                  LifeBots/OAuth/1_auth_request.js \
-                  LifeBots/OAuth/2_authcode_for_access_token.js \
-                  LifeBots/OAuth/3_API_Usage.js \
-                  LifeBots/LICENSE \
-                  LifeBots/bin/easy2clubdj \
-                  LifeBots/bin/anya2beach \
-                  LifeBots/bin/anya2msdj \
-                  LifeBots/bin/anya2club \
-                  LifeBots/bin/bots2home \
-                  LifeBots/bin/bots2clubdance \
-                  LifeBots/bin/angelus2pole \
-                  LifeBots/bin/checkbots \
-                  LifeBots/bin/easy2pole \
-                  LifeBots/bin/checkeasy \
-                  LifeBots/bin/angelus2clubdj \
-                  LifeBots/bin/anya2seat \
-                  LifeBots/example_dot_lifebots \
-                  LifeBots/VERSION \
-                  LifeBots/Examples/LifeBot_Logout.lsl \
-                  LifeBots/Examples/LifeBot_Login.lsl \
-                  LifeBots/Examples/logout-curl.sh \
-                  LifeBots/Examples/login-curl.sh \
-                  LifeBots/lifebot.sh \
-                  LifeBots/Developer_Getting_Started.txt
+		  install-lifebot
 
 git fetch --tags origin

@@ -14,10 +14,28 @@ SCRIPT_PATH="$(
 have_real=$(type -p realpath)
 [ "${have_real}" ] && SCRIPT_PATH="$(realpath $SCRIPT_PATH)"
 
+have_git=$(type -p git)
+
 cd "${SCRIPT_PATH}"
 [ -f LifeBots/lifebot.sh ] || {
-  echo "ERROR: cannot locate LifeBots/lifebot.sh. Exiting."
-  exit 1
+  if [ -d Bots ]; then
+    if [ -x Bots/install-lifebot ]; then
+      exec Bots/install-lifebot
+      exit 0
+    else
+      echo "ERROR: cannot locate LifeBots/lifebot.sh. Exiting."
+      exit 1
+    fi
+  else
+    if [ "${have_git}" ]; then
+      git clone https://github.com/missyrestless/Bots.git
+      exec Bots/install-lifebot
+      exit 0
+    else
+      echo "ERROR: cannot locate LifeBots/lifebot.sh or git. Exiting."
+      exit 1
+    fi
+  fi
 }
 
 [ -d /usr/local/bin ] || ${SUDO} mkdir -p /usr/local/bin
