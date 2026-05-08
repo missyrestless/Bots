@@ -1,0 +1,139 @@
+# The settings prior to END_SETTINGS are all that is read and used
+# See below for additional optional LifeBots configuration settings
+#
+# LifeBots Developer API Key, REQUIRED
+LB_API_KEY = 'your-api-key'
+# LifeBots bot secret, OPTIONAL
+#     This will be the default LifeBots bot secret if set
+#     If set in the user's command script that value will override this
+LB_SECRET = ''
+# Full Bot Name (used for API requests, must match your LifeBots config), OPTIONAL
+#     This will be the default LifeBots bot name if set
+#     If set in the user's command script that value will override this
+LB_BOT_NAME = ''
+# UUID to sit on when logging in, OPTIONAL
+#LOGIN_SITON = "uuid-of-siton-object"
+#
+# First and Last name are used to determine whether to respond to chat
+# Does not need to match your LifeBot's real name
+# If these are not set then the first and last names in LB_BOT_NAME are used
+#FIRST_NAME = 'Some'
+#LAST_NAME = 'Trigger'
+# Should the bot only respond to chat which includes its first or last name
+NAME_ENABLED = TRUE
+# Should the bot be able to send email
+EMAIL_ENABLED = TRUE
+END_SETTINGS
+#
+# Configuration notecard for the LifeBots Control Panel
+# Settings are specified in the format "<name> = <value>"
+# DO NOT use "=" in either the <name> or <value>
+# Place any uncommented configuration settings above the END_SETTINGS
+# line above. Lines below END_SETTINGS will not be read and are here
+# for information and help configuring.
+#
+# These comments can be left in the notecard without adversely effecting
+# performance as the script stops reading the notecard when it hits the
+# END_SETTINGS line so we can put as many comments here as we want.
+#
+# The default settings should work well for most uses. 
+#
+#############################################################################
+#
+# Here are the various settings and their defaults:
+#
+# Configure API credentials for each bot and copy the file to root prim Contents
+# This notecard contains sensitive information and should be accessible only by the owner
+#
+# LifeBots Developer API Key
+#LB_API_KEY = 'your-api-key'
+#LB_SECRET = 'your-bot-secret'  # Also referred to in the doc as an access code
+
+# If you have more than one bot you can set each bot's secret like this
+#LB_SECRET_BOT1_NAME = 'your-first-bot-secret'
+#LB_SECRET_BOT2_NAME = 'your-second-bot-secret'
+#LB_SECRET_BOT3_NAME = 'your-third-bot-secret'
+# Replace spaces in the Bot's name with "_"
+# For example, if the Bot's name is "John Doe" then the entry would be:
+#LB_SECRET_John_Doe = 'john-doe-bot-secret'
+
+# Default Bot Name
+#LB_BOT_NAME = 'your-default-bot-name'
+# Login siton UUID
+#LOGIN_SITON_Bot_Name = "uuid-of-siton-object"
+
+# OAuth Applications
+# If you have configured OAuth applications then the client id and secret can be set here
+#LB_CLIENT_ID_app_name = 'your-oauth-app-client-id'
+#LB_CLIENT_SECRET_app_name = 'your-oauth-app-client-secret'
+
+# The following optional convenience entries are supported to allow
+# specifying an alias on the command line rather than a SLURL or UUID
+#
+## Bot name aliases for use with the "-n name" command line option
+#BOT_NAME_bot1 = "Bot1 Name"
+#BOT_NAME_bot2 = "Bot2 Name"
+#BOT_NAME_bot3 = "Bot3 Name"
+#
+## Slurl aliases for use with the "-l location" command line option
+# SLURL aliases can be set for use with the location option, -l location
+# For example, the following 2 SLURL aliases could be used with -l beach or -l club
+# to teleport the bot to the beach or the club specified in these SLURLs
+#SLURL_beach = "http://maps.secondlife.com/secondlife/BEACH_REGION_NAME/X/Y/Z"
+# Urlencode spaces in the region name by using %20 instead of space
+#SLURL_club = "http://maps.secondlife.com/secondlife/CLUB_REGION%20NAME/X/Y/Z"
+
+## UUID aliases for use with the "-u uuid" command line option
+# UUID aliases can be set for use with the UUID option, -u uuid
+# For example, the following UUID aliases could be used with -u dancepole
+# or -u couch to seat the bot on the specified object
+#UUID_dancepole = "dance-pole-object-uuid"
+#UUID_couch = "couch-object-uuid"
+#
+# If FALSE the bot will attempt to respond to all local chat
+# If TRUE the bot will attempt to respond only to local chat containing
+# her name. Regardless, all email and shutoff triggers in local chat are
+# responded to if EMAIL_ENABLED and/or SHUTOFF_ENABLED are TRUE.
+#NAME_ENABLED = TRUE
+#
+# Owner only bot menu ?
+#OWNER_BOT_MENU = FALSE
+#
+# Provide a dialog menu interface when touched
+#SHOW_BOT_MENU = TRUE
+#
+# Make the bot invisible ?
+#INVISIBLE = FALSE
+#
+# Does the bot rotate ?
+#ROTATE = FALSE
+#
+# A non-zero positive integer sets a private owner only channel.
+# If set, bot will only respond to queries like "/4 who is lincoln ?" by owner
+# where CHANNEL = 4. Default is public channel 0.
+#CHANNEL = 0
+#
+# If TRUE you can use the bot to send email! See the EMAIL_TRIGGERS below
+# Set to FALSE if you don't want to allow people to use the bot to send email
+#EMAIL_ENABLED = TRUE
+#
+# Time, in seconds, you have to compose your email
+#EMAIL_TIMEOUT = 300
+#
+# If TRUE the bot will shutoff when hearing one of these phrases.
+# See SHUTOFF_TRIGGERS below. Touch the bot to wake her up.
+#VERBAL_SHUTOFF_ENABLED = TRUE
+#
+# Only the owner of the LifeBot can talk to and hear the LifeBot
+#OWNER_LISTEN_ONLY = FALSE
+#
+# Restrict shutoff/configuration menu access to all (0), owner (1), group (2)
+#RESTRICTED_ACCESS = 1
+#
+# If EMAIL_ENABLED is TRUE these phrases indicate the resident
+# wishes to send email
+#EMAIL_TRIGGERS =i want to email ,i would like to email ,i want to send an email to ,i would like to send an email to ,email ,send an email to
+#
+# If SHUTOFF_ENABLED is TRUE these phrases will shut the bot off until touched
+#SHUTOFF_TRIGGERS =shut up,shut up.,shut up!,be quiet.,be quiet
+#
