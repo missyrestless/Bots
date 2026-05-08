@@ -1005,7 +1005,7 @@ Currently supported `lifebot` actions include:
 
 ```
 login, logout, status, location, walkto, sit, teleport, touch,
-listalias, listinventory, im, send_notice, send_group_im
+listalias, listinventory, im, reply_dialog, send_notice, send_group_im
 ```
 
 Development is in progress for additional actions. Let us know which
