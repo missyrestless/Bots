@@ -153,10 +153,10 @@ The `lifebot` command supports a significant subset of the full `LifeBots` API.
 #### Basic Commands
 
 - `bot_location` : get precise bot location
-- `key2name` : convert an avatar name to avatar UUID
+- `key2name` : convert an avatar UUID to avatar name
 - `login` : login bot
 - `logout` : logout bot
-- `name2key` : convert an avatar UUID to avatar name
+- `name2key` : convert an avatar name to avatar UUID
 - `status` : get bot status
 
 #### Movement Commands
