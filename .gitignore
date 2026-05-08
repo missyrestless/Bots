@@ -9,6 +9,7 @@ tmp/
 Dist/
 
 # LifeBots scripts
+LifeBots/Encryption_Key
 LifeBots/MyScripts/
 LifeBots/OAuth/Easy/
 
