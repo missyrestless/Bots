@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#
+# bot2bar - send a bot to the beach bar to bartend
+#
+# Usage: bot2bar <bot name>
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+[ "$1" ] || {
+  echo "Usage: bot2bar <bot name>"
+  exit 1
+}
+
+bot="$*"
+
+# Check if Bot is online and if not, login
+lifebot -a status -n "${bot}" | jq -r '.status' | grep -i online >/dev/null || {
+  lifebot -a login -n "${bot}" -l beach
+  sleep 10
+}
+
+lifebot -a stand -n "${bot}" >/dev/null 2>&1
+lifebot -a teleport -n "${bot}" -l beach >/dev/null 2>&1
+sleep 5
+lifebot -a sit -n "${bot}" -u beachbar

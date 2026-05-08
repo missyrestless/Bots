@@ -19,7 +19,7 @@ have_jq=$(type -p jq)
 
 # Check if Bot is online and if not, login
 lifebot -a status -n Anya | jq -r '.status' | grep -i online >/dev/null || {
-  lifebot -a login -n Anya -l club
+  lifebot -a login -n Anya -l beach
   sleep 10
 }
 
