@@ -32,9 +32,9 @@ if [ "$1" == "-l" ]; then
   lifebot -a sit -n Angel -u beachbar
 else
   # Check if online
-  lifebot -a status -c Easy | grep Angelus+Portal >/dev/null || {
+  lifebot -a status -c Easy | grep 'Angelus Portal' >/dev/null || {
     # Maybe Easy is not online
-    lifebot -a status -c Angel | grep Angelus+Portal >/dev/null || {
+    lifebot -a status -c Angel | grep 'Angelus Portal' >/dev/null || {
       echo "Angelus Portal does not appear to be online"
       exit 1
     }

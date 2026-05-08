@@ -24,7 +24,7 @@ line
 .SS SYNOPSIS
 .PP
 lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k
-apikey] [-B text] [-C channel] [-c corrade] [-F filter] [-M message] [-N
+apikey] [-T text] [-C channel] [-c corrade] [-F filter] [-M message] [-N
 name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 .PP
 See the Bots Github repository
@@ -89,6 +89,35 @@ To set the \f[V]ScriptLanguage\f[R] to JSON in
 .nf
 \f[C]
   <ScriptLanguage>JSON</ScriptLanguage>
+\f[R]
+.fi
+.PP
+Note that each Corrade API request requires some permissions enabled in
+the Corrade Configuration.
+For example, balance inquiries and payments require the
+\f[V]economy\f[R] permission, inventory operations require the
+\f[V]inventory\f[R] permission, movement requires the \f[V]movement\f[R]
+permission.
+An example set of Corrade permissions that enable capabilities required
+by the \f[V]lifebot\f[R] command might look like:
+.IP
+.nf
+\f[C]
+    <Permissions>
+        <Permission>movement</Permission>
+        <Permission>grooming</Permission>
+        <Permission>interact</Permission>
+        <Permission>notifications</Permission>
+        <Permission>talk</Permission>
+        <Permission>group</Permission>
+        <Permission>land</Permission>
+        <Permission>inventory</Permission>
+        <Permission>directory</Permission>
+        <Permission>system</Permission>
+        <Permission>bridge</Permission>
+        <Permission>economy</Permission>
+        <Permission>execute</Permission>
+    </Permissions>
 \f[R]
 .fi
 .SS CONFIGURATION
@@ -204,17 +233,6 @@ The following command line options are available with \f[V]lifebot\f[R]:
 \f[V]-a action\f[R] : specifies the API action (sit, teleport, login,
 \&...)
 .PP
-Supported actions:
-.IP
-.nf
-\f[C]
-  login, logout, status (default), bot_location, walkto, sit, stand, teleport, listalias, key2name,
-  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
-  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
-  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
-\f[R]
-.fi
-.PP
 \f[V]-l location\f[R] : specifies a location for login and teleport
 actions
 .PP
@@ -225,7 +243,7 @@ Ordinary
 .PP
 \f[V]-k apikey\f[R] : specifies an API Key, use environment instead
 .PP
-\f[V]-B text\f[R] : specifies the dialog button text for replies to
+\f[V]-T text\f[R] : specifies the dialog button text for replies to
 dialog menus
 .PP
 \f[V]-C channel\f[R] : specifies the channel for a message [default: 0]
@@ -259,6 +277,38 @@ exits
 \f[V]-i\f[R] : retrieves Bot details
 .PP
 \f[V]-h\f[R] : displays this usage message and exits
+.SS Supported Actions
+.IP \[bu] 2
+Supported LifeBots actions:
+.RS 2
+.IP \[bu] 2
+login, logout, status, bot_location, walkto, sit, stand, teleport,
+listalias, key2name, notecard_create,
+.IP \[bu] 2
+avatar_picks, name2key, listinventory, im, reply_dialog, send_notice,
+send_group_im, attachments,
+.IP \[bu] 2
+rebake, touch_attachment, touch_prim, activate_group, wear, takeoff,
+say_chat_channel, set_hoverheight,
+.IP \[bu] 2
+get_outfit, get_outfits, wear_outfit, get_balance, give_inventory,
+give_money, give_money_object
+.RE
+.IP \[bu] 2
+Supported Corrade actions:
+.RS 2
+.IP \[bu] 2
+attach, batchavatarkeytoname, batchavatarnametokey, changeappearance,
+createlandmark,
+.IP \[bu] 2
+createnotecard, detach, fly, flyto, getattachments, getattachmentspath,
+getmembersonline,
+.IP \[bu] 2
+inventory cwd, inventory list current outfit, inventory list outfits,
+pay avatar,
+.IP \[bu] 2
+pay object, sit, stand, teleport, touch, unwear, walkto, wear
+.RE
 .SS ENVIRONMENT
 .PP
 Entries in \f[V]\[ti]/.lifebots\f[R] can be \f[V]LB_API_KEY\f[R],
@@ -546,7 +596,7 @@ and button text)
 \f[V]Example\f[R] : click couch menu button \[dq]Male\[dq] on channel
 99999
 .IP \[bu] 2
-\f[V]lifebot -a reply -n \[dq]John Doebot\[dq] -C 99999 -B Male -u \[dq]a811d6fe-de59-2f4e-ee19-0cc48da48981\[dq]\f[R]
+\f[V]lifebot -a reply -n \[dq]John Doebot\[dq] -C 99999 -T Male -u \[dq]a811d6fe-de59-2f4e-ee19-0cc48da48981\[dq]\f[R]
 .RE
 .IP \[bu] 2
 \f[V]say_chat_channel\f[R] : send a message to the specified chat

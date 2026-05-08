@@ -1,18 +1,12 @@
 #!/usr/bin/env bash
 #
-# lifebot - control LifeBot bots from the command line using the LifeBot API
+# lifebot - control LifeBot or Corrade bots from the command line
 #
-# Copyright (c) 2025 Truth & Beauty Lab
+# Copyright (c) 2025-2026 Truth & Beauty Lab
 #
 # Author:  Missy Restless <missyrestless@gmail.com>
-# Date:    15-Nov-2025
+# Created: 15-Nov-2025
 # License: MIT
-#
-# Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,
-#   avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
-#   touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
-#   get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
@@ -35,7 +29,7 @@
 #
 # Set the default Bot name
 # Setting in .lifebots overrides, setting on command line with -n name overrides all
-LB_BOT_NAME="Easy Islay"
+LB_BOT_NAME="Anya Ordinary"
 # Set the default action, can be specified with -a action
 ACTION="status"
 # LifeBots API endpoint
@@ -58,33 +52,28 @@ usage() {
     LINE=
     NORM=
   }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
-  printf "\n  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-C channel]"
+  printf "\n  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-T text] [-u uuid] [-z num]${NORM}"
   [ "$1" == "brief" ] && {
     printf "\n\n"
     exit 1
   }
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
-  printf "\n\tSupported actions:"
-  printf "\n\t  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,"
-  printf "\n\t  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
-  printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
-  printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
   printf "\n\t${BOLD}${LINE}-k apikey${NORM} specifies an API Key, use environment instead"
   printf "\n\t${BOLD}${LINE}-A avatar${NORM} specifies an avatar UUID for use with giving money or objects"
-  printf "\n\t${BOLD}${LINE}-B text${NORM} specifies the dialog button text for replies to dialog menus"
   printf "\n\t${BOLD}${LINE}-C channel${NORM} specifies the channel for a message [default: 0]"
   printf "\n\t${BOLD}${LINE}-c corrade${NORM} specifies a Corrade bot name to act upon"
   printf "\n\t${BOLD}${LINE}-F filter${NORM} specifies a filter to match when listing attachments"
   printf "\n\t${BOLD}${LINE}-M message${NORM} specifies the message body for a group notice/im"
-  printf "\n\t${BOLD}${LINE}-N name${NORM} specifies the SL name of the recipient of an IM"
+  printf "\n\t${BOLD}${LINE}-N name${NORM} specifies the name of the recipient of an IM or landmark/notecard"
   printf "\n\t${BOLD}${LINE}-O name${NORM} specifies an attachment object name or outfit name"
   printf "\n\t${BOLD}${LINE}-S subject${NORM} specifies the subject for a group notice"
   printf "\n\t${BOLD}${LINE}-s secret${NORM} specifies a Bot secret, use environment instead"
+  printf "\n\t${BOLD}${LINE}-T text${NORM} specifies the notecard text or dialog button text for reply to menus"
   printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with actions that require one (e.g. sit)"
   printf "\n\t${BOLD}${LINE}-z num${NORM} specifies a hover height adjustment size [default: -0.05]"
   printf "\n\t\tcan also be used to specify a payment amount"
@@ -106,7 +95,9 @@ usage() {
   printf "\n  lifebot -a login -l Home # Default Bot login to Home location"
   printf "\n  lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID"
   printf "\n  lifebot -a stand -n Jane -c John # Jane bot sends the stand command to Corrade bot John"
-  printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots\n"
+  printf "\n  lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots"
+  printf "\n${BOLD}${LINE}Supported Actions${NORM}"
+  list_supported_actions
   exit 1
 }
 
@@ -334,6 +325,19 @@ list_aliases() {
   echo ""
 }
 
+list_supported_actions() {
+  printf "\nSupported LifeBots actions:"
+  printf "\n  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, notecard_create,"
+  printf "\n  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+  printf "\n  rebake, touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
+  printf "\n  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
+  printf "\nSupported Corrade actions:"
+  printf "\n  attach, batchavatarkeytoname, batchavatarnametokey, changeappearance, createlandmark,"
+  printf "\n  createnotecard, detach, fly, flyto, getattachments, getattachmentspath, getmembersonline,"
+  printf "\n  inventory cwd, inventory list current outfit, inventory list outfits, pay avatar,"
+  printf "\n  pay object, sit, stand, teleport, touch, unwear, walkto, wear\n"
+}
+
 get_coords() {
   local loc="$1"
   # Convert position coordinates from x/y/z to x,y,z
@@ -417,13 +421,29 @@ send_corrade_request() {
     echo "Empty command. Exiting."
     usage
   }
-  if [ "${CORRADE_BOT_ID}" ]; then
-    SL_NAME="${CORRADE_BOT_ID}"
-  else
-    SL_NAME="${corrade}"
-  fi
   COMMON="\"group\": \"${cgroup}\", \"password\": \"${cpassw}\""
   case "${cmd}" in
+    attach|detach)
+      [ "${UUID}" ] || {
+        echo "The ${cmd} action requires an inventory item UUID specified with -u UUID"
+        usage brief
+      }
+      if [ "${cmd}" == "attach" ]; then
+        COMMAND="\"command\": \"attach\", \"attachments\": \"Default\", \"${UUID}\""
+      else
+        COMMAND="\"command\": \"detach\", \"type\": \"UUID\", \"attachments\": \"${UUID}\""
+      fi
+      ;;
+    creat*landmark|creat*lm)
+      [ "${SL_NAME}" ] || {
+        echo "The ${cmd} action requires a Landmark Name specified with -N name"
+        usage brief
+      }
+      COMMAND="\"command\": \"createlandmark\", \"name\": \"${SL_NAME}\""
+      ;;
+    creat*notecard|creat*nc|note*creat*|nc*creat*)
+      COMMAND="\"command\": \"createnotecard\", \"entity\": \"text\", \"name\": \"${SL_NAME}\", \"text\": \"${TEXT}\""
+      ;;
     fly|nofly)
       local action="start"
       [ "${cmd}" == "nofly" ] && action="stop"
@@ -434,10 +454,13 @@ send_corrade_request() {
       local position="<${POS}>"
       COMMAND="\"command\": \"flyto\", \"fly\": \"False\", \"position\": \"${position} + <0,0,5>\""
       ;;
-    getattachments*)
+    *attachments*)
       local comm="getattachments"
       echo "${cmd}" | grep attachmentspath >/dev/null && comm="getattachmentspath"
       COMMAND="\"command\": \"${comm}\""
+      ;;
+    get_balance|getbalance|balance)
+      COMMAND="\"command\": \"getbalance\""
       ;;
     getcwd|cwd)
       COMMAND="\"command\": \"inventory\", \"action\": \"cwd\""
@@ -447,11 +470,20 @@ send_corrade_request() {
       echo "${cmd}" | grep get_outfits >/dev/null && path="/My Inventory/My Outfits"
       COMMAND="\"command\": \"inventory\", \"path\": \"${path}\", \"follow\": \"True\", \"action\": \"ls\""
       ;;
+    key2name)
+      COMMAND="\"command\": \"batchavatarkeytoname\", \"avatars\": \"${UUID}\""
+      ;;
     listinventory)
-      # If the Corrade configuration specifies WAS ScriptLanguage:
-      # COMMAND="command=inventory&group=${cgroup}&password=${cpassw}&action=ls"
-      # If the Corrade configuration specifies JSON ScriptLanguage:
       COMMAND="\"command\": \"inventory\", \"action\": \"ls\""
+      ;;
+    name2key)
+      COMMAND="\"command\": \"batchavatarnametokey\", \"avatars\": \"${SL_NAME}\""
+      ;;
+    pay|pay_avatar|give_money)
+      COMMAND="\"command\": \"pay\", \"entity\": \"avatar\", \"agent\": \"${AVATAR_UUID}\", \"amount\": \"${AMOUNT}\""
+      ;;
+    pay_object|give_money_object)
+      COMMAND="\"command\": \"pay\", \"entity\": \"object\", \"target\": \"${OBJECT_UUID}\", \"amount\": \"${AMOUNT}\""
       ;;
     sit|touch*)
       if [ "${UUID}" ]; then
@@ -481,10 +513,16 @@ send_corrade_request() {
       local rgn=$(echo "${LOCATION}" | awk -F '/' '{ print $(NF-3) }' | sed -e "s/%20/ /g")
       COMMAND="\"command\": \"teleport\", \"entity\": \"region\", \"region\": \"${rgn}\", \"position\": \"${pos}\""
       ;;
+    unwear|remove|takeoff)
+      COMMAND="\"command\": \"unwear\", \"type\": \"UUID\", \"wearables\": \"${UUID}\""
+      ;;
     walk*)
       local POS=$(get_coords "${LOCATION}")
       local position="<${POS}>"
       COMMAND="\"command\": \"walkto\", \"position\": \"${position}\""
+      ;;
+    wear)
+      COMMAND="\"command\": \"wear\", \"replace\": \"False\", \"wearables\": \"${WEARABLE}\""
       ;;
     change*|wear*)
       local outfit_folder="/My Inventory/My Outfits/${OUTFIT_NAME}"
@@ -496,6 +534,7 @@ send_corrade_request() {
   esac
   [ "${COMMAND}" ] || {
     echo "Corrade command ${cmd} not yet supported"
+    list_supported_actions
     usage brief
   }
   [ "${CORRADE_BOT_URL}" ] || {
@@ -748,6 +787,27 @@ send_lifebot_request() {
         }"
       fi
       ;;
+    notecard_create)
+      if [ "${dryrun}" ]; then
+        echo "curl ${verb} -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"name\": \"${SL_NAME}\",
+          \"text\": \"${TEXT}\"
+        }\""
+      else
+        curl ${verb} -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"name\": \"${SL_NAME}\",
+          \"text\": \"${TEXT}\"
+        }"
+      fi
+      ;;
     reply_dialog)
       if [ "${dryrun}" ]; then
         echo "curl ${verb} -X POST ${ENDPOINT} \
@@ -755,7 +815,7 @@ send_lifebot_request() {
           -H \"Content-Type: application/json\" \
           -d \"{
           ${COMMON},
-          \"button\": \"${BUTTON}\",
+          \"button\": \"${TEXT}\",
           \"channel\": \"${CHANNEL}\",
           \"object\": \"${UUID}\"
         }\""
@@ -765,7 +825,7 @@ send_lifebot_request() {
           -H "Content-Type: application/json" \
           -d "{
           ${COMMON},
-          \"button\": \"${BUTTON}\",
+          \"button\": \"${TEXT}\",
           \"channel\": \"${CHANNEL}\",
           \"object\": \"${UUID}\"
         }"
@@ -934,9 +994,9 @@ send_request() {
   fi
 }
 
-ACTION_STR= AMOUNT= AVATAR_UUID= BOT_NAME= BUTTON= FILTER= GROUP_ID=
-LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
-CORRADE_BOT_ID= CORRADE_BOT_NAME= CORRADE_BOT_URL=
+ACTION_STR= AMOUNT= AVATAR_UUID= BOT_NAME= FILTER= GROUP_ID=
+LOGIN_SITON= MESSAGE= OBJ_NAME= OUTFIT_NAME= SL_NAME= SUBJECT= TEXT=
+CORRADE_BOT_ID= CORRADE_BOT_NAME= CORRADE_BOT_URL= UUID= WEARABLE=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
@@ -944,16 +1004,13 @@ CORRADE_BOT_ID= CORRADE_BOT_NAME= CORRADE_BOT_URL=
 have_jq=$(type -p jq)
 
 command_line_secret= details= dryrun= nobold= corrade= verb="-s"
-while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:vz:Heh" flag; do
+while getopts ":a:A:c:C:dijF:l:M:N:n:O:k:S:s:T:u:vz:Heh" flag; do
   case $flag in
     a)
       ACTION_STR="${OPTARG}"
       ;;
     A)
       AVATAR_UUID="${OPTARG}"
-      ;;
-    B)
-      BUTTON="${OPTARG}"
       ;;
     C)
       CHANNEL="${OPTARG}"
@@ -999,6 +1056,9 @@ while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:vz:Heh" flag; do
     s)
       LB_SECRET="${OPTARG}"
       command_line_secret=1
+      ;;
+    T)
+      TEXT="${OPTARG}"
       ;;
     u)
       UUID="${OPTARG}"
@@ -1046,12 +1106,6 @@ shift $(( OPTIND - 1 ))
   envurl="API_URL_${corrade}"
   [ "${!envurl}" ] && CORRADE_BOT_URL="${!envurl}"
   [ "${!envid}" ] && CORRADE_BOT_ID="${!envid}"
-  is_valid_uuid "${CORRADE_BOT_ID}" || {
-    [ "${have_jq}" ] && {
-      SL_NAME="${corrade}"
-      CORRADE_BOT_ID=$(send_request -l "name2key" | jq -r '.key')
-    }
-  }
 }
 
 # Check for a bot specific secret
@@ -1087,8 +1141,14 @@ shift $(( OPTIND - 1 ))
     is_valid_uuid "${AVATAR_UUID}" || {
       [ "${have_jq}" ] && {
         # Avatar name can be provided, convert name to key
+        tmp_SLNAME="${SL_NAME}"
         SL_NAME="${AVATAR_UUID}"
-        AVATAR_UUID=$(send_request -l "name2key" | jq -r '.key')
+        if [ "${corrade}" ]; then
+          AVATAR_UUID=$(send_request "name2key" | jq -r '.data[1]')
+        else
+          AVATAR_UUID=$(send_request "name2key" | jq -r '.key')
+        fi
+        SL_NAME="${tmp_SLNAME}"
       }
     }
   }
@@ -1204,6 +1264,21 @@ case "${ACTION}" in
       send_request "give_inventory"
     fi
     ;;
+  note*creat*|creat*note*|nc*creat*|creat*nc*)
+    [ "${SL_NAME}" ] || {
+      echo "The ${ACTION} action requires a Notecard Name specified with -N name"
+      usage brief
+    }
+    [ "${TEXT}" ] || {
+      echo "The ${ACTION} action requires a Notecard text specified with -T text"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "notecard_create" | jq -r .
+    else
+      send_request "notecard_create"
+    fi
+    ;;
   pay_avatar|give_money)
     show_usage=
     [ "${AVATAR_UUID}" ] || {
@@ -1264,8 +1339,8 @@ case "${ACTION}" in
       echo "The ${ACTION} action requires an Object UUID specified with -u uuid"
       show_usage=1
     }
-    [ "${BUTTON}" ] || {
-      echo "The ${ACTION} action requires a button text specified with -B text"
+    [ "${TEXT}" ] || {
+      echo "The ${ACTION} action requires a button text specified with -T text"
       show_usage=1
     }
     [ ${CHANNEL} -eq 0 ] && {
@@ -1389,10 +1464,18 @@ case "${ACTION}" in
     fi
     ;;
   wear)
-    [ "${UUID}" ] || {
-      echo "The ${ACTION} action requires an item UUID to wear specified with -u uuid"
-      usage brief
-    }
+    if [ "${corrade}" ]; then
+      [ "${OBJ_NAME}" ] && WEARABLE="${OBJ_NAME}"
+      [ "${WEARABLE}" ] || {
+        echo "The ${ACTION} action requires a path to an item to wear specified with -O '/path/to/item'"
+        usage brief
+      }
+    else
+      [ "${UUID}" ] || {
+        echo "The ${ACTION} action requires an item UUID to wear specified with -u uuid"
+        usage brief
+      }
+    fi
     if [ "${have_jq}" ]; then
       send_request "wear" | jq -r .
     else
@@ -1556,11 +1639,7 @@ case "${ACTION}" in
       send_request "${ACTION}"
     else
       echo "Action '${ACTION}' not yet supported"
-      echo "Currently supported actions:"
-      echo "  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,"
-      echo "  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
-      echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
-      echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
+      list_supported_actions
     fi
     ;;
 esac

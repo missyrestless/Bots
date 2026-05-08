@@ -29,16 +29,24 @@ have_jq=$(type -p jq)
 }
 
 usage() {
-  printf "\nUsage: keys2names [-n name] [-f /path/to/file]"
+  printf "\nUsage: keys2names [-c|l] [-n name] [-f /path/to/file]"
   printf "\nWhere:"
+  printf "\n\t-c indicates use Corrade API"
+  printf "\n\t-l indicates use LifeBots API"
   printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]"
   printf "\n\t-f file specifies the path to a file with UUIDs [default: ${DEF_FILE}]\n\n"
   exit 1
 }
 
-BOT= FILE=
-while getopts ":n:f:h" flag; do
+BOT= FILE= CORRADE= LIFEBOT=
+while getopts ":cln:f:h" flag; do
   case $flag in
+    c)
+      CORRADE=1
+      ;;
+    l)
+      LIFEBOT=1
+      ;;
     n)
       BOT="$OPTARG"
       ;;
@@ -56,20 +64,37 @@ while getopts ":n:f:h" flag; do
 done
 shift $(( OPTIND - 1 ))
 
+[ "${CORRADE}" ] && [ "${LIFEBOT}" ] && {
+  echo "Only one of -c and -l can be specified. Exiting."
+  exit 1
+}
+[ "${CORRADE}" ] || [ "${LIFEBOT}" ] || {
+  echo "One of -c or -l must be given in order to specify the API. Exiting."
+  exit 1
+}
+
 [ "${BOT}" ] || BOT="${DEF_BOT}"
 [ "${FILE}" ] || FILE="${DEF_FILE}"
 
 # Check if Bot is online and if not, login
-lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
-  echo "Logging in ${BOT} ..."
-  lifebot -a login -n ${BOT}
-  sleep 10
+[ "${LIFEBOT}" ] && {
+  lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
+    echo "Logging in ${BOT} ..."
+    lifebot -a login -n ${BOT}
+    sleep 10
+  }
 }
 
 if [ -r "${FILE}" ]; then
   cat "${FILE}" | while read uuid
   do
-    [ "${uuid}" ] && lifebot -a key2name -n ${BOT} -u ${uuid} | jq -r .name
+    [ "${uuid}" ] && {
+      if [ "${LIFEBOT}" ]; then
+        lifebot -a key2name -n ${BOT} -u ${uuid} | jq -r .name
+      else
+        lifebot -a key2name -c ${BOT} -u ${uuid} | jq -r '.data[1]'
+      fi
+    }
   done
 else
   echo "${FILE} does not exist or is not readable. Exiting."

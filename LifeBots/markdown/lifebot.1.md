@@ -14,7 +14,7 @@ lifebot - Manage LifeBots and Corrade Second Life bots from the command line
 
 ## SYNOPSIS
 
-lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-T text] [-C channel]
   [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 
 See the [Bots Github repository README](https://github.com/missyrestless/Bots)
@@ -63,6 +63,30 @@ To set the `ScriptLanguage` to JSON in `CorradeConfiguration.xml`:
 
 ```xml
   <ScriptLanguage>JSON</ScriptLanguage>
+```
+
+Note that each Corrade API request requires some permissions enabled in the Corrade
+Configuration. For example, balance inquiries and payments require the `economy`
+permission, inventory operations require the `inventory` permission, movement requires
+the `movement` permission. An example set of Corrade permissions that enable capabilities
+required by the `lifebot` command might look like:
+
+```xml
+    <Permissions>
+        <Permission>movement</Permission>
+        <Permission>grooming</Permission>
+        <Permission>interact</Permission>
+        <Permission>notifications</Permission>
+        <Permission>talk</Permission>
+        <Permission>group</Permission>
+        <Permission>land</Permission>
+        <Permission>inventory</Permission>
+        <Permission>directory</Permission>
+        <Permission>system</Permission>
+        <Permission>bridge</Permission>
+        <Permission>economy</Permission>
+        <Permission>execute</Permission>
+    </Permissions>
 ```
 
 ## CONFIGURATION
@@ -168,13 +192,6 @@ The following command line options are available with `lifebot`:
 
 `-a action` : specifies the API action (sit, teleport, login, ...)
 
-Supported actions:
-
-	  login, logout, status (default), bot_location, walkto, sit, stand, teleport, listalias, key2name,
-	  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
-	  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
-	  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
-
 `-l location` : specifies a location for login and teleport actions
 
 `-n name` : specifies a LifeBots Bot name, Default: Anya Ordinary
@@ -183,7 +200,7 @@ Supported actions:
 
 `-k apikey` : specifies an API Key, use environment instead
 
-`-B text` : specifies the dialog button text for replies to dialog menus
+`-T text` : specifies the dialog button text for replies to dialog menus
 
 `-C channel` : specifies the channel for a message [default: 0]
 
@@ -210,6 +227,19 @@ Supported actions:
 `-i` : retrieves Bot details
 
 `-h` : displays this usage message and exits
+
+### Supported Actions
+
+- Supported LifeBots actions:
+  - login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, notecard_create,
+  - avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+  - rebake, touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
+  - get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
+- Supported Corrade actions:
+  - attach, batchavatarkeytoname, batchavatarnametokey, changeappearance, createlandmark,
+  - createnotecard, detach, fly, flyto, getattachments, getattachmentspath, getmembersonline,
+  - inventory cwd, inventory list current outfit, inventory list outfits, pay avatar,
+  - pay object, sit, stand, teleport, touch, unwear, walkto, wear
 
 ### ENVIRONMENT
 
@@ -359,7 +389,7 @@ are supported by the `lifebot` command.
   - `lifebot -a name2key -n "John Doebot" -N "Missy Restless"`
 - `reply_dialog` : reply to a dialog menu (requires channel, UUID, and button text)
   - `Example` : click couch menu button "Male" on channel 99999
-  - `lifebot -a reply -n "John Doebot" -C 99999 -B Male -u "a811d6fe-de59-2f4e-ee19-0cc48da48981"`
+  - `lifebot -a reply -n "John Doebot" -C 99999 -T Male -u "a811d6fe-de59-2f4e-ee19-0cc48da48981"`
 - `say_chat_channel` : send a message to the specified chat channel
   - `Example` : send a message on channel 0, visible to everyone nearby
   - `lifebot -a say -n "John Doebot" -C 0 -M "Hi everyone, you look great"`

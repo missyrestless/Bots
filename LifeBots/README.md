@@ -381,27 +381,24 @@ Let us know which `LifeBots` API requests you would like supported.
 </summary>
 
 ```
-Usage: lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
-	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
+Usage: lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-C channel]
+  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-T text] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
-	Supported actions:
-	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, key2name,
-	  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
-	  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
-	  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 	-l location specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
 	-k apikey specifies an API Key, use environment instead
-	-B text specifies the dialog button text for replies to dialog menus
+	-A avatar specifies an avatar UUID for use with giving money or objects
 	-C channel specifies the channel for a message [default: 0]
+	-c corrade specifies a Corrade bot name to act upon
 	-F filter specifies a filter to match when listing attachments
 	-M message specifies the message body for a group notice/im
-	-N name specifies the SL name of the recipient of an IM
+	-N name specifies the name of the recipient of an IM or landmark/notecard
 	-O name specifies an attachment object name or outfit name
 	-S subject specifies the subject for a group notice
 	-s secret specifies a Bot secret, use environment instead
+	-T text specifies the notecard text or dialog button text for reply to menus
 	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
 	-z num specifies a hover height adjustment size [default: -0.05]
 		can also be used to specify a payment amount
@@ -422,7 +419,19 @@ Examples:
   lifebot  # Displays the status of the default Bot
   lifebot -a login -l Home # Default Bot login to Home location
   lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
+  lifebot -a stand -n Jane -c John # Jane bot sends the stand command to Corrade bot John
   lifebot -a teleport -l club  # Uses a 'club' location alias defined in .lifebots
+Supported Actions
+Supported LifeBots actions:
+  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, notecard_create,
+  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+  rebake, touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
+  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
+Supported Corrade actions:
+  attach, batchavatarkeytoname, batchavatarnametokey, changeappearance, createlandmark,
+  createnotecard, detach, fly, flyto, getattachments, getattachmentspath, getmembersonline,
+  inventory cwd, inventory list current outfit, inventory list outfits, pay avatar,
+  pay object, sit, stand, teleport, touch, unwear, walkto, wear
 ```
 
 </details>

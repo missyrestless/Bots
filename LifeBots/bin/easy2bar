@@ -32,9 +32,9 @@ if [ "$1" == "-l" ]; then
   lifebot -a sit -n Easy -u beachbar
 else
   # Check if online
-  lifebot -a status -c Angel | grep Easy+Islay >/dev/null || {
+  lifebot -a status -c Angel | grep 'Easy Islay' >/dev/null || {
     # Maybe Angel is not online
-    lifebot -a status -c Easy | grep Easy+Islay >/dev/null || {
+    lifebot -a status -c Easy | grep 'Easy Islay' >/dev/null || {
       echo "Easy Islay does not appear to be online"
       exit 1
     }
@@ -42,6 +42,8 @@ else
 
   lifebot -a stand -c Easy >/dev/null 2>&1
   lifebot -a teleport -c Easy -l beach >/dev/null 2>&1
+  sleep 5
+  lifebot -a wear_outfit -c Easy -O '** Legacy Basic Bikini Purple **' >/dev/null 2>&1
   sleep 5
   lifebot -a sit -c Easy -u beachbar
 fi
