@@ -236,7 +236,7 @@ send_request() {
             \"apikey\": \"${LB_API_KEY}\",
             \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\",
-            \"siton\": \"${LOGIN_UUID}\",
+            \"siton\": \"${LOGIN_SITON}\",
             \"dataType\": \"json\",
             \"location\": \"${LOCATION}\"
           }\""
@@ -249,7 +249,7 @@ send_request() {
             \"apikey\": \"${LB_API_KEY}\",
             \"botname\": \"${LB_BOT_NAME}\",
             \"secret\": \"${LB_SECRET}\",
-            \"siton\": \"${LOGIN_UUID}\",
+            \"siton\": \"${LOGIN_SITON}\",
             \"dataType\": \"json\",
             \"location\": \"${LOCATION}\"
           }"
