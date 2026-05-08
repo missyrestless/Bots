@@ -11,7 +11,7 @@ REGION="Scylla"
 # Set to object UUID to touch or sit for bots to dance
 UUID="cmover"
 # Set to action, sit or touch object to dance
-ACTION="touch"
+ACTION="touch_prim"
 # Set to location, a Slurl or a Slurl alias
 LOC="club"
 
