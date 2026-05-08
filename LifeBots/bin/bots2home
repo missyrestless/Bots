@@ -33,10 +33,10 @@ lifebot -a teleport -n Angel -l club
 sleep 7
 lifebot -a sit -n Angel -u rpole
 
-# Send Anya to her couch
+# Send Anya to her dance pole
 lifebot -a teleport -n Anya -l club
 sleep 7
-lifebot -a sit -n Anya -u lcouch
+lifebot -a sit -n Anya -u lpole
 
 # Send Easy to her dance pole
 lifebot -a teleport -n Easy -l club
