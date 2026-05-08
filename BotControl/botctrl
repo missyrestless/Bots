@@ -33,7 +33,7 @@ LB_BOT_NAME="Anya Ordinary"
 # Set the default action, can be specified with -a action
 ACTION="status"
 # LifeBots API endpoint
-APIURL="https://api.botctrl.cloud/api"
+APIURL="https://api.lifebots.cloud/api"
 ENDPOINT="${APIURL}/bot.html"
 # Set the default login location
 LOCATION="Last location"
