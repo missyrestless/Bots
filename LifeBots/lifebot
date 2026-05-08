@@ -502,7 +502,7 @@ send_corrade_request() {
       COMMAND="\"command\": \"${cmd}\", \"item\": \"${cuuid}\", \"range\": \"${CORRADE_RANGE}\""
       ;;
     stand)
-      COMMAND="\"command\": \"stand\""
+      COMMAND="\"command\": \"stand\", \"deanimate\": \"True\""
       ;;
     getmembersonline|status)
       COMMAND="\"command\": \"getmembersonline\""

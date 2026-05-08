@@ -7,8 +7,9 @@
 # Default bot
 DEF_BOT="Anya"
 # All bots
-#ALL_BOTS="Angel Anya Easy"
-ALL_BOTS="Anya"
+ALL_CO_BOTS="Angel Easy"
+ALL_LB_BOTS="Anya"
+ALL_BOTS="${ALL_CO_BOTS} ${ALL_LB_BOTS}"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {
@@ -22,28 +23,56 @@ have_lb=$(type -p lifebot)
 }
 
 have_jq=$(type -p jq)
-[ "${have_jq}" ] || {
-  echo "ERROR: cannot locate jq in PATH"
-  exit 1
-}
 
 usage() {
-  printf "\nUsage: checkstatus [-A] [-n name]\n\n"
+  printf "\nUsage: checkstatus [-A] [-c|l] [-n name]\n\n"
   printf "\nWhere:"
   printf "\n\t-A indicates check status of all bots [All Bots: ${ALL_BOTS}]"
+  printf "\n\t-c indicates use Corrade API to perform check"
+  printf "\n\t-l indicates use LifeBots API to perform check"
   printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]\n\n"
   exit 1
 }
 
-BOT=
-allbots=
-while getopts ":An:h" flag; do
+check_co_bot() {
+  local slbot="$1"
+  # Check for Name alias in ~/.lifebots
+  local SL_NAME="${slbot}"
+  local botname=$(echo "${slbot}" | sed -e "s/ /_/g")
+  local envname="BOT_NAME_${botname}"
+  [ "${!envname}" ] && SL_NAME="${!envname}"
+  if lifebot -a status -c "${SL_NAME}" 2>&1 | grep 'parse error' >/dev/null; then
+    STATUS="OFFLINE"
+  else
+    STATUS="ONLINE"
+  fi
+  if [ "${have_jq}" ]; then
+    printf "\n{\n  \"action\": \"status\",\n  \"status\": \"${STATUS}\",\n  \"slname\": \"${SL_NAME}\"\n}\n" | jq -r .
+  else
+    printf '\n{'
+    printf '\n  "action": "status",'
+    printf "\n  \"status\": \"${STATUS}\","
+    printf "\n  \"slname\": \"${SL_NAME}\""
+    printf '\n}\n'
+  fi
+  sleep 2
+}
+
+BOT= allbots=1 corrade= lifebot=
+while getopts ":Acln:h" flag; do
   case $flag in
     A)
       allbots=1
       ;;
+    c)
+      corrade=1
+      ;;
+    l)
+      lifebot=1
+      ;;
     n)
       BOT="$OPTARG"
+      allbots=
       ;;
     h)
       usage
@@ -56,14 +85,47 @@ while getopts ":An:h" flag; do
 done
 shift $(( OPTIND - 1 ))
 
+[ "${corrade}" ] && [ "${lifebot}" ] && {
+  echo "Only one of -c and -l can be specified. Exiting."
+  exit 1
+}
+[ "${BOT}" ] && {
+  [ "${corrade}" ] || [ "${lifebot}" ] || {
+    echo "One of -c or -l must be given when specifying bot name with -n name. Exiting."
+    exit 1
+  }
+}
+
 [ "${BOT}" ] || BOT="${DEF_BOT}"
 
+[ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
+
 if [ "${allbots}" ]; then
-  for bot in ${ALL_BOTS}
-  do
-    lifebot -a status -n ${bot}
-    sleep 2
-  done
+  [ "${ALL_LB_BOTS}" ] && {
+    for bot in ${ALL_LB_BOTS}
+    do
+      if [ "${have_jq}" ]; then
+        lifebot -a status -n ${bot} | jq -r '{action: .action, status: .status, slname: .slname}'
+      else
+        lifebot -a status -n ${bot}
+      fi
+      sleep 2
+    done
+  }
+  [ "${ALL_CO_BOTS}" ] && {
+    for bot in ${ALL_CO_BOTS}
+    do
+      check_co_bot "${bot}"
+    done
+  }
 else
-  lifebot -a status -n ${BOT}
+  if [ "${corrade}" ]; then
+    check_co_bot "${BOT}"
+  else
+    if [ "${have_jq}" ]; then
+      lifebot -a status -n ${BOT} | jq -r '{action: .action, status: .status, slname: .slname}'
+    else
+      lifebot -a status -n ${BOT}
+    fi
+  fi
 fi

@@ -23,6 +23,7 @@ needsleep=
 for bot in Anya
 do
   lifebot -a stand -n ${bot} >/dev/null 2>&1
+  sleep 1
   lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
     lifebot -a login -n ${bot} -l club
     needsleep=1
@@ -31,6 +32,8 @@ done
 [ "${needsleep}" ] && sleep 10
 
 # Send Angelus to his dance pole
+lifebot -a stand -c Angel >/dev/null 2>&1
+sleep 1
 lifebot -a teleport -c Angel -l club
 sleep 5
 lifebot -a sit -c Angel -u rpole
@@ -41,6 +44,8 @@ sleep 5
 lifebot -a sit -n Anya -u lpole
 
 # Send Easy to her dance pole
+lifebot -a stand -c Easy >/dev/null 2>&1
+sleep 1
 lifebot -a teleport -c Easy -l club
 sleep 5
 lifebot -a sit -c Easy -u dancepole

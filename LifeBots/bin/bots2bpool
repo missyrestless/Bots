@@ -22,6 +22,7 @@ needsleep=
 for bot in Anya
 do
   lifebot -a stand -n ${bot} >/dev/null 2>&1
+  sleep 1
   lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
     lifebot -a login -n ${bot} -l beach
     needsleep=1
@@ -32,6 +33,8 @@ done
 # Send Angelus and Easy to the beach pool
 for bot in Easy Angel
 do
+  lifebot -a stand -c ${bot} >/dev/null 2>&1
+  sleep 1
   lifebot -a teleport -c ${bot} -l beach >/dev/null 2>&1
   sleep 5
   lifebot -a sit -c ${bot} -u bpool
