@@ -5,13 +5,13 @@
 //  https://creativecommons.org/licenses/by/2.0/     //
 ///////////////////////////////////////////////////////
 //
-// This script can be used to control Corrade's movement manually using the
-// WSAD and arrow keys on the keyboard.
+// This script can be used to control Corrade's movement
+// manually using the WSAD and arrow keys on the keyboard.
 //
 // For more information on Corrade, please see:
 //     http://grimore.org/secondlife/scripted_agents/corrade
 //
-///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
  
 string wasKeyValueGet(string k, string data) {
     if(llStringLength(data) == 0) return "";
