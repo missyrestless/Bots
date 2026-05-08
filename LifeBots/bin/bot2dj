@@ -70,6 +70,7 @@ lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
   sleep 20
 }
 
+lifebot -a stand -n ${BOT} >/dev/null 2>&1
 lifebot -a teleport -n ${BOT} -l ${LOC}
 sleep 10
 lifebot -a sit -n ${BOT} -u ${UUID}

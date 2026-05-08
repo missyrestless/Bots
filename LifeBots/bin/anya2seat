@@ -23,6 +23,7 @@ lifebot -a status -n Anya | jq -r '.status' | grep -i online >/dev/null || {
 }
 sleep 20
 
+lifebot -a stand -n Anya >/dev/null 2>&1
 lifebot -a teleport -n Anya -l media
 sleep 10
 lifebot -a sit -n Anya -u mseats

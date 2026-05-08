@@ -21,6 +21,7 @@ have_jq=$(type -p jq)
 needsleep=
 for bot in Angel Anya Easy
 do
+  lifebot -a stand -n ${bot} >/dev/null 2>&1
   lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
     lifebot -a login -n ${bot} -l club
     needsleep=1
