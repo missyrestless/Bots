@@ -21,6 +21,7 @@ https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
 - `Avatars`: Specifications for free male and female avatars
 - `bin`: convenience scripts to manage services on the server-side
 - `etc`: Corrade, Nginx, and Shoutcast configuration and systemd units
+- `Evade_Region_Restart`: Script and configuration notecard to evade region restarts
 - `Examples`: some simple examples of how to use the Corrade system
 - `HUD`: the Corrade HUD, control bots in-world with this heads-up display
 - `Pay2Play`: WDC Tipjar settings examples
