@@ -12,7 +12,7 @@
 #   login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,
 #   name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
 #   touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
-#   get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
+#   get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
@@ -58,7 +58,7 @@ usage() {
     LINE=
     NORM=
   }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
   printf "\n\t[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
   [ "$1" == "brief" ] && {
     printf "\n\n"
@@ -70,11 +70,12 @@ usage() {
   printf "\n\t  login, logout, status (default), bot_location, walkto, sit, stand, teleport, listalias, key2name,"
   printf "\n\t  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
   printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
-  printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
+  printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
   printf "\n\t${BOLD}${LINE}-k apikey${NORM} specifies an API Key, use environment instead"
+  printf "\n\t${BOLD}${LINE}-A avatar${NORM} specifies an avatar UUID for use with giving money or objects"
   printf "\n\t${BOLD}${LINE}-B text${NORM} specifies the dialog button text for replies to dialog menus"
   printf "\n\t${BOLD}${LINE}-C channel${NORM} specifies the channel for a message [default: 0]"
   printf "\n\t${BOLD}${LINE}-F filter${NORM} specifies a filter to match when listing attachments"
@@ -132,8 +133,8 @@ examples() {
   printf "\n\tExample : list available outfits for bot named John Doebot"
   printf "\n\tlifebot -a get_outfits -n \"John Doebot\""
   printf "\ngive_money : pay another avatar L$ from your bot"
-  printf "\n\tExample : pay avatar with specified UUID L$300 from bot John Doebot"
-  printf "\n\tlifebot -a give_money -n \"John Doebot\" -u \"3506213c-29c8-4aa1-a38f-e12f6d41b804\" -z 300"
+  printf "\n\tExample : pay avatar with specified avatar UUID L$300 from bot John Doebot"
+  printf "\n\tlifebot -a give_money -n \"John Doebot\" -A \"3506213c-29c8-4aa1-a38f-e12f6d41b804\" -z 300"
   printf "\ngive_money_object : pay an object L$ from your bot"
   printf "\n\tExample : pay a tip jar with specified UUID L$100 from bot John Doebot"
   printf "\n\tlifebot -a give_money_object -n \"John Doebot\" -u \"47cb1fc7-8144-b538-6716-c723fb1332d6\" -z 100"
@@ -220,10 +221,12 @@ examples() {
 
 is_valid_uuid() {
   local uuid="$1"
-  if [[ "$uuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$ ]]; then
-    return 0 # Valid UUID
+  if [[ $uuid =~ ^\{?[A-F0-9a-f]{8}-[A-F0-9a-f]{4}-[A-F0-9a-f]{4}-[A-F0-9a-f]{4}-[A-F0-9a-f]{12}\}?$ ]]; then
+    echo "${uuid} is valid"
+    return 0 # Valid
   else
-    return 1 # Invalid UUID
+    echo "${uuid} is invalid"
+    return 1 # Invalid
   fi
 }
 
@@ -467,6 +470,27 @@ send_request() {
         }"
       fi
       ;;
+    give_inventory)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"avatar\": \"${AVATAR_UUID}\",
+          \"object\": \"${UUID}\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"avatar\": \"${AVATAR_UUID}\",
+          \"object\": \"${UUID}\"
+        }"
+      fi
+      ;;
     give_money|give_money_object)
       if [ "${dryrun}" ]; then
         echo "curl -s -X POST ${ENDPOINT} \
@@ -661,7 +685,7 @@ send_request() {
   esac
 }
 
-ACTION_STR= AMOUNT= BOT_NAME= BUTTON= FILTER= GROUP_ID=
+ACTION_STR= AMOUNT= AVATAR_UUID= BOT_NAME= BUTTON= FILTER= GROUP_ID=
 LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
@@ -670,10 +694,13 @@ LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
 have_jq=$(type -p jq)
 
 command_line_secret= details= dryrun= nobold=
-while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
+while getopts ":a:A:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
   case $flag in
     a)
       ACTION_STR="${OPTARG}"
+      ;;
+    A)
+      AVATAR_UUID="${OPTARG}"
       ;;
     B)
       BUTTON="${OPTARG}"
@@ -725,6 +752,7 @@ while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
     z)
       HEIGHT="${OPTARG}"
       AMOUNT="${OPTARG}"
+      INVUUID="${OPTARG}"
       ;;
     e)
       examples
@@ -770,6 +798,16 @@ shift $(( OPTIND - 1 ))
   botloc=$(echo "${LOCATION}" | sed -e "s/ /_/g")
   envloc="SLURL_${botloc}"
   [ "${!envloc}" ] && LOCATION="${!envloc}"
+}
+
+# Check for avatar UUID alias in ~/.lifebots
+[ "${AVATAR_UUID}" ] && {
+  # Check if UUID is a valid Second Life avatar UUID, if not then check for alias
+  is_valid_uuid "${AVATAR_UUID}" || {
+    botuuid=$(echo "${AVATAR_UUID}" | sed -e "s/ /_/g")
+    envuuid="UUID_${botuuid}"
+    [ "${!envuuid}" ] && AVATAR_UUID="${!envuuid}"
+  }
 }
 
 # Check for UUID alias in ~/.lifebots
@@ -857,10 +895,28 @@ case "${ACTION}" in
       send_request "get_balance"
     fi
     ;;
+  give_inv*|give_obj*)
+    show_usage=
+    [ "${AVATAR_UUID}" ] || {
+      echo "The ${ACTION} action requires an Avatar UUID specified with -A avatar-uuid"
+      show_usage=1
+    }
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an inventory object UUID specified with -u uuid"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage brief
+
+    if [ "${have_jq}" ]; then
+      send_request "give_inventory" | jq -r .
+    else
+      send_request "give_inventory"
+    fi
+    ;;
   pay_avatar|give_money)
     show_usage=
-    [ "${UUID}" ] || {
-      echo "The ${ACTION} action requires an Avatar UUID specified with -u uuid"
+    [ "${AVATAR_UUID}" ] || {
+      echo "The ${ACTION} action requires an Avatar UUID specified with -A avatar-uuid"
       show_usage=1
     }
     [ "${AMOUNT}" ] || {
@@ -870,7 +926,6 @@ case "${ACTION}" in
     [ "${show_usage}" ] && usage brief
 
     if [[ "${AMOUNT}" =~ ^[0-9]+$ ]]; then
-      AVATAR_UUID="${UUID}"
       if [ "${have_jq}" ]; then
         send_request "give_money" | jq -r .
       else
@@ -1183,6 +1238,6 @@ case "${ACTION}" in
     echo "  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,"
     echo "  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
     echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
-    echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
+    echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
     ;;
 esac
