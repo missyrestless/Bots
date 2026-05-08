@@ -2,6 +2,8 @@
 
 This is an example of how one could automate Corrade such that it evades region restarts in order to not be disconnected once the region goes down. The script monitors the region's alert messages and detects when a region restart is scheduled. Once a region restart is scheduled, the script attempts to teleport Corrade out of the way and then waits (in a suspended state) till the region comes back up. When the region is back up, the script teleports Corrade back to a configurable home position.
 
+This is available for L$0 on the SL Marketplace at https://marketplace.secondlife.com/p/WaS-Corrade-Region-Restart-Evader/8323879
+
 ## Requirements
 
 The script requires that for the configured group, the following permissions to be enabled:
