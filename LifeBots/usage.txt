@@ -1,33 +1,34 @@
 
-Usage: lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
-	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
-Where:
-	-a action specifies the API action (sit, teleport, login, ...)
+[1m[4mUsage:(B[m [1mlifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num](B[m
+[1m[4mWhere:(B[m
+	[1m[4m-a action(B[m specifies the API action (sit, teleport, login, ...)
 	Supported actions:
-	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, key2name,
-	  name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
-	  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
-	  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
-	-l location specifies a location for login and teleport actions
+	  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,
+	  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+	  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
+	  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
+	[1m[4m-l location(B[m specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
-	-n name specifies a Bot name, Default: Easy Islay
-	-k apikey specifies an API Key, use environment instead
-	-B text specifies the dialog button text for replies to dialog menus
-	-C channel specifies the channel for a message [default: 0]
-	-F filter specifies a filter to match when listing attachments
-	-M message specifies the message body for a group notice/im
-	-N name specifies the SL name of the recipient of an IM
-	-O name specifies an attachment object name or outfit name
-	-S subject specifies the subject for a group notice
-	-s secret specifies a Bot secret, use environment instead
-	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
-	-z num specifies a hover height adjustment size [default: -0.05]
+	[1m[4m-n name(B[m specifies a Bot name, Default: Easy Islay
+	[1m[4m-k apikey(B[m specifies an API Key, use environment instead
+	[1m[4m-A avatar(B[m specifies an avatar UUID for use with giving money or objects
+	[1m[4m-B text(B[m specifies the dialog button text for replies to dialog menus
+	[1m[4m-C channel(B[m specifies the channel for a message [default: 0]
+	[1m[4m-F filter(B[m specifies a filter to match when listing attachments
+	[1m[4m-M message(B[m specifies the message body for a group notice/im
+	[1m[4m-N name(B[m specifies the SL name of the recipient of an IM
+	[1m[4m-O name(B[m specifies an attachment object name or outfit name
+	[1m[4m-S subject(B[m specifies the subject for a group notice
+	[1m[4m-s secret(B[m specifies a Bot secret, use environment instead
+	[1m[4m-u uuid(B[m specifies a UUID for use with actions that require one (e.g. sit)
+	[1m[4m-z num(B[m specifies a hover height adjustment size [default: -0.05]
 		can also be used to specify a payment amount
-	-d indicates dryrun mode - tell me what you would do without doing anything
-	-e displays a list of supported commands and examples then exits
-	-i retrieves Bot details
-	-h displays this usage message and exits
-Environment:
+	[1m[4m-d(B[m indicates dryrun mode - tell me what you would do without doing anything
+	[1m[4m-e(B[m displays a list of supported commands and examples then exits
+	[1m[4m-i(B[m retrieves Bot details
+	[1m[4m-h(B[m displays this usage message and exits
+[1m[4mEnvironment:(B[m
   Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
   of the form LB_SECRET_BOT_NAME in order to support multiple bots
   Entries can specify a Slurl alias. For example:
@@ -36,7 +37,7 @@ Environment:
   Entries can also specify a UUID alias. For example:
     export UUID_Mover='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'
   A UUID alias can be used with the -u command line argument, e.g. -u Mover
-Examples:
+[1m[4mExamples:(B[m
   lifebot  # Displays the status of the default Bot
   lifebot -a login -l Home # Default Bot login to Home location
   lifebot -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
