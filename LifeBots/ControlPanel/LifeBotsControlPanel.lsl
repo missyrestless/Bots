@@ -124,28 +124,9 @@ integer BOT_NOTECARD_READ_REPLY     = 290238;   //
 integer BOT_NOTECARD_CREATE_REPLY   = 290239;   //
                                                 //
 // LifeBots API Extensions                      //
-integer LIST_GROUP_MEMBERS          = 299000;   //
-integer LIST_INVENTORY              = 299001;   //
-integer ACTIVATE_ROLE               = 299002;   //
-integer TAKE_DELETE_OBJECT          = 299003;   //
-integer INVENTORY_TO_OBJECT         = 299004;   //
+//
+// Avatar Operations
 integer ADJUST_HOVER_HEIGHT         = 299005;   //
-integer LIST_OUTFITS                = 299006;   //
-integer WEAR_OUTFIT                 = 299007;   //
-integer GET_WORN_OUTFIT             = 299008;   //
-integer FIND_OBJECTS                = 299009;   //
-integer FIND_OBJECTS_WITH_PROP      = 299010;   //
-integer FIND_OBJECTS_PARCEL         = 299011;   //
-integer FIND_OBJECT_UUID            = 299012;   //
-integer GROUP_INFO                  = 299013;   //
-integer LIST_GROUPS_UUID            = 299014;   //
-integer LIST_GROUPS_NAME            = 299015;   //
-integer GROUP_VISIBILITY            = 299016;   //
-integer GROUP_OFFER_ACCEPT          = 299017;   //
-integer GROUP_OFFER_DECLINE         = 299018;   //
-integer ALWAYS_RUN                  = 299019;   //
-integer ALWAYS_WALK                 = 299020;   //
-integer SCAN_AVATARS                = 299021;   //
 integer AVATAR_INFO                 = 299022;   //
 integer AVATAR_DISPLAY_NAME         = 299023;   //
 integer AVATAR_PICKS                = 299024;   //
@@ -153,12 +134,41 @@ integer AVATAR_GROUPS               = 299025;   //
 integer AVATAR_GROUPS_MATCH         = 299026;   //
 integer AVATAR_GROUPS_SKIP          = 299027;   //
 integer AVATAR_GROUPS_MATCH_SKIP    = 299028;   //
+integer SCAN_AVATARS                = 299021;   //
+integer UUID_TO_NAME                = 299021;   //
+integer NAME_TO_UUID                = 299021;   //
+// Communication
+integer TELEPORT_OFFER_ACCEPT       = 299033;   //
+integer TELEPORT_OFFER_DECLINE      = 299034;   //
+// Group Management
+integer ACTIVATE_ROLE               = 299002;   //
+integer GROUP_INFO                  = 299013;   //
+integer GROUP_VISIBILITY            = 299016;   //
+integer GROUP_OFFER_ACCEPT          = 299017;   //
+integer GROUP_OFFER_DECLINE         = 299018;   //
+integer LIST_GROUPS_UUID            = 299014;   //
+integer LIST_GROUPS_NAME            = 299015;   //
+integer LIST_GROUP_MEMBERS          = 299000;   //
+// Inventory Management
+integer LIST_INVENTORY              = 299001;   //
+integer LIST_OUTFITS                = 299006;   //
+integer WEAR_OUTFIT                 = 299007;   //
+integer GET_WORN_OUTFIT             = 299008;   //
+integer INVENTORY_TO_OBJECT         = 299004;   //
+// Object Interaction
+integer TAKE_DELETE_OBJECT          = 299003;   //
+integer FIND_OBJECTS                = 299009;   //
+integer FIND_OBJECTS_WITH_PROP      = 299010;   //
+integer FIND_OBJECTS_PARCEL         = 299011;   //
+integer FIND_OBJECT_UUID            = 299012;   //
+// Movement Commands
+integer ALWAYS_RUN                  = 299019;   //
+integer ALWAYS_WALK                 = 299020;   //
+// Simulator/Parcel Management
 integer SIM_RETURN_OBJECTS          = 299029;   //
 integer SIM_RETURN_SCRIPTED_OBJECTS = 299030;   //
 integer SIM_RETURN_OTHERS_OBJECTS   = 299031;   //
 integer REGION_INFO                 = 299032;   //
-integer TELEPORT_OFFER_ACCEPT       = 299033;   //
-integer TELEPORT_OFFER_DECLINE      = 299034;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 // LifeBots Control Panel Command & Control Bridge
@@ -171,6 +181,10 @@ string BOT_SECRET = "";
 
 string DEVICE_NAME = "";
 string LOGIN_SITON = "";
+
+string WEBHOOK_URL = "";
+key urlRequestId = NULL_KEY;
+key selfCheckRequestId = NULL_KEY;
 
 // Configuration Notecard
 string CONFIG_CARD = "Configuration";
@@ -189,37 +203,37 @@ integer DEBUG = 0;
 // Send LifeBots HTTP API commands
 LifeBotsAPI(string command, list params) {
 
-  if (DEBUG == 1) {
-    llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
-    llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
-    llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
-  }
-  // Populate the query data
-  list query = [
-    "action="  + command,
-    "apikey="  + llEscapeURL(API_KEY),
-    "botname=" + llEscapeURL(BOT_NAME),
-    "secret="  + llEscapeURL(BOT_SECRET)
-  ];
-  if (DEBUG == 1) {
-    llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
-    llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
-    llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
-  }
+    if (DEBUG == 1) {
+        llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
+        llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
+        llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
+    }
+    // Populate the query data
+    list query = [
+        "action="  + command,
+        "apikey="  + llEscapeURL(API_KEY),
+        "botname=" + llEscapeURL(BOT_NAME),
+        "secret="  + llEscapeURL(BOT_SECRET)
+    ];
+    if (DEBUG == 1) {
+        llSay(DEBUG_CHANNEL, "API_KEY = " + API_KEY);
+        llSay(DEBUG_CHANNEL, "BOT_NAME = " + BOT_NAME);
+        llSay(DEBUG_CHANNEL, "BOT_SECRET = " + BOT_SECRET);
+    }
 
-  integer i;
-  for(i = 0; i<llGetListLength(params); i += 2) {
-    query += [ llList2String(params, i) + "=" + llEscapeURL(llList2String(params, i+1)) ];
-  }
+    integer i;
+    for(i = 0; i<llGetListLength(params); i += 2) {
+        query += [ llList2String(params, i) + "=" + llEscapeURL(llList2String(params, i+1)) ];
+    }
 
-  string queryString = llDumpList2String(query, "&");
+    string queryString = llDumpList2String(query, "&");
 
-  if (DEBUG == 1) {
-    llSay(DEBUG_CHANNEL, "API_URL = " + API_URL);
-    llSay(DEBUG_CHANNEL, "queryString = " + queryString);
-  }
+    if (DEBUG == 1) {
+        llSay(DEBUG_CHANNEL, "API_URL = " + API_URL);
+        llSay(DEBUG_CHANNEL, "queryString = " + queryString);
+    }
  
-  llHTTPRequest(API_URL, [HTTP_METHOD,"POST"], queryString);
+    llHTTPRequest(API_URL, [HTTP_METHOD,"POST"], queryString);
 }
 
 // Function to convert a string to a boolean (case-insensitive, basic values)
@@ -236,8 +250,30 @@ boolean stringToBoolean(string str) {
         return FALSE; // Handles "false", "no", "off", "0", "" and any other string
     }
 }
+ 
+request_secure_url()
+{
+    if (WEBHOOK_URL != "") {
+        llReleaseURL(WEBHOOK_URL);
+    }
+    WEBHOOK_URL = "";
+ 
+    urlRequestId = llRequestSecureURL();
+}
+ 
+throw_exception(string inputString)
+{
+    key owner = llGetOwner();
+    llInstantMessage(owner, inputString);
+ 
+    // yeah, bad way to handle exceptions by restarting.
+    // However this is just a demo script...
+ 
+    llResetScript();
+}
 
 default {
+ 
     state_entry()
     {
         Owner = llGetOwner();
@@ -248,6 +284,7 @@ default {
         else {
             llOwnerSay("Configuration notecard missing, using defaults.");
         }
+        request_secure_url();
     }
 
     on_rez(integer param)
@@ -257,10 +294,18 @@ default {
 
     changed(integer change)
     {
-        if ( change & CHANGED_INVENTORY ) {
+        if (change & (CHANGED_OWNER | CHANGED_INVENTORY))
+        {
+            llReleaseURL(WEBHOOK_URL);
+            WEBHOOK_URL = "";
+ 
             llResetScript();
         }
+ 
+        if (change & (CHANGED_REGION | CHANGED_REGION_START | CHANGED_TELEPORT))
+            request_secure_url();
     }
+ 
 
     dataserver( key queryid, string data )
     {
@@ -310,10 +355,37 @@ default {
         }
     }
 
+    http_request(key id, string method, string body)
+    {
+        if (method == URL_REQUEST_DENIED)
+            throw_exception("Error while attempting to get a free URL for this device:\n \n" + body);
+ 
+        else if (method == URL_REQUEST_GRANTED)
+        {
+            WEBHOOK_URL = body;
+            // check every 5 mins for dropped URL
+            llSetTimerEvent(300.0);
+        }
+    }
+ 
+    timer()
+    {
+        selfCheckRequestId = llHTTPRequest(WEBHOOK_URL,
+                                [HTTP_METHOD, "GET", HTTP_VERBOSE_THROTTLE, FALSE,
+                                 HTTP_BODY_MAXLENGTH, 16384], "");
+    }
+
     http_response(key request_id, integer status, list metadata, string body)
     {
-        if (status == 200)
+        if (request_id == selfCheckRequestId)
         {
+            selfCheckRequestId = NULL_KEY;
+ 
+            if (status != 200)
+                request_secure_url();
+        } else if (request_id == NULL_KEY) {
+            throw_exception("Too many HTTP requests too fast!");
+        } else if (status == 200) {
             llOwnerSay("✓ Success!");
             llOwnerSay("Response: " + body);
             
@@ -327,9 +399,7 @@ default {
             {
                 llOwnerSay("✗ Command failed - check response");
             }
-        }
-        else
-        {
+        } else {
             llOwnerSay("✗ HTTP Error: " + (string)status);
             llOwnerSay("Response: " + body);
         }
@@ -390,7 +460,19 @@ default {
         // Communication commands
         // TODO:
         //   BOT_LISTEN_LOCAL_CHAT
-        //   BOT_LISTEN_IM
+        //   "url": "https://your-server.com/webhook",
+        //   "events": "im,teleport,login", or "all"
+        //   "operation": "add", "remove", or "list"
+        } else if (num == BOT_LISTEN_IM) {
+            if (WEBHOOK_URL == "") {
+                request_secure_url();
+            }
+            llOwnerSay("Sending bot listen IM request...");
+            LifeBotsAPI("set_http_callback", [
+              "url", WEBHOOK_URL,
+              "events", "im",
+              "operation", "add"
+            ]);
         } else if (num == BOT_SAY_CHAT) {
             llOwnerSay("Sending bot say chat request...");
             LifeBotsAPI("say_chat_channel", [
@@ -797,6 +879,23 @@ default {
             ]);
         // LifeBots API Extensions
         // TODO: object search needs guidance on interface
+        } else if (num == NAME_TO_UUID) {
+            llOwnerSay("Sending display name to UUID request...");
+            LifeBotsAPI("name2key", [
+              "name", message
+            ]);
+        } else if (num == UUID_TO_NAME) {
+            llOwnerSay("Sending UUID to display name request...");
+            if ((message == "0") || (message == "1")) {
+                LifeBotsAPI("key2name", [
+                  "key", (string)trigger,
+                  "request_case", message
+                ]);
+            } else {
+                LifeBotsAPI("key2name", [
+                  "key", (string)trigger
+                ]);
+            }
         } else if (num == FIND_OBJECTS) {
             integer range = 96;
             if (message != "") {
