@@ -363,6 +363,47 @@ wasURLEscape() {
                   -e "s/\n/%0D%0A/g"
 }
 
+fixup_Outfits_JSON() {
+  # I know, it's ugly, but the JSON return output was uglier
+  local type_outfit="$1"
+  if [ "${type_outfit}" == "current" ]; then
+    printf '\n{\n  "action": "get_outfit",\n  "outfits": [\n'
+  else
+    printf '\n{\n  "action": "get_outfits",\n  "outfits": [\n'
+  fi
+
+  local name=
+  local uuid=
+  local line
+  while IFS= read -r line; do
+    if [ "${line}" == "name" ]; then
+      printf '    {\n      "name": '
+      name=1
+    else
+      if [ "${line}" == "item" ]; then
+        printf '      "uuid": '
+        uuid=1
+      else
+        [ "${name}" ] && {
+          printf "\"${line}\",\n"
+          name=
+        }
+        [ "${uuid}" ] && {
+          printf "\"${line}\"\n    },\n"
+          uuid=
+        }
+      fi
+    fi
+  done
+
+  printf '    {\n'
+  printf '      "name": "LifeBotsCommandDummyPlaceholder",\n'
+  printf '      "uuid": "foo-bar-spam"\n'
+  printf '    }\n'
+  printf '  ]\n'
+  printf '}\n'
+}
+
 send_corrade_request() {
   local cmd="$1"
   # If the Corrade configuration specifies WAS ScriptLanguage:
@@ -404,7 +445,7 @@ send_corrade_request() {
     get_outfit*)
       local path="/My Inventory/Current Outfit"
       echo "${cmd}" | grep get_outfits >/dev/null && path="/My Inventory/My Outfits"
-      COMMAND="\"command\": \"inventory\", \"path\": \"${path}\", \"action\": \"ls\""
+      COMMAND="\"command\": \"inventory\", \"path\": \"${path}\", \"follow\": \"True\", \"action\": \"ls\""
       ;;
     listinventory)
       # If the Corrade configuration specifies WAS ScriptLanguage:
@@ -474,13 +515,32 @@ send_corrade_request() {
             ${COMMAND}
           }\""
   else
-    curl -s -X POST ${CORRADE_BOT_URL} \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d "{
-            ${COMMON},
-            ${COMMAND}
-          }"
+    if [ "${have_jq}" ]; then
+      case "${cmd}" in
+        get_outfit*)
+          local outfit_type="current"
+          echo "${cmd}" | grep get_outfits >/dev/null && outfit_type="outfits"
+          curl -s -X POST ${CORRADE_BOT_URL} \
+               -H "Accept: application/json" \
+               -H "Content-Type: application/json" \
+               -d "{
+                 ${COMMON},
+                 ${COMMAND}
+               }" | jq -r '.data[]' | fixup_Outfits_JSON "${outfit_type}" | \
+                    jq 'del(.outfits[] | select(.name == "LifeBotsCommandDummyPlaceholder"))'
+          ;;
+        *)
+          ;;
+      esac
+    else
+      curl -s -X POST ${CORRADE_BOT_URL} \
+           -H "Accept: application/json" \
+           -H "Content-Type: application/json" \
+           -d "{
+             ${COMMON},
+             ${COMMAND}
+           }"
+    fi
   fi
 }
 
