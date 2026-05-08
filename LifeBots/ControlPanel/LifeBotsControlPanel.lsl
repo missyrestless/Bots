@@ -123,19 +123,22 @@ integer BOT_NOTECARD_READ_REPLY     = 290238;   //
 integer BOT_NOTECARD_CREATE_REPLY   = 290238;   //
                                                 //
 // LifeBots API Extensions                      //
-integer BOT_ACTIVATE_ROLE           = 298999;   //
 integer BOT_LIST_GROUP_MEMBERS      = 299000;   //
 integer BOT_LIST_INVENTORY          = 299001;   //
-integer BOT_WEAR_INVENTORY_ITEM     = 299002;   //
-integer BOT_REMOVE_WORN_ITEM        = 299003;   //
+integer BOT_ACTIVATE_ROLE           = 299002;   //
+integer BOT_TAKE_DELETE_OBJECT      = 299003;   //
 integer BOT_INVENTORY_TO_OBJECT     = 299004;   //
 integer BOT_ADJUST_HOVER_HEIGHT     = 299005;   //
 integer BOT_LIST_OUTFITS            = 299006;   //
 integer BOT_WEAR_OUTFIT             = 299007;   //
 integer BOT_GET_WORN_OUTFIT         = 299008;   //
+integer BOT_FIND_OBJECTS            = 299009;   //
+integer BOT_FIND_OBJECTS_WITH_PROP  = 299010;   //
+integer BOT_FIND_OBJECTS_PARCEL     = 299011;   //
+integer BOT_FIND_OBJECT_UUID        = 299012;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
-// LifeBots Command & Control Bridge
+// LifeBots Control Panel Command & Control Bridge
 //////////////////////////////////////////////////
 
 string API_URL = "https://api.lifebots.cloud/api/bot.html";
@@ -560,12 +563,119 @@ default {
               "uuid", (string)trigger
             ]);
         } else if (num == BOT_GIVE_INVENTORY) {
-            llOwnerSay("Sending give_inventory request...");
+            llOwnerSay("Sending bot give inventory request...");
             LifeBotsAPI("give_inventory", [
               "avatar", (string)trigger,
               "object", message
             ]);
+        // Bot Appearance
+        } else if (num == BOT_ATTACHMENTS) {
+            llOwnerSay("Sending bot attachments request...");
+            LifeBotsAPI("attachments", [ ]);
+        } else if (num == BOT_REBAKE) {
+            llOwnerSay("Sending bot rebake request...");
+            LifeBotsAPI("rebake", [ ]);
+        } else if (num == BOT_WEAR_OUTFIT) {
+            llOwnerSay("Sending bot wear outfit request...");
+            LifeBotsAPI("wear_outfit", [
+              "outfitname", message
+            ]);
+        } else if (num == BOT_TAKEOFF) {
+            llOwnerSay("Sending bot remove worn item request...");
+            LifeBotsAPI("takeoff", [
+              "uuid", (string)trigger
+            ]);
+        // Sim Management
+        // BOT_SIM_ACCESS_ALL_ESTATES
+        } else if (num == BOT_SIM_SEND_MESSAGE) {
+            llOwnerSay("Sending bot sim send message request...");
+            LifeBotsAPI("sim_send_message", [
+              "message", message
+            ]);
+        } else if (num == BOT_SIM_RESTART_START) {
+            llOwnerSay("Sending bot sim restart request...");
+            LifeBotsAPI("sim_send_message", [
+              "message", "Restarting simulator in " + message + " seconds!"
+            ]);
+            LifeBotsAPI("sim_restart", [
+              "state", "schedule",
+              "delay", (integer)message
+            ]);
+        } else if (num == BOT_SIM_RESTART_STOP) {
+            llOwnerSay("Sending bot sim cancel restart request...");
+            LifeBotsAPI("sim_send_message", [
+              "message", "Cancelling simulator restart"
+            ]);
+            LifeBotsAPI("sim_restart", [
+              "state", "cancel",
+              "delay", 0
+            ]);
+        } else if (num == BOT_SIM_KICK) {
+            llOwnerSay("Sending bot sim kick request...");
+            LifeBotsAPI("sim_kick", [
+              "avatar", (string)trigger,
+            ]);
+        // Misc. commands
+        // TODO: BOT_LISTEN_DIALOG
+        } else if (num == BOT_DIALOG_REPLY) {
+            // Split the message parameter into list
+            list repstr=llParseString2List(message,["\n"],[]);
+            // The first line is the channel, the second line is the button text
+            string CHANNEL = llList2String(repstr,0);
+            string BUTTON = llList2String(repstr,1);
+            llOwnerSay("Sending bot reply dialog request...");
+            LifeBotsAPI("reply_dialog", [
+              "object", (string)trigger,
+              "channel", CHANNEL,
+              "button", BUTTON
+            ]);
+        } else if (num == BOT_TOUCH_OBJECT) {
+            llOwnerSay("Sending bot touch object request...");
+            LifeBotsAPI("touch_prim", [
+              "uuid", (string)trigger
+            ]);
+        } else if (num == BOT_ATTACHMENT_OBJECT) {
+            llOwnerSay("Sending bot touch attachment request...");
+            LifeBotsAPI("touch_attachment", [
+              "objectname", message
+            ]);
         // LifeBots API Extensions
+        // TODO: object search needs guidance on interface
+        } else if (num == BOT_FIND_OBJECTS) {
+            integer range = 96;
+            if (message != "") {
+                range = (integer)message;
+            }
+            llOwnerSay("Sending bot find objects request...");
+            LifeBotsAPI("find_objects", [
+              "range", range
+            ]);
+        } else if (num == BOT_FIND_OBJECTS_WITH_PROP) {
+            integer prop = 96;
+            if (message != "") {
+                prop = (integer)message;
+            }
+            llOwnerSay("Sending bot find objects with props request...");
+            LifeBotsAPI("find_objects", [
+              "range", prop,
+              "with_props": "1"
+            ]);
+        } else if (num == BOT_FIND_OBJECTS_PARCEL) {
+            llOwnerSay("Sending bot find objects parcel request...");
+            LifeBotsAPI("find_objects", [
+              "current_parcel", "1"
+            ]);
+        } else if (num == BOT_FIND_OBJECT_UUID) {
+            llOwnerSay("Sending bot find object uuid request...");
+            LifeBotsAPI("find_objects", [
+              "uuid", (string)trigger
+            ]);
+        } else if (num == BOT_TAKE_DELETE_OBJECT) {
+            llOwnerSay("Sending bot take or delete object request...");
+            LifeBotsAPI("inworld_prim_take", [
+              "uuid", (string)trigger,
+              "operation", message
+            ]);
         } else if (num == BOT_ADJUST_HOVER_HEIGHT) {
             llOwnerSay("Sending bot adjust hover height request...");
             LifeBotsAPI("set_hoverheight", [
@@ -574,24 +684,14 @@ default {
         } else if (num == BOT_LIST_OUTFITS) {
             llOwnerSay("Sending bot list outfits request...");
             LifeBotsAPI("get_outfits", [ ]);
-        } else if (num == BOT_WEAR_OUTFIT) {
-            llOwnerSay("Sending bot wear outfit request...");
-            LifeBotsAPI("wear_outfit", [
-              "outfitname", message
-            ]);
         } else if (num == BOT_GET_WORN_OUTFIT) {
             llOwnerSay("Sending bot get worn outfit request...");
             LifeBotsAPI("get_outfit", [ ]);
-        } else if (num == BOT_WEAR_INVENTORY_ITEM) {
+        } else if (num == BOT_WEAR) {
             llOwnerSay("Sending bot wear inventory item request...");
             LifeBotsAPI("wear", [
               "uuid", (string)trigger,
               "wear", message
-            ]);
-        } else if (num == BOT_REMOVE_WORN_ITEM) {
-            llOwnerSay("Sending bot remove worn item request...");
-            LifeBotsAPI("takeoff", [
-              "uuid", (string)trigger
             ]);
         } else if (num == BOT_INVENTORY_TO_OBJECT) {
             llOwnerSay("Sending bot transfer inventory to object request...");
