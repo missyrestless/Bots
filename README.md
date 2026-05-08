@@ -10,6 +10,7 @@ with either `Corrade` or `LifeBots`.
 
 - [Repository Contents](#repository-contents)
 - [LifeBots](#lifebots)
+  - [Requirements](#requirements)
   - [Install lifebot](#install-lifebot)
   - [Scheduling Bot Actions](#scheduling-bot-actions)
 - [Corrade](#corrade)
@@ -78,7 +79,7 @@ open source, MIT licensed, and free to download, deploy, modify, and distribute.
 [Truth & Beauty Lab](http://maps.secondlife.com/secondlife/Brightbrook%20Isle/56/135/23)
 or [Club Truth & Beauty](http://maps.secondlife.com/secondlife/Scylla/226/32/78).
 
-### Install lifebot
+### Requirements
 
 The `lifebot` command line management system requires:
 
@@ -93,6 +94,8 @@ These requirements, with the exception of `jq`, are typically included in the ba
 operating system on all supported platforms. If your platform does not have `jq`
 installed then you can still use `lifebot`, a few of the helper utilities will not
 function properly but the bulk of the system will function without `jq`.
+
+### Install lifebot
 
 To install `lifebot`:
 
@@ -202,8 +205,16 @@ export SLURL_club="http://maps.secondlife.com/secondlife/Scylla/226/32/78"
 ```
 
 Aliases provide some convenience. For example, the command
-`lifebot -a teleport -n Easy -l club` is just an easier way of issuing the command
-`lifebot -a teleport -n "Easy Islay" -l "http://maps.secondlife.com/secondlife/Scylla/226/32/78"`
+
+```bash
+lifebot -a teleport -n Easy -l club
+```
+
+is just an easier way of issuing the command
+
+```bash
+lifebot -a teleport -n "Easy Islay" -l "http://maps.secondlife.com/secondlife/Scylla/226/32/78"
+```
 
 Currently supported `lifebot` actions include:
 
@@ -211,8 +222,8 @@ Currently supported `lifebot` actions include:
 login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch
 ```
 
-Support for additional actions are being added, please let us know which `LifeBots`
-API requests you would like supported.
+Support for additional actions are being added, please let us know which
+`LifeBots` API requests you would like supported.
 
 ## Corrade
 
