@@ -9,9 +9,9 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, teleport, listalias,
-#   listinventory, reply_dialog, im, send_notice, send_group_im, attachments,
-#   touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit
+#   login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,
+#   im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
+#   activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
@@ -57,17 +57,18 @@ usage() {
     LINE=
     NORM=
   }
-  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]"
-  printf "\n\t [-C channel] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]"
+  printf "\n\t[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]${NORM}"
   [ "$1" == "brief" ] && {
     printf "\n\n"
     exit 1
   }
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
-  printf "\n\t  Supported actions: login, logout, status (default), bot_location, walkto, sit, teleport,"
-  printf "\n\t        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,"
-  printf "\n\t        attachments, touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit"
+  printf "\n\tSupported actions:"
+  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, listinventory,"
+  printf "\n\t  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,"
+  printf "\n\t  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
@@ -325,7 +326,7 @@ send_request() {
         }"
       fi
       ;;
-    im|say_chat_channel|send_group_im|send_notice)
+    activate_group|im|say_chat_channel|send_group_im|send_notice)
       msg_label="message"
       [ "${act}" == "send_notice" ] && msg_label="text"
       if [ "${dryrun}" ]; then
@@ -372,6 +373,27 @@ send_request() {
           -d "{
           ${COMMON},
           \"height\": \"${HEIGHT}\"
+        }"
+      fi
+      ;;
+    takeoff|wear)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"uuid\": \"${UUID}\",
+          \"wear\": \"add\"
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"uuid\": \"${UUID}\",
+          \"wear\": \"add\"
         }"
       fi
       ;;
@@ -654,6 +676,19 @@ case "${ACTION}" in
       send_request "reply_dialog"
     fi
     ;;
+  activate*)
+    if [ "${UUID}" ]; then
+      GROUP_ID="${UUID}"
+    else
+      echo "The ${ACTION} action requires a Group UUID specified with -u uuid"
+      usage brief
+    fi
+    if [ "${have_jq}" ]; then
+      send_request "activate_group" | jq -r .
+    else
+      send_request "activate_group"
+    fi
+    ;;
   sendgroupi*|send_group_i*)
     show_usage=
     if [ "${UUID}" ]; then
@@ -715,6 +750,28 @@ case "${ACTION}" in
       send_request "set_hoverheight" | jq -r .
     else
       send_request "set_hoverheight"
+    fi
+    ;;
+  takeoff|remove)
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an item UUID to remove specified with -u uuid"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "takeoff" | jq -r .
+    else
+      send_request "takeoff"
+    fi
+    ;;
+  wear)
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an item UUID to wear specified with -u uuid"
+      usage brief
+    }
+    if [ "${have_jq}" ]; then
+      send_request "wear" | jq -r .
+    else
+      send_request "wear"
     fi
     ;;
   wear*|replace*outfit)
@@ -853,6 +910,6 @@ case "${ACTION}" in
     echo "Currently supported actions:"
     echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,"
     echo "  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,"
-    echo "  set_hoverheight, get_outfit, get_outfits, wear_outfit"
+    echo "  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit"
     ;;
 esac

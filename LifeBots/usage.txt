@@ -1,11 +1,12 @@
 
-Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text]
-	 [-C channel] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
+Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] [-C channel]
+	[-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
-	  Supported actions: login, logout, status (default), bot_location, walkto, sit, teleport,
-	        listalias, listinventory, im, reply_dialog, send_notice, send_group_im,
-	        attachments, touch_attachment, touch_prim, set_hoverheight, get_outfit, get_outfits, wear_outfit
+	Supported actions:
+	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, listinventory,
+	  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
+	  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit
 	-l location specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
