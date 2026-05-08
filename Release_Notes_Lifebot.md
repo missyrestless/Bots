@@ -2,8 +2,6 @@
 
 This major new release of the `lifebot` command line management system adds support for controlling `Corrade` bots from the command line.
 
-The previous release of the `lifebot` command line management system for `LifeBots` added support for additional LifeBots API commands, provides examples for each command, adds a `lifebot` man page, fixes several bugs, and simplifies installation and updates.
-
 The release includes the release artifact `install-lifebot` which can be used to install the `lifebot` management system. See the [Install lifebot](#install-lifebot) section below for installation instructions. See the [repository README](https://github.com/missyrestless/Bots) for additional info and example `lifebot` command invocations.
 
 ## Install lifebot
@@ -28,6 +26,36 @@ Alternatively, download the `install-lifebot` release artifact and execute it. T
 wget -q https://github.com/missyrestless/Bots/releases/latest/download/install-lifebot
 chmod 755 install-lifebot
 ./install-lifebot
+```
+
+## Configure Corrade for use with the lifebot command
+
+In order to use the `lifebot` command to manage your `Corrade` bot(s):
+
+- The HTTP server must be enabled in the `Corrade` configuration
+- `ScriptLanguage` must be set to `JSON` in the `Corrade` configuration
+
+Example snippet to enable the HTTP server in `CorradeConfiguration.xml`:
+
+```xml
+<Servers>
+    <HTTPServer>
+        <Enable>1</Enable>
+        <Prefixes>
+            <Prefix>http://+:8082/</Prefix>
+        </Prefixes>
+    </HTTPServer>
+    ...
+</Servers>
+```
+
+Set the port number in the `Prefix` configuration to an open unused port.
+If you have more than one `Corrade` bot then use a different port for each.
+
+To set the `ScriptLanguage` to JSON in `CorradeConfiguration.xml`:
+
+```xml
+  <ScriptLanguage>JSON</ScriptLanguage>
 ```
 
 ## Configure lifebot

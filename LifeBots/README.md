@@ -54,6 +54,7 @@ or [Club Truth & Beauty](http://maps.secondlife.com/secondlife/Scylla/226/32/78)
 - [LifeBots Command Line](#lifebots-command-line)
   - [Requirements](#requirements)
   - [Install lifebot](#install-lifebot)
+  - [Configure Corrade for use with the lifebot command](#configure-corrade-for-use-with-the-lifebot-command)
   - [Configure lifebot](#configure-lifebot)
   - [Supported Bot Actions and Examples](#supported-bot-actions-and-examples)
   - [Usage and Source of lifebot command](#usage-and-source-of-lifebot-command)
@@ -111,6 +112,39 @@ and install the system:
 wget -q https://github.com/missyrestless/Bots/releases/latest/download/install-lifebot
 chmod 755 install-lifebot
 ./install-lifebot
+```
+
+### Configure Corrade for use with the lifebot command
+
+Version 2 and later of the `lifebot` command supports command and control of both
+`LifeBots` and `Corrade` bots.
+
+In order to use the `lifebot` command to manage your `Corrade` bot(s):
+
+- The HTTP server must be enabled in the `Corrade` configuration
+- `ScriptLanguage` must be set to `JSON` in the `Corrade` configuration
+
+Example snippet to enable the HTTP server in `CorradeConfiguration.xml`:
+
+```xml
+<Servers>
+    <HTTPServer>
+        <Enable>1</Enable>
+        <Prefixes>
+            <Prefix>http://+:8082/</Prefix>
+        </Prefixes>
+    </HTTPServer>
+    ...
+</Servers>
+```
+
+Set the port number in the `Prefix` configuration to an open unused port.
+If you have more than one `Corrade` bot then use a different port for each.
+
+To set the `ScriptLanguage` to JSON in `CorradeConfiguration.xml`:
+
+```xml
+  <ScriptLanguage>JSON</ScriptLanguage>
 ```
 
 ### Configure lifebot

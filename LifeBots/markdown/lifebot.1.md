@@ -10,7 +10,7 @@ date: November 23, 2025
 
 ## NAME
 
-lifebot - Manage LifeBots Second Life bots from the command line
+lifebot - Manage LifeBots and Corrade Second Life bots from the command line
 
 ## SYNOPSIS
 
@@ -26,14 +26,44 @@ A command line management system for `LifeBots` and `Corrade` Second Life script
 The `lifebot` command can be used to manage either `Lite` or `Full` bots from `LifeBots` as well
 as `Corrade` bots configured with the built-in Corrade HTTP service enabled.
 
-**NEW** The `lifebot` command now supports management of both `LifeBots` and `Corrade` bots.
-To manage a `Corrade` bot simply replace the `-n <bot name or alias>` command line argument
-with `-c <bot name or alias>`.
-
 See [https://lifebots.cloud](https://lifebots.cloud) for more information on `LifeBots`.
 
 See [https://grimore.org/secondlife/scripted_agents/corrade](https://grimore.org/secondlife/scripted_agents/corrade)
 for more information on `Corrade`.
+
+### CORRADE CONFIGURATION
+
+**NEW** The `lifebot` command now supports management of both `LifeBots` and `Corrade` bots.
+To manage a `Corrade` bot simply replace the `-n <bot name or alias>` command line argument
+with `-c <bot name or alias>`.
+
+In order to use the `lifebot` command to manage your `Corrade` bot(s):
+
+- The HTTP server must be enabled in the `Corrade` configuration
+- `ScriptLanguage` must be set to `JSON` in the `Corrade` configuration
+
+Example snippet to enable the HTTP server in `CorradeConfiguration.xml`:
+
+```xml
+<Servers>
+    <HTTPServer>
+        <Enable>1</Enable>
+        <Prefixes>
+            <Prefix>http://+:8082/</Prefix>
+        </Prefixes>
+    </HTTPServer>
+    ...
+</Servers>
+```
+
+Set the port number in the `Prefix` configuration to an open unused port.
+If you have more than one `Corrade` bot then use a different port for each.
+
+To set the `ScriptLanguage` to JSON in `CorradeConfiguration.xml`:
+
+```xml
+  <ScriptLanguage>JSON</ScriptLanguage>
+```
 
 ## CONFIGURATION
 
@@ -387,7 +417,7 @@ Written by Missy Restless `missyrestless@gmail.com`
 
 MIT License
 
-Copyright (c) 2025 Truth & Beauty Lab
+Copyright (c) 2025-2026 Truth & Beauty Lab
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -414,8 +444,6 @@ Submit bug reports online at:
 <https://github.com/missyrestless/Bots/issues>
 
 ## SEE ALSO
-
-**bot2dj**(1), **bot2login**(1), **bot2logout**(1), **send_bot_balance**(1)
 
 Full documentation and sources at:
 
