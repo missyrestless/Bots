@@ -143,6 +143,22 @@ integer BOT_LIST_GROUPS_NAME        = 299015;   //
 integer BOT_GROUP_VISIBILITY        = 299016;   //
 integer BOT_GROUP_OFFER_ACCEPT      = 299017;   //
 integer BOT_GROUP_OFFER_DECLINE     = 299018;   //
+integer BOT_ALWAYS_RUN              = 299019;   //
+integer BOT_ALWAYS_WALK             = 299020;   //
+integer BOT_SCAN_AVATARS            = 299021;   //
+integer AVATAR_INFO                 = 299022;   //
+integer AVATAR_DISPLAY_NAME         = 299023;   //
+integer AVATAR_PICKS                = 299024;   //
+integer AVATAR_GROUPS               = 299025;   //
+integer AVATAR_GROUPS_MATCH         = 299026;   //
+integer AVATAR_GROUPS_SKIP          = 299027;   //
+integer AVATAR_GROUPS_MATCH_SKIP    = 299028;   //
+integer SIM_RETURN_OBJECTS          = 299029;   //
+integer SIM_RETURN_SCRIPTED_OBJECTS = 299030;   //
+integer SIM_RETURN_OTHERS_OBJECTS   = 299031;   //
+integer REGION_INFO                 = 299032;   //
+integer TELEPORT_OFFER_ACCEPT       = 299033;   //
+integer TELEPORT_OFFER_DECLINE      = 299034;   //
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 // LifeBots Control Panel Command & Control Bridge
@@ -405,13 +421,22 @@ default {
               "subject", SUBJECT,
               "text", TEXT
             ]);
-        } else if (num == BOT_OFFER_TELEPORT) {
-            llOwnerSay("Sending bot offer teleport request...");
-            LifeBotsAPI("offer_teleport", [
-              "avatar", (string)trigger,
-              "message", message
-            ]);
         // Movement
+        } else if (num == BOT_ALWAYS_RUN) {
+            llOwnerSay("Sending bot always run request...");
+            LifeBotsAPI("alwaysRun", [ ]);
+        } else if (num == BOT_ALWAYS_WALK) {
+            llOwnerSay("Sending bot always walk request...");
+            LifeBotsAPI("alwaysWalk", [ ]);
+        } else if (num == BOT_SCAN_AVATARS) {
+            llOwnerSay("Sending bot scan nearby avatars request...");
+            if (((string)((integer)message) == message) || ((string)((float)message) == message)) {
+                LifeBotsAPI("nearbyavatars_scan", [
+                  "radius", (float)message
+                ]);
+            } else {
+                LifeBotsAPI("nearbyavatars_scan", [ ]);
+            }
         } else if (num == BOT_SIT) {
             llOwnerSay("Sending bot sit request...");
             LifeBotsAPI("sit", [
@@ -506,7 +531,72 @@ default {
               "groupuuid", GROUPUUID,
               "roleuuid", ROLEUUID
             ]);
-        // Friendship                                   //
+        // Avatar / Friendship
+        } else if (num == AVATAR_DISPLAY_NAME) {
+            llOwnerSay("Sending bot avatar display name request...");
+            LifeBotsAPI("getDisplayName", [
+              "uuid", (string)trigger
+            ]);
+        } else if (num == BOT_OFFER_TELEPORT) {
+            llOwnerSay("Sending bot offer teleport request...");
+            LifeBotsAPI("offer_teleport", [
+              "avatar", (string)trigger,
+              "message", message
+            ]);
+        } else if (num == TELEPORT_OFFER_ACCEPT) {
+            llOwnerSay("Sending teleport offer accept request...");
+            LifeBotsAPI("teleport_offer_accept", [
+              "session_id", (string)trigger,
+              "accept", "1"
+            ]);
+        } else if (num == TELEPORT_OFFER_DECLINE) {
+            llOwnerSay("Sending teleport offer decline request...");
+            LifeBotsAPI("teleport_offer_accept", [
+              "session_id", (string)trigger,
+              "accept", "0"
+            ]);
+        } else if (num == AVATAR_PICKS) {
+            llOwnerSay("Sending bot avatar picks request...");
+            LifeBotsAPI("avatar_picks", [
+              "avatar", (string)trigger
+            ]);
+        } else if (num == AVATAR_GROUPS) {
+            llOwnerSay("Sending bot avatar groups request...");
+            LifeBotsAPI("avatar_groups", [
+              "avatar", (string)trigger
+            ]);
+        } else if (num == AVATAR_GROUPS_MATCH) {
+            llOwnerSay("Sending bot avatar groups match request...");
+
+            LifeBotsAPI("avatar_groups", [
+              "avatar", (string)trigger,
+              "matchnames", message
+            ]);
+        } else if (num == AVATAR_GROUPS_SKIP) {
+            llOwnerSay("Sending bot avatar groups skip request...");
+
+            LifeBotsAPI("avatar_groups", [
+              "avatar", (string)trigger,
+              "skipnames", message
+            ]);
+        } else if (num == AVATAR_GROUPS_MATCH_AND_SKIP) {
+            llOwnerSay("Sending bot avatar groups match and skip request...");
+            // Split the message parameter into list
+            list matstr=llParseString2List(message,["\n"],[]);
+            // The first line is the match names param, the second line is the skip names param
+            string MATCHNAMES = llList2String(matstr,0);
+            string SKIPNAMES = llList2String(matstr,1);
+
+            LifeBotsAPI("avatar_groups", [
+              "avatar", (string)trigger,
+              "matchnames", MATCHNAMES,
+              "skipnames", SKIPNAMES
+            ]);
+        } else if (num == AVATAR_INFO) {
+            llOwnerSay("Sending bot avatar profile info request...");
+            LifeBotsAPI("avatar_info", [
+              "avatar", (string)trigger
+            ]);
         } else if (num == BOT_UNFRIEND) {
             llOwnerSay("Sending bot unfriend request...");
             LifeBotsAPI("cancel_friendship", [
@@ -604,6 +694,49 @@ default {
             ]);
         // Sim Management
         // TODO: BOT_SIM_ACCESS_ALL_ESTATES
+        } else if (num == REGION_INFO) {
+            llOwnerSay("Sending region info request...");
+            LifeBotsAPI("region_info", [ ]);
+        } else if (num == SIM_RETURN_OBJECTS) {
+            llOwnerSay("Sending sim return objects request...");
+            if (message == "all_estates") {
+                LifeBotsAPI("sim_return", [
+                  "avatar", (string)trigger,
+                  "all_estates", 1
+                ]);
+            } else {
+                LifeBotsAPI("sim_return", [
+                  "avatar", (string)trigger
+                ]);
+            }
+        } else if (num == SIM_RETURN_SCRIPTED_OBJECTS) {
+            llOwnerSay("Sending sim return scripted objects request...");
+            if (message == "all_estates") {
+                LifeBotsAPI("sim_return", [
+                  "avatar", (string)trigger,
+                  "scripted", 1,
+                  "all_estates", 1
+                ]);
+            } else {
+                LifeBotsAPI("sim_return", [
+                  "avatar", (string)trigger,
+                  "scripted", 1
+                ]);
+            }
+        } else if (num == SIM_RETURN_OTHERS_OBJECTS) {
+            llOwnerSay("Sending sim return others objects request...");
+            if (message == "all_estates") {
+                LifeBotsAPI("sim_return", [
+                  "avatar", (string)trigger,
+                  "others", 1,
+                  "all_estates", 1
+                ]);
+            } else {
+                LifeBotsAPI("sim_return", [
+                  "avatar", (string)trigger,
+                  "others", 1
+                ]);
+            }
         } else if (num == BOT_SIM_ACCESS) {
             llOwnerSay("Sending bot sim access request...");
             LifeBotsAPI("sim_access", [
