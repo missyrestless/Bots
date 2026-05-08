@@ -6,6 +6,30 @@ Second Life bots. Included are management systems for `Corrade` bots and `LifeBo
 **[NOTE:]** The Truth & Beauty Lab and Missy Restless are not associated in any way
 with either `Corrade` or `LifeBots`.
 
+## Table of Contents
+
+- [Repository Contents](#repository-contents)
+- [LifeBots](#lifebots)
+  - [Install lifebot](#install-lifebot)
+  - [Scheduling Bot Actions](#scheduling-bot-actions)
+- [Corrade](#corrade)
+- [Corrade HUD](#corrade-hud)
+
+## Repository Contents
+
+- `Avatars`: Specifications for free male and female avatars
+- `bin`: convenience scripts to manage Corrade services on the server-side
+- `etc`: Corrade, Nginx, and Shoutcast configuration and systemd units
+- `Evade_Region_Restart`: Script and configuration notecard to evade region restarts
+- `Examples`: some simple examples of how to use the Corrade system
+- `HUD`: the Corrade HUD, control bots in-world with this heads-up display
+- `LifeBots`: the lifebot command line management system for LifeBots
+- `Masters`: Script and configuration notecard to extend some privileges to the Corrade bot owner
+- `Pay2Play`: WDC Tipjar settings examples
+- `Select_Dialog_Option`: a dialog menu selector for the Corrade bot
+- `Sit_Animate`: example sit on object and animate a Corrade bot
+- `Toggle_Vista_AO`: example script turning on/off the Vista AO of a bot
+
 ## LifeBots
 
 [LifeBots](https://lifebots.cloud) bills itself as:
@@ -61,8 +85,14 @@ The `lifebot` command line management system requires:
 - Linux, Macos, or Windows Subsystem for Linux (WSL)
 - Bash
 - Cron
+- curl
 - git
 - [jq](https://jqlang.org)
+
+These requirements, with the exception of `jq`, are typically included in the base
+operating system on all supported platforms. If your platform does not have `jq`
+installed then you can still use `lifebot`, a few of the helper utilities will not
+function properly but the bulk of the system will function without `jq`.
 
 To install `lifebot`:
 
@@ -84,6 +114,105 @@ Configure `lifebot` by adding and editing the file `${HOME}/.lifebots`.
 See `LifeBots/example_dot_lifebots` for a template to use for this file.
 
 See `LifeBots/crontab.in` for example crontab entries to schedule bot activities.
+
+### Scheduling Bot Actions
+
+The Truth & Beauty Lab utilizes the `Cron` subsystem on Linux and Macos to
+schedule `LifeBots` actions. Truth & Beauty Lab bots are logged in, teleported
+to various locations, seated on various objects, and engaged in a variety of
+activities using `crontab` entries that execute `LifeBots` API requests at
+scheduled times. Here is an example `crontab` entry with some brief descriptions
+in comments of what activities are scheduled:
+
+```
+SHELL=/bin/bash
+#
+# Schedule LifeBots actions
+# -------------------------
+# Uses the lifebot command line tool at:
+#   https://github.com/missyrestless/Bots/blob/main/LifeBots/lifebot.sh
+# Assumes some configuration in ~/.lifebots has been performed
+#
+# m h  dom mon dow   command
+#
+# Weekdays send Anya bot to the club at 4am
+0 4 * * 1-5 /bin/bash -lc /usr/local/LifeBots/anya2club >> /usr/local/LifeBots/log/cron.log 2>&1
+# Weekends send Anya bot to the beach at 11am
+0 11 * * 0,6 /bin/bash -lc /usr/local/LifeBots/anya2beach >> /usr/local/LifeBots/log/cron.log 2>&1
+# Monday at 4pm send Anya bot to DJ at the Media Sphere
+0 16 * * 1 /bin/bash -lc /usr/local/LifeBots/anya2msdj >> /usr/local/LifeBots/log/cron.log 2>&1
+# Monday at 6pm sit Anya in theater seating after her set
+0 18 * * 1 /bin/bash -lc /usr/local/LifeBots/anya2seat >> /usr/local/LifeBots/log/cron.log 2>&1
+# Tuesday at 6pm send Angelus bot to DJ at the club
+0 18 * * 2 /bin/bash -lc /usr/local/LifeBots/angelus2clubdj >> /usr/local/LifeBots/log/cron.log 2>&1
+# Tuesday at 8pm send Angelus bot back to his dance pole
+0 20 * * 2 /bin/bash -lc /usr/local/LifeBots/angelus2pole >> /usr/local/LifeBots/log/cron.log 2>&1
+# Friday at 6pm send Easy bot to DJ at the club
+0 18 * * 5 /bin/bash -lc /usr/local/LifeBots/easy2clubdj >> /usr/local/LifeBots/log/cron.log 2>&1
+# Friday at 8pm send Easy bot back to her dance pole
+0 20 * * 5 /bin/bash -lc /usr/local/LifeBots/easy2pole >> /usr/local/LifeBots/log/cron.log 2>&1
+# Saturday at 6pm send all bots to dance at the club
+0 18 * * 6 /bin/bash -lc /usr/local/LifeBots/bots2clubdance >> /usr/local/LifeBots/log/cron.log 2>&1
+# Saturday at 9pm send all bots back to their default locations
+0 21 * * 6 /bin/bash -lc /usr/local/LifeBots/bots2home >> /usr/local/LifeBots/log/cron.log 2>&1
+# Check every hour if Easy bot is at the club greeting visitors
+0 * * * * /bin/bash -lc /usr/local/LifeBots/checkeasy >> /usr/local/LifeBots/log/cron.log 2>&1
+```
+
+Here is the code for one of the control scripts executed by a `cron` job, the `checkeasy`
+script that keeps a Greeter bot in the club:
+
+```bash
+#!/usr/bin/env bash
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p lifebot)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate lifebot in PATH"
+  exit 1
+}
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Easy is online and if not, login
+lifebot -a status -n Easy | jq -r '.status' | grep -i online >/dev/null || {
+  lifebot -a login -n Easy -l club
+  sleep 20
+}
+
+# Check if Easy is at the club and if not, teleport
+lifebot -a status -n Easy | jq -r '.location' | grep Scylla >/dev/null || {
+  lifebot -a teleport -n Easy -l club
+}
+```
+
+This script uses a couple of aliases defined in `$HOME/.lifebots`, the `club`
+location alias and the `Easy` bot name alias:
+
+```bash
+export BOT_NAME_Easy="Easy Islay"
+export SLURL_club="http://maps.secondlife.com/secondlife/Scylla/226/32/78"
+```
+
+Aliases provide some convenience. For example, the command
+`lifebot -a teleport -n Easy -l club` is just an easier way of issuing the command
+`lifebot -a teleport -n "Easy Islay" -l "http://maps.secondlife.com/secondlife/Scylla/226/32/78"`
+
+Currently supported `lifebot` actions include:
+
+```
+login, logout, status, location, walkto, sit, teleport, listalias, listinventory, touch
+```
+
+Support for additional actions are being added, please let us know which `LifeBots`
+API requests you would like supported.
 
 ## Corrade
 
@@ -107,21 +236,6 @@ along with modified versions of scripts distributed under an Open Source
 license found at:
 
 https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
-
-## Repository Contents
-
-- `Avatars`: Specifications for free male and female avatars
-- `bin`: convenience scripts to manage Corrade services on the server-side
-- `etc`: Corrade, Nginx, and Shoutcast configuration and systemd units
-- `Evade_Region_Restart`: Script and configuration notecard to evade region restarts
-- `Examples`: some simple examples of how to use the Corrade system
-- `HUD`: the Corrade HUD, control bots in-world with this heads-up display
-- `LifeBots`: the lifebot command line management system for LifeBots
-- `Masters`: Script and configuration notecard to extend some privileges to the Corrade bot owner
-- `Pay2Play`: WDC Tipjar settings examples
-- `Select_Dialog_Option`: a dialog menu selector for the Corrade bot
-- `Sit_Animate`: example sit on object and animate a Corrade bot
-- `Toggle_Vista_AO`: example script turning on/off the Vista AO of a bot
 
 ## Corrade HUD
 
