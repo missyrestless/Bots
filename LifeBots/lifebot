@@ -9,7 +9,7 @@
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name,
+#   login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,
 #   avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
 #   touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
 #   get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
@@ -68,7 +68,7 @@ usage() {
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\tSupported actions:"
   printf "\n\t  login, logout, status (default), bot_location, walkto, sit, stand, teleport, listalias, key2name,"
-  printf "\n\t  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+  printf "\n\t  avatar_picks, name2key, listinventory, im, rebake, reply_dialog, send_notice, send_group_im, attachments,"
   printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
   printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
@@ -986,6 +986,13 @@ case "${ACTION}" in
     else
       echo "Amount specified to pay must be a positive integer."
       usage brief
+    fi
+    ;;
+  rebake*)
+    if [ "${have_jq}" ]; then
+      send_request "rebake" | jq -r .
+    else
+      send_request "rebake"
     fi
     ;;
   reply*)

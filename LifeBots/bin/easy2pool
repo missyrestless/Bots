@@ -19,27 +19,14 @@ have_jq=$(type -p jq)
 
 # Check if Bots are online and if not, login
 needsleep=
-for bot in Angel Anya Easy
-do
-  lifebot -a stand -n ${bot} >/dev/null 2>&1
-  lifebot -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
-    lifebot -a login -n ${bot} -l zen
-    needsleep=1
-  }
-done
+lifebot -a stand -n Easy >/dev/null 2>&1
+lifebot -a status -n Easy | jq -r '.status' | grep -i online >/dev/null || {
+  lifebot -a login -n Easy -l zen
+  needsleep=1
+}
 [ "${needsleep}" ] && sleep 20
 
-# Send Angelus to the hottub
-lifebot -a teleport -n Angel -l zen >/dev/null 2>&1
-sleep 7
-lifebot -a sit -n Angel -u hottub
-
-# Send Anya to the pool float
-lifebot -a teleport -n Anya -l zen
-sleep 7
-lifebot -a sit -n Anya -u zfloat
-
 # Send Easy to the right lounge chair
-lifebot -a teleport -n Easy -l zen
+lifebot -a teleport -n Easy -l zen >/dev/null 2>&1
 sleep 7
 lifebot -a sit -n Easy -u zlounger
