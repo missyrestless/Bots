@@ -1014,7 +1014,10 @@ default {
               "height", (float)message
             ]);
         } else {
-            llOwnerSay("Unsupported API request: num=" + (string)num + ", message=" + message);
+            // TODO: which others did we not catch in this link_message event
+            if ((num != BOT_SETUP_SUCCESS) && (num != BOT_SETUP_FAILED) && (num > 250000)) {
+                llOwnerSay("Unsupported API request: num=" + (string)num + ", message=" + message);
+            }
         }
     }
 

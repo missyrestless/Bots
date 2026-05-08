@@ -1,28 +1,18 @@
-// Simple script that invites whoever touches the object to the specified group
-//
-// Sets up the device and the bot in state_entry
-// Sends out group invite on touch
+// Simple script that returns the Profile Picks of whoever touches the object
 //
 ///////// LIFEBOTS COMMAND & CONTROL ////////////////
-//                                                 //
-// Setup and startup                               //
 integer BOT_SETUP_SETBOT            = 280101;      //
-// Device Settings                                 //
 integer BOT_SETUP_DEVICENAME        = 280103;      //
-// Group Management                                //
-integer BOT_GROUP_INVITE            = 280156;      //
-// EVENTS                                          //
+integer AVATAR_PICKS                = 299003;      //
 integer BOT_SETUP_SUCCESS           = 280201;      //
 /////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////
 // Land Inviter
 ////////////////////////////////////////////////////
-string deviceName = "Inviter";
+string deviceName = "Avatar Picks";
 string botName = "Bot Name";
 string botCode = "Bot Access Code";
-string groupID = "UUID of group you want the bot to invite to";
-string roleID = "UUID of role you want the bot to invite to"; //NULL_KEY for everyone
     
 default {
     state_entry() {
@@ -35,7 +25,7 @@ default {
     
     // Send out group invite on touch
     touch_start(integer num) {
-        llMessageLinked(LINK_SET, BOT_GROUP_INVITE, groupID + "\n" + roleID, llDetectedKey(0));
+        llMessageLinked(LINK_SET, AVATAR_PICKS, "", llDetectedKey(0));
     }
     
     // Notify owner if device was successfully initialized
