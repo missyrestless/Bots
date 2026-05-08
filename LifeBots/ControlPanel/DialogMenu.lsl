@@ -631,13 +631,6 @@ default {
         llMessageLinked(LINK_THIS, 154, "Get Commands", "");
         if (llGetInventoryType(_SPARKLE) == INVENTORY_SCRIPT)
             _NavigationMenus = _NavigationMenus + [ _COMMANDS ];
-        if (llGetInventoryType(CONFIG_CARD) == INVENTORY_NOTECARD) {
-            NotecardLine = 0;
-            QueryID = llGetNotecardLine(CONFIG_CARD, NotecardLine);
-        }
-        else {
-            llOwnerSay("Configuration notecard missing, using defaults.");
-        }
     }
 
     on_rez(integer param)
@@ -652,51 +645,6 @@ default {
                 llListenRemove(dialog_handle);
             dialog_handle = 0;
             llResetScript();
-        }
-    }
-
-    dataserver( key queryid, string data )
-    {
-        integer lang_pos;
-        list temp;
-        string name;
-        string value;
-        if ( queryid == QueryID ) {
-            if ( data != EOF ) {
-                if (data == "END_SETTINGS") {
-                    if ((API_KEY == "") || (API_KEY == "your-api-key")) {
-                        llOwnerSay("ERROR: LB_API_KEY not set.");
-                        llOwnerSay("Edit the Configuration notecard to set your LifeBots API Key.");
-                        llSetScriptState(llGetScriptName(), FALSE);
-                    }
-                }
-                if ( llGetSubString(data, 0, 0) != "#" && llStringTrim(data, STRING_TRIM) != "" ) {
-                    temp = llParseString2List(data, ["="], []);
-                    name = llStringTrim(llList2String(temp, 0), STRING_TRIM);
-                    value = llStringTrim(llList2String(temp, 1), STRING_TRIM);
-                    if ( value == "TRUE" ) value = "1";
-                    if ( value == "FALSE" ) value = "0";
-                    if ( name == "LB_API_KEY" ) {
-                        API_KEY = value;
-                    } else if ( name == "LB_SECRET" ) {
-                        BOT_SECRET = value;
-                    } else if ( name == "LB_BOT_NAME" ) {
-                        BOT_NAME = value;
-                    } else if ( name == "LOGIN_SITON" ) {
-                        LOGIN_SITON = value;
-                    } else if ( name == "OWNER_BOT_MENU" ) {
-                        OWNER_BOT_MENU = (integer)value;
-                    } else if ( name == "SHOW_BOT_MENU" ) {
-                        SHOW_BOT_MENU = (integer)value;
-                    } else if ( name == "INVISIBLE" ) {
-                        INVISIBLE = (integer)value;
-                    } else if ( name == "RESTRICTED_ACCESS" ) {
-                        RESTRICTED_ACCESS = (integer)value;
-                    }
-                }
-                NotecardLine++;
-                QueryID = llGetNotecardLine( CONFIG_CARD, NotecardLine );
-            }
         }
     }
 
