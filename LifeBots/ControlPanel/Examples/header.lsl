@@ -105,47 +105,47 @@ integer BOT_NOTECARD_CREATE_REPLY   = 290239;   //
 // LifeBots API Extensions                      //
 //
 // Avatar Operations
-integer ADJUST_HOVER_HEIGHT         = 299000;   //
-integer AVATAR_INFO                 = 299001;   //
-integer AVATAR_DISPLAY_NAME         = 299002;   //
-integer AVATAR_PICKS                = 299003;   //
-integer AVATAR_GROUPS               = 299004;   //
-integer AVATAR_GROUPS_MATCH         = 299005;   //
-integer AVATAR_GROUPS_SKIP          = 299006;   //
-integer AVATAR_GROUPS_MATCH_SKIP    = 299007;   //
-integer SCAN_AVATARS                = 299008;   //
-integer UUID_TO_NAME                = 299009;   //
-integer NAME_TO_UUID                = 299010;   //
+integer ADJUST_HOVER_HEIGHT         = 299005;   //
+integer AVATAR_INFO                 = 299022;   //
+integer AVATAR_DISPLAY_NAME         = 299023;   //
+integer AVATAR_PICKS                = 299024;   //
+integer AVATAR_GROUPS               = 299025;   //
+integer AVATAR_GROUPS_MATCH         = 299026;   //
+integer AVATAR_GROUPS_SKIP          = 299027;   //
+integer AVATAR_GROUPS_MATCH_SKIP    = 299028;   //
+integer SCAN_AVATARS                = 299021;   //
+integer UUID_TO_NAME                = 299021;   //
+integer NAME_TO_UUID                = 299021;   //
 // Communication
-integer TELEPORT_OFFER_ACCEPT       = 299030;   //
-integer TELEPORT_OFFER_DECLINE      = 299031;   //
+integer TELEPORT_OFFER_ACCEPT       = 299033;   //
+integer TELEPORT_OFFER_DECLINE      = 299034;   //
 // Group Management
-integer ACTIVATE_ROLE               = 299050;   //
-integer GROUP_INFO                  = 299051;   //
-integer GROUP_VISIBILITY            = 299052;   //
-integer GROUP_OFFER_ACCEPT          = 299053;   //
-integer GROUP_OFFER_DECLINE         = 299054;   //
-integer LIST_GROUPS_UUID            = 299055;   //
-integer LIST_GROUPS_NAME            = 299056;   //
-integer LIST_GROUP_MEMBERS          = 299057;   //
+integer ACTIVATE_ROLE               = 299002;   //
+integer GROUP_INFO                  = 299013;   //
+integer GROUP_VISIBILITY            = 299016;   //
+integer GROUP_OFFER_ACCEPT          = 299017;   //
+integer GROUP_OFFER_DECLINE         = 299018;   //
+integer LIST_GROUPS_UUID            = 299014;   //
+integer LIST_GROUPS_NAME            = 299015;   //
+integer LIST_GROUP_MEMBERS          = 299000;   //
 // Inventory Management
-integer LIST_INVENTORY              = 299070;   //
-integer LIST_OUTFITS                = 299071;   //
-integer WEAR_OUTFIT                 = 299072;   //
-integer GET_WORN_OUTFIT             = 299073;   //
-integer INVENTORY_TO_OBJECT         = 299074;   //
+integer LIST_INVENTORY              = 299001;   //
+integer LIST_OUTFITS                = 299006;   //
+integer WEAR_OUTFIT                 = 299007;   //
+integer GET_WORN_OUTFIT             = 299008;   //
+integer INVENTORY_TO_OBJECT         = 299004;   //
 // Object Interaction
-integer TAKE_DELETE_OBJECT          = 299090;   //
-integer FIND_OBJECTS                = 299091;   //
-integer FIND_OBJECTS_WITH_PROP      = 299092;   //
-integer FIND_OBJECTS_PARCEL         = 299093;   //
-integer FIND_OBJECT_UUID            = 299094;   //
+integer TAKE_DELETE_OBJECT          = 299003;   //
+integer FIND_OBJECTS                = 299009;   //
+integer FIND_OBJECTS_WITH_PROP      = 299010;   //
+integer FIND_OBJECTS_PARCEL         = 299011;   //
+integer FIND_OBJECT_UUID            = 299012;   //
 // Movement Commands
-integer ALWAYS_RUN                  = 299110;   //
-integer ALWAYS_WALK                 = 299111;   //
+integer ALWAYS_RUN                  = 299019;   //
+integer ALWAYS_WALK                 = 299020;   //
 // Simulator/Parcel Management
-integer SIM_RETURN_OBJECTS          = 299140;   //
-integer SIM_RETURN_SCRIPTED_OBJECTS = 299141;   //
-integer SIM_RETURN_OTHERS_OBJECTS   = 299142;   //
-integer REGION_INFO                 = 299143;   //
+integer SIM_RETURN_OBJECTS          = 299029;   //
+integer SIM_RETURN_SCRIPTED_OBJECTS = 299030;   //
+integer SIM_RETURN_OTHERS_OBJECTS   = 299031;   //
+integer REGION_INFO                 = 299032;   //
 //////////////////////////////////////////////////
