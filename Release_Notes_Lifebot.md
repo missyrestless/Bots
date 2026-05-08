@@ -5,8 +5,11 @@ This release of the `lifebot` command line management system for `LifeBots` adds
 - `activate_group` : activate a group tag
 - `attachments` : list bot attachments, optionally specify a filter to match
 - `bot_location` : get precise bot location
+- `get_balance` : get your bot's L$ balance
 - `get_outfit` : list currently worn bot outfit
 - `get_outfits` : list available bot outfits
+- `give_money` : pay another avatar L$ from your bot
+- `give_money_object` : pay an object L$ from your bot
 - `im` : send an instant message to an avatar
 - `listalias` : list configured `lifebot` aliases in `$HOME/.lifebots`
 - `listinventory` : list bot inventory, optionally specify an inventory folder UUID

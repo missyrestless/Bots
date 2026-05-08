@@ -29,4 +29,4 @@ SHELL=/bin/bash
 # Saturday at 9pm send all bots back to their default locations
 0 21 * * 6 /bin/bash -lc /usr/local/LifeBots/bots2home >> /usr/local/LifeBots/log/cron.log 2>&1
 # Check every hour if Easy bot is at the club greeting visitors
-0 * * * * /bin/bash -lc /usr/local/LifeBots/checkbot >> /usr/local/LifeBots/log/cron.log 2>&1
+# 0 * * * * /bin/bash -lc /usr/local/LifeBots/checkbot >> /usr/local/LifeBots/log/cron.log 2>&1

@@ -192,12 +192,21 @@ are supported by the `lifebot` command.
 - `bot_location` : get precise bot location
   - `Example` : get location of bot named `John Doebot`
   - `lifebot -a location -n "John Doebot"`
+- `get_balance` : get your bot's L$ balance
+  - `Example` : get the L$ balance of bot `John Doebot`
+  - `lifebot -a balance -n "John Doebot"`
 - `get_outfit` : list currently worn bot outfit
   - `Example` : list currently worn outfit of bot named `John Doebot`
   - `lifebot -a get_outfit -n "John Doebot"`
 - `get_outfits` : list available bot outfits
   - `Example` : list available outfits for bot named `John Doebot`
   - `lifebot -a get_outfits -n "John Doebot"`
+- `give_money` : pay another avatar L$ from your bot
+  - `Example` : pay avatar with specified UUID L$300 from bot `John Doebot`
+  - `lifebot -a give_money -n "John Doebot" -u "3506213c-29c8-4aa1-a38f-e12f6d41b804" -z 300`
+- `give_money_object` : pay an object L$ from your bot
+  - `Example` : pay a tip jar with specified UUID L$100 from bot `John Doebot`
+  - `lifebot -a give_money_object -n "John Doebot" -u "47cb1fc7-8144-b538-6716-c723fb1332d6" -z 100`
 - `im` : send an instant message to an avatar
   - `Example` : send IM from `John Doebot` to avatar "Jane Free"
   - `lifebot -a im -n "John Doebot" -N "Jane Free" -M 'Hi Jane, do you want to meetup?'`
@@ -283,9 +292,10 @@ Usage: lifebot [-dih] [-a action] [-l location] [-n name] [-k apikey] [-B text] 
 Where:
 	-a action specifies the API action (sit, teleport, login, ...)
 	Supported actions:
-	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, listinventory,
-	  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
-	  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit
+	  login, logout, status (default), bot_location, walkto, sit, teleport, listalias,
+	  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+	  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
+	  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 	-l location specifies a location for login and teleport actions
 		Default: Last location, teleport action requires a Slurl location
 	-n name specifies a Bot name, Default: Easy Islay
@@ -300,6 +310,7 @@ Where:
 	-s secret specifies a Bot secret, use environment instead
 	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
 	-z num specifies a hover height adjustment size [default: -0.05]
+		can also be used to specify a payment amount
 	-d indicates dryrun mode - tell me what you would do without doing anything
 	-i retrieves Bot details
 	-h displays this usage message and exits
@@ -339,9 +350,10 @@ Examples:
 # License: MIT
 #
 # Currently supported actions:
-#   login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,
-#   im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,
-#   activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit
+#   login, logout, status, bot_location, walkto, sit, teleport, listalias,
+#   listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+#   touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,
+#   get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
@@ -396,9 +408,10 @@ usage() {
   printf "\n${BOLD}${LINE}Where:${NORM}"
   printf "\n\t${BOLD}${LINE}-a action${NORM} specifies the API action (sit, teleport, login, ...)"
   printf "\n\tSupported actions:"
-  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias, listinventory,"
-  printf "\n\t  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,"
-  printf "\n\t  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit"
+  printf "\n\t  login, logout, status (default), bot_location, walkto, sit, teleport, listalias,"
+  printf "\n\t  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+  printf "\n\t  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,"
+  printf "\n\t  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
   printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location for login and teleport actions"
   printf "\n\t\tDefault: Last location, teleport action requires a Slurl location"
   printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name, Default: Easy Islay"
@@ -413,6 +426,7 @@ usage() {
   printf "\n\t${BOLD}${LINE}-s secret${NORM} specifies a Bot secret, use environment instead"
   printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with actions that require one (e.g. sit)"
   printf "\n\t${BOLD}${LINE}-z num${NORM} specifies a hover height adjustment size [default: -0.05]"
+  printf "\n\t\tcan also be used to specify a payment amount"
   printf "\n\t${BOLD}${LINE}-d${NORM} indicates dryrun mode - tell me what you would do without doing anything"
   printf "\n\t${BOLD}${LINE}-i${NORM} retrieves Bot details"
   printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits"
@@ -633,6 +647,28 @@ send_request() {
         fi
       fi
       ;;
+    give_money|give_money_object)
+      if [ "${dryrun}" ]; then
+        echo "curl -s -X POST ${ENDPOINT} \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          -d \"{
+          ${COMMON},
+          \"avatar\": \"${AVATAR_UUID}\",
+          \"object_uuid\": \"${OBJECT_UUID}\",
+          \"amount\": ${AMOUNT}
+        }\""
+      else
+        curl -s -X POST ${ENDPOINT} \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -d "{
+          ${COMMON},
+          \"object_uuid\": \"${UUID}\",
+          \"amount\": ${AMOUNT}
+        }"
+      fi
+      ;;
     reply_dialog)
       if [ "${dryrun}" ]; then
         echo "curl -s -X POST ${ENDPOINT} \
@@ -804,7 +840,8 @@ send_request() {
   esac
 }
 
-ACTION_STR= BOT_NAME= BUTTON= FILTER= GROUP_ID= LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
+ACTION_STR= AMOUNT= BOT_NAME= BUTTON= FILTER= GROUP_ID=
+LOGIN_SITON= MESSAGE= OBJ_NAME= SL_NAME= SUBJECT= UUID=
 
 [ -f ${HOME}/.lifebots ] && source ${HOME}/.lifebots
 
@@ -866,6 +903,7 @@ while getopts ":a:B:C:dijF:l:M:N:n:O:k:S:s:u:z:Hh" flag; do
       ;;
     z)
       HEIGHT="${OPTARG}"
+      AMOUNT="${OPTARG}"
       ;;
     H)
       nobold=1
@@ -983,6 +1021,61 @@ case "${ACTION}" in
       send_request "send_notice" | jq -r .
     else
       send_request "send_notice"
+    fi
+    ;;
+  get_balance|balance)
+    if [ "${have_jq}" ]; then
+      send_request "get_balance" | jq -r .
+    else
+      send_request "get_balance"
+    fi
+    ;;
+  pay_avatar|give_money)
+    show_usage=
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an Avatar UUID specified with -u uuid"
+      show_usage=1
+    }
+    [ "${AMOUNT}" ] || {
+      echo "The ${ACTION} action requires an amount to pay in L\$ specified with -z num"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage brief
+
+    if [[ "${AMOUNT}" =~ ^[0-9]+$ ]]; then
+      AVATAR_UUID="${UUID}"
+      if [ "${have_jq}" ]; then
+        send_request "give_money_object" | jq -r .
+      else
+        send_request "give_money_object"
+      fi
+    else
+      echo "Amount specified to pay must be a positive integer."
+      usage brief
+    fi
+    ;;
+  pay_object|give_money_object)
+    show_usage=
+    [ "${UUID}" ] || {
+      echo "The ${ACTION} action requires an Object UUID specified with -u uuid"
+      show_usage=1
+    }
+    [ "${AMOUNT}" ] || {
+      echo "The ${ACTION} action requires an amount to pay in L\$ specified with -z num"
+      show_usage=1
+    }
+    [ "${show_usage}" ] && usage brief
+
+    if [[ "${AMOUNT}" =~ ^[0-9]+$ ]]; then
+      OBJECT_UUID="${UUID}"
+      if [ "${have_jq}" ]; then
+        send_request "give_money_object" | jq -r .
+      else
+        send_request "give_money_object"
+      fi
+    else
+      echo "Amount specified to pay must be a positive integer."
+      usage brief
     fi
     ;;
   reply*)
@@ -1238,9 +1331,10 @@ case "${ACTION}" in
   *)
     echo "Action '${ACTION}' not yet supported"
     echo "Currently supported actions:"
-    echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias, listinventory,"
-    echo "  im, reply_dialog, send_notice, send_group_im, attachments, touch_attachment, touch_prim,"
-    echo "  activate_group, wear, takeoff, set_hoverheight, get_outfit, get_outfits, wear_outfit"
+    echo "  login, logout, status, bot_location, walkto, sit, teleport, listalias,"
+    echo "  listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+    echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, set_hoverheight,"
+    echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_money, give_money_object"
     ;;
 esac
 ```
