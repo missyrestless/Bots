@@ -30,7 +30,11 @@ ${SUDO} chmod 755 /usr/local/bin/lifebot
   exit 1
 }
 
-[ -d /usr/local/LifeBots ] || ${SUDO} mkdir -p /usr/local/LifeBots
+user=$(id -u)
+group=$(id -g)
+[ -d /usr/local/LifeBots/log ] || ${SUDO} mkdir -p /usr/local/LifeBots/log
+${SUDO} touch /usr/local/LifeBots/log/cron.log
+${SUDO} chown -R ${user}:${group} /usr/local/LifeBots/log
 
 ${SUDO} cp LifeBots/bin/* /usr/local/LifeBots
 ${SUDO} chmod 755 /usr/local/LifeBots/*
@@ -42,8 +46,10 @@ do
   ${SUDO} ln -s ${scr} /usr/local/bin/${bas}
 done
 
-echo "Installation of the lifebot command and associated scripts is complete."
-echo "Add /usr/local/bin to your execution PATH if it is not already included."
-echo "Configure lifebot by adding and editing the file ${HOME}/.lifebots"
-echo "See ${SCRIPT_PATH}/LifeBots/example_dot_lifebots for a template to use for this file."
-echo "See ${SCRIPT_PATH}/LifeBots/crontab.in for example crontab entries to schedule bot activities."
+printf "\n\nInstallation of the lifebot command and associated scripts is complete.\n"
+printf "\nAdd /usr/local/bin to your execution PATH if it is not already included.\n"
+printf "\nConfigure lifebot by adding and editing the file ${HOME}/.lifebots"
+printf "\n\tSee ${SCRIPT_PATH}/LifeBots/example_dot_lifebots"
+printf "\n\tfor a template to use for this file.\n"
+printf "\nSee ${SCRIPT_PATH}/LifeBots/crontab.in"
+printf "\nfor example crontab entries to schedule bot activities.\n\n"
