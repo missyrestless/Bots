@@ -1,0 +1,32 @@
+SHELL=/bin/bash
+#
+# Schedule LifeBots actions
+# -------------------------
+# Uses the lifebot command line tool at:
+#   https://github.com/missyrestless/Bots/blob/main/LifeBots/lifebot.sh
+# Assumes some configuration in ~/.lifebots has been performed
+#
+# m h  dom mon dow   command
+#
+# Weekdays send Anya bot to the club at 4am
+0 4 * * 1-5 /bin/bash -lc '/usr/local/LifeBots/anya2club'
+# Weekends send Anya bot to the beach at 11am
+0 11 * * 0,6 /bin/bash -lc '/usr/local/LifeBots/anya2beach'
+# Monday at 4pm send Anya bot to DJ at the Media Sphere
+0 16 * * 1 /bin/bash -lc '/usr/local/LifeBots/anya2msdj'
+# Monday at 6pm sit Anya in theater seating after her set
+0 18 * * 1 /bin/bash -lc '/usr/local/LifeBots/anya2seat'
+# Tuesday at 6pm send Angelus bot to DJ at the club
+0 18 * * 2 /bin/bash -lc '/usr/local/LifeBots/angelus2clubdj'
+# Tuesday at 8pm send Angelus bot back to his dance pole
+0 20 * * 2 /bin/bash -lc '/usr/local/LifeBots/angelus2pole'
+# Friday at 6pm send Easy bot to DJ at the club
+0 18 * * 5 /bin/bash -lc '/usr/local/LifeBots/easy2clubdj'
+# Friday at 8pm send Easy bot back to her dance pole
+0 20 * * 5 /bin/bash -lc '/usr/local/LifeBots/easy2pole'
+# Saturday at 6pm send all bots to dance at the club
+0 18 * * 6 /bin/bash -lc '/usr/local/LifeBots/bots2clubdance'
+# Saturday at 9pm send all bots back to their default locations
+0 21 * * 6 /bin/bash -lc '/usr/local/LifeBots/bots2home'
+# Check every hour if Easy bot is at the club greeting visitors
+0 * * * * /bin/bash -lc '/usr/local/LifeBots/checkeasy'
