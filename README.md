@@ -1,5 +1,19 @@
 # Second Life Bots
 
+## Important Notes
+
+The command line bot control system,
+[BotControl](https://github.com/missyrestless/BotControl#readme),
+used to control Corrade and LifeBots Second Life bots from the UNIX/Linux command line,
+has moved to it's own repository at https://github.com/missyrestless/BotControl
+
+The scripted in-world object,
+[LifeBotsControlPanel](https://github.com/missyrestless/LifeBotsControlPanel#readme),
+an LSL library enabling command and control of `LifeBots` bots via the LifeBots API,
+has moved to it's own repository at https://github.com/missyrestless/LifeBotsControlPanel
+
+## Overview
+
 This repository contains commands, configuration, and management scripts for Second Life
 scripted agents (bots). Included are management systems for `Corrade` and `LifeBots`.
 
@@ -48,25 +62,14 @@ for details on the in-world LSL bridge for `LifeBots`.
 
 ## BotControl Command Line
 
-**NEW** The `botctrl` command now supports management of both `LifeBots` and `Corrade` bots.
-To manage a `Corrade` bot simply replace the `-n <bot name or alias>` command line argument
-with `-c <bot name or alias>`.
-
 The `BotControl Command Line` is a suite of tools that enable control and management of
 [LifeBots](https://lifebots.cloud) and [Corrade](https://grimore.org/secondlife/scripted_agents/corrade)
 bots via the Unix/Linux command line. These tools are executed in a terminal using the Bash shell
 and standard Linux utilities.
 
-The primary command line tool is the `botctrl` Bash script which acts as a front-end
-for `LifeBots` and `Corrade` API requests.
-
-For those power users who wish to automate their `LifeBots` or `Corrade` bots using
-the command line and tools such as `cron` and `jq` the `botctrl` command and associated
-utilities found here may provide additional power and flexibility. The `BotControl` command
-line management system is open source and free to download, deploy, modify, and distribute.
-
-See the [BotControl README](https://github.com/missyrestless/Bots/tree/main/BotControl#readme)
-for details on the BotControl Command Line.
+See the
+[BotControl repository](https://github.com/missyrestless/BotControl#readme)
+for details on command line control of Corrade and LifeBots bots.
 
 ## Corrade
 
@@ -76,14 +79,8 @@ and update it myself, and my bots are not dependant on some cloud service
 that may disappear at any time. This is a significant advantage.
 
 `Corrade` is a multi-purpose, multi-platform scripted agent (bot) that runs
-under Windows or Unix natively, as a service or daemon whilst staying connected
-to a Linden-based grid (either Second Life or OpenSim) and controlled entirely
-by scripts. We like to think of Corrade as a bridge, that gives access to
-viewer-commands to LSL scripts. Corrade does not stop at providing viewer-commands
-to LSL scripts but reaches into the Internet of Things (IoT), Big Data and
-Artificial Intelligence (AI) by implementing the latest technologies and
-communication protocols. Corrade's target audience consists of programmers
-that will use Corrade as a building block and then create an end-product.
+under Windows or Unix natively, as a service or daemon whilst staying connected to a
+Linden-based grid (either Second Life or OpenSim) and controlled entirely by scripts.
 
 The scripts in this repository are original scripting by Truth & Beauty Lab
 along with modified versions of scripts distributed under an Open Source
