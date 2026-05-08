@@ -372,7 +372,7 @@ send_corrade_request() {
   cgroup=$(wasURLEscape "${CORRADE_GROUP}")
   cpassw=$(wasURLEscape "${CORRADE_PASSW}")
   case "${cmd}" in
-    sit)
+    sit|touch*)
       if [ "${UUID}" ]; then
         cuuid=$(wasURLEscape "${UUID}")
       else
@@ -383,7 +383,8 @@ send_corrade_request() {
           usage brief
         fi
       fi
-      COMMAND="command=sit&group=${cgroup}&password=${cpassw}&item=${cuuid}&range=64"
+      [ "${cmd}" == "sit" ] || cmd="touch"
+      COMMAND="command=${cmd}&group=${cgroup}&password=${cpassw}&item=${cuuid}&range=64"
       ;;
     stand)
       COMMAND="command=stand&group=${cgroup}&password=${cpassw}"

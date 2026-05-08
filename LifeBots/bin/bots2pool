@@ -19,7 +19,6 @@ have_jq=$(type -p jq)
 
 # Check if Bots are online and if not, login
 needsleep=
-#for bot in Angel Anya Easy
 for bot in Anya
 do
   lifebot -a stand -n ${bot} >/dev/null 2>&1
@@ -31,16 +30,16 @@ done
 [ "${needsleep}" ] && sleep 20
 
 # Send Angelus to the hottub
-#lifebot -a teleport -n Angel -l zen >/dev/null 2>&1
-#sleep 7
-#lifebot -a sit -n Angel -u hottub
+lifebot -a teleport -c Angel -l zen >/dev/null 2>&1
+sleep 5
+lifebot -a sit -c Angel -u hottub
 
 # Send Anya to the pool float
 lifebot -a teleport -n Anya -l zen
-sleep 7
+sleep 5
 lifebot -a sit -n Anya -u zfloat
 
 # Send Easy to the right lounge chair
-#lifebot -a teleport -n Easy -l zen
-#sleep 7
-#lifebot -a sit -n Easy -u zlounger
+lifebot -a teleport -c Easy -l zen
+sleep 5
+lifebot -a sit -c Easy -u zlounger

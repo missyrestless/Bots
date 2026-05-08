@@ -5,15 +5,16 @@
 # Usage: bot2login [-n name] [-l location] [-u uuid]
 
 # Default bot
-DEF_BOT="Easy"
+DEF_BOT="Anya"
 # Default location
 DEF_LOC="club"
 # Default sit uuid
-DEF_UUID="dancepole"
+DEF_UUID="lpole"
 # Default action
 DEF_ACTION="sit"
 # All bots
-ALL_BOTS="Angel Anya Easy"
+#ALL_BOTS="Angel Anya Easy"
+ALL_BOTS="Anya"
 # Sit targets for all bots
 UUID_Easy="${DEF_UUID}"
 UUID_Anya="lcouch"
