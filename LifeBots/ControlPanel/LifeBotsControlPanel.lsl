@@ -124,28 +124,28 @@ integer BOT_NOTECARD_READ_REPLY     = 290238;   //
 integer BOT_NOTECARD_CREATE_REPLY   = 290239;   //
                                                 //
 // LifeBots API Extensions                      //
-integer BOT_LIST_GROUP_MEMBERS      = 299000;   //
-integer BOT_LIST_INVENTORY          = 299001;   //
-integer BOT_ACTIVATE_ROLE           = 299002;   //
-integer BOT_TAKE_DELETE_OBJECT      = 299003;   //
-integer BOT_INVENTORY_TO_OBJECT     = 299004;   //
-integer BOT_ADJUST_HOVER_HEIGHT     = 299005;   //
-integer BOT_LIST_OUTFITS            = 299006;   //
-integer BOT_WEAR_OUTFIT             = 299007;   //
-integer BOT_GET_WORN_OUTFIT         = 299008;   //
-integer BOT_FIND_OBJECTS            = 299009;   //
-integer BOT_FIND_OBJECTS_WITH_PROP  = 299010;   //
-integer BOT_FIND_OBJECTS_PARCEL     = 299011;   //
-integer BOT_FIND_OBJECT_UUID        = 299012;   //
-integer BOT_GROUP_INFO              = 299013;   //
-integer BOT_LIST_GROUPS_UUID        = 299014;   //
-integer BOT_LIST_GROUPS_NAME        = 299015;   //
-integer BOT_GROUP_VISIBILITY        = 299016;   //
-integer BOT_GROUP_OFFER_ACCEPT      = 299017;   //
-integer BOT_GROUP_OFFER_DECLINE     = 299018;   //
-integer BOT_ALWAYS_RUN              = 299019;   //
-integer BOT_ALWAYS_WALK             = 299020;   //
-integer BOT_SCAN_AVATARS            = 299021;   //
+integer LIST_GROUP_MEMBERS          = 299000;   //
+integer LIST_INVENTORY              = 299001;   //
+integer ACTIVATE_ROLE               = 299002;   //
+integer TAKE_DELETE_OBJECT          = 299003;   //
+integer INVENTORY_TO_OBJECT         = 299004;   //
+integer ADJUST_HOVER_HEIGHT         = 299005;   //
+integer LIST_OUTFITS                = 299006;   //
+integer WEAR_OUTFIT                 = 299007;   //
+integer GET_WORN_OUTFIT             = 299008;   //
+integer FIND_OBJECTS                = 299009;   //
+integer FIND_OBJECTS_WITH_PROP      = 299010;   //
+integer FIND_OBJECTS_PARCEL         = 299011;   //
+integer FIND_OBJECT_UUID            = 299012;   //
+integer GROUP_INFO                  = 299013;   //
+integer LIST_GROUPS_UUID            = 299014;   //
+integer LIST_GROUPS_NAME            = 299015;   //
+integer GROUP_VISIBILITY            = 299016;   //
+integer GROUP_OFFER_ACCEPT          = 299017;   //
+integer GROUP_OFFER_DECLINE         = 299018;   //
+integer ALWAYS_RUN                  = 299019;   //
+integer ALWAYS_WALK                 = 299020;   //
+integer SCAN_AVATARS                = 299021;   //
 integer AVATAR_INFO                 = 299022;   //
 integer AVATAR_DISPLAY_NAME         = 299023;   //
 integer AVATAR_PICKS                = 299024;   //
@@ -422,13 +422,13 @@ default {
               "text", TEXT
             ]);
         // Movement
-        } else if (num == BOT_ALWAYS_RUN) {
+        } else if (num == ALWAYS_RUN) {
             llOwnerSay("Sending bot always run request...");
             LifeBotsAPI("alwaysRun", [ ]);
-        } else if (num == BOT_ALWAYS_WALK) {
+        } else if (num == ALWAYS_WALK) {
             llOwnerSay("Sending bot always walk request...");
             LifeBotsAPI("alwaysWalk", [ ]);
-        } else if (num == BOT_SCAN_AVATARS) {
+        } else if (num == SCAN_AVATARS) {
             llOwnerSay("Sending bot scan nearby avatars request...");
             if (((string)((integer)message) == message) || ((string)((float)message) == message)) {
                 LifeBotsAPI("nearbyavatars_scan", [
@@ -494,7 +494,7 @@ default {
             LifeBotsAPI("activate_group", [
               "groupuuid", (string)trigger
             ]);
-        } else if (num == BOT_ACTIVATE_ROLE) {
+        } else if (num == ACTIVATE_ROLE) {
             llOwnerSay("Sending bot activate group role request...");
             LifeBotsAPI("activate_role", [
               "groupuuid", (string)trigger,
@@ -797,7 +797,7 @@ default {
             ]);
         // LifeBots API Extensions
         // TODO: object search needs guidance on interface
-        } else if (num == BOT_FIND_OBJECTS) {
+        } else if (num == FIND_OBJECTS) {
             integer range = 96;
             if (message != "") {
                 range = (integer)message;
@@ -806,7 +806,7 @@ default {
             LifeBotsAPI("find_objects", [
               "range", range
             ]);
-        } else if (num == BOT_FIND_OBJECTS_WITH_PROP) {
+        } else if (num == FIND_OBJECTS_WITH_PROP) {
             integer prop = 96;
             if (message != "") {
                 prop = (integer)message;
@@ -816,32 +816,32 @@ default {
               "range", prop,
               "with_props": "1"
             ]);
-        } else if (num == BOT_FIND_OBJECTS_PARCEL) {
+        } else if (num == FIND_OBJECTS_PARCEL) {
             llOwnerSay("Sending bot find objects parcel request...");
             LifeBotsAPI("find_objects", [
               "current_parcel", "1"
             ]);
-        } else if (num == BOT_FIND_OBJECT_UUID) {
+        } else if (num == FIND_OBJECT_UUID) {
             llOwnerSay("Sending bot find object uuid request...");
             LifeBotsAPI("find_objects", [
               "uuid", (string)trigger
             ]);
         // Groups
-        } else if (num == BOT_GROUP_OFFER_ACCEPT) {
+        } else if (num == GROUP_OFFER_ACCEPT) {
             llOwnerSay("Sending bot group offer accept request...");
             LifeBotsAPI("group_offer_accept", [
               "session_id", (string)trigger,
               "avatar_uuid", message,
               "accept", "1"
             ]);
-        } else if (num == BOT_GROUP_OFFER_DECLINE) {
+        } else if (num == GROUP_OFFER_DECLINE) {
             llOwnerSay("Sending bot group offer decline request...");
             LifeBotsAPI("group_offer_accept", [
               "session_id", (string)trigger,
               "avatar_uuid", message,
               "accept", "0"
             ]);
-        } else if (num == BOT_GROUP_VISIBILITY) {
+        } else if (num == GROUP_VISIBILITY) {
             string profile = "1";
             if (messsage == "0") {
                 profile = message;
@@ -851,51 +851,51 @@ default {
               "groupuuid", (string)trigger,
               "profile", profile
             ]);
-        } else if (num == BOT_LIST_GROUPS_UUID) {
+        } else if (num == LIST_GROUPS_UUID) {
             llOwnerSay("Sending bot list groups by uuid request...");
             LifeBotsAPI("listgroups", [
               "limit_uuid", (string)trigger
             ]);
-        } else if (num == BOT_LIST_GROUPS_NAME) {
+        } else if (num == LIST_GROUPS_NAME) {
             llOwnerSay("Sending bot list groups by name request...");
             LifeBotsAPI("listgroups", [
               "limit_name", message
             ]);
-        } else if (num == BOT_GROUP_INFO) {
+        } else if (num == GROUP_INFO) {
             llOwnerSay("Sending bot group info request...");
             LifeBotsAPI("group_info", [
               "groupuuid", (string)trigger
             ]);
-        } else if (num == BOT_LIST_GROUP_MEMBERS) {
+        } else if (num == LIST_GROUP_MEMBERS) {
             llOwnerSay("Sending bot list group members request...");
             LifeBotsAPI("get_group_members", [
               "groupuuid", (string)trigger
             ]);
         // Inventory
-        } else if (num == BOT_TAKE_DELETE_OBJECT) {
+        } else if (num == TAKE_DELETE_OBJECT) {
             llOwnerSay("Sending bot take or delete object request...");
             LifeBotsAPI("inworld_prim_take", [
               "uuid", (string)trigger,
               "operation", message
             ]);
-        } else if (num == BOT_LIST_OUTFITS) {
+        } else if (num == LIST_OUTFITS) {
             llOwnerSay("Sending bot list outfits request...");
             LifeBotsAPI("get_outfits", [ ]);
-        } else if (num == BOT_GET_WORN_OUTFIT) {
+        } else if (num == GET_WORN_OUTFIT) {
             llOwnerSay("Sending bot get worn outfit request...");
             LifeBotsAPI("get_outfit", [ ]);
-        } else if (num == BOT_WEAR_OUTFIT) {
+        } else if (num == WEAR_OUTFIT) {
             llOwnerSay("Sending bot wear outfit request...");
             LifeBotsAPI("wear_outfit", [
               "outfitname", message
             ]);
-        } else if (num == BOT_INVENTORY_TO_OBJECT) {
+        } else if (num == INVENTORY_TO_OBJECT) {
             llOwnerSay("Sending bot transfer inventory to object request...");
             LifeBotsAPI("inventory_to_prim", [
               "prim_uuid", (string)trigger,
               "object_uuid", message
             ]);
-        } else if (num == BOT_LIST_INVENTORY) {
+        } else if (num == LIST_INVENTORY) {
             llOwnerSay("Sending bot list inventory request...");
             boolean ext = stringToBoolean(message);
             if (trigger == NULL_KEY) {
@@ -909,7 +909,7 @@ default {
                 ]);
             }
         // Miscellaneous
-        } else if (num == BOT_ADJUST_HOVER_HEIGHT) {
+        } else if (num == ADJUST_HOVER_HEIGHT) {
             llOwnerSay("Sending bot adjust hover height request...");
             LifeBotsAPI("set_hoverheight", [
               "height", (float)message
