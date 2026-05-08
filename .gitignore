@@ -8,7 +8,10 @@ tmp/
 # Corrade release archives
 Dist/
 
-# LifeBots scripts
+# LifeBots scripts and doc
+LifeBots/Doc/Doc-Start.txt
+LifeBots/Doc/Neal-IM.txt
+LifeBots/Doc/todo
 LifeBots/Encryption_Key
 LifeBots/MyScripts/
 LifeBots/OAuth/Easy/
