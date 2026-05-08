@@ -8,7 +8,7 @@ The following table shows input values (you send them with the API call) and ret
 
 | Variable | Required | Description               |
 |:-------- |:-------- |:------------------------- |
-| str      | yes      | 1 = Allow\n0 = Revoke     |
+| str      | yes      | 1 = Allow<br>0 = Revoke   |
 | id       | yes      | UUID of friend            |
 
 ## Example

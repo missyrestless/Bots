@@ -8,7 +8,7 @@ The following table shows input values (you send them with the API call) and ret
 
 | Variable | Required | Description               |
 |:-------- |:-------- |:------------------------- |
-| str      | yes      | 0 - to disable debug\n1 - enable debug |
+| str      | yes      | 0 - to disable debug<br>1 - enable debug |
 | id       | yes      | --                        |
 
 ## Comments
