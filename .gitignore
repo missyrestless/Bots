@@ -1,4 +1,5 @@
 tmp/
+*.[0-9][0-9]
 *.tmp
 *.bak
 *.swp
@@ -7,8 +8,12 @@ tmp/
 # Corrade release archives
 Dist/
 
+# LifeBots scripts
+LifeBots/MyScripts/
+
 # Configuration notecards with sensitive data
 Evade_Region_Restart/configuration-*
+Sit_Animate/Corrade-Configuration-*
 
 # Private scripts, do not add or commit
 Private/

@@ -1,17 +1,20 @@
 # STEP 1 - Set Title for the TIPJAR
-BOARDTITLE= PLAY WITH ME
+BOARDTITLE= Pay Board, Sit With Me
 
 # STEP 2 - Set color for the board title
-BOARDCOLOR=1,1,1
+#BOARDCOLOR=1,1,1
+BOARDCOLOR=1.000,0.863,0.000
 
 # STEP 3 - Set Title for the HEAD SITTER
 #EX .HEADTITLE=TOUCH MY HEAD OR MY BOARD\nTO FORCE ME TO SIT
 # IF THIS IS EMPTY NOTHING WILL APPEAR ABOVE HEAD.
-HEADTITLE=
+#HEADTITLE=
+HEADTITLE=PLAY WITH ME
 
 # STEP 4 - Set color for the HEAD SITTER title
 # EX. HEADCOLOR=1, 0, 1
-HEADCOLOR=1,1,1
+#HEADCOLOR=1,1,1
+HEADCOLOR=0.004,1.000,0.439
 
 # STEP 3-Set the price for one session ($L)
 PAY=250
@@ -26,7 +29,7 @@ MAXTIME=0
 # STEP 7 - Set Owner Commission. set 0-100%
 OWNER_COMMISSION=0
 
-* STEP 8 - This message will appear after the thank you for your donation...
+# STEP 8 - This message will appear after the thank you for your donation...
 MSG=Thank you for your tip. Let's have fun!
 
 # STEP 9 - information on top of the tip jar
@@ -35,7 +38,7 @@ MSG=Thank you for your tip. Let's have fun!
 # 2=last tip + total
 # 3=total only
 # 4= nothing
-INFO=1
+INFO=4
 
 # STEP 10 - Choose access: OWNER/GROUP/ALL/ALLGROUP/RESERVED
 ACCESS=RESERVED
@@ -44,7 +47,7 @@ ACCESS=RESERVED
 # STEP 11- Name of the avatar user for whom the tipjar is reserved
 # Example AV_RESERVED =WallaGo Dingson
 #I MPORTANT - TO ACTIVE THIS FEATURE CHANGE THE ACCESS TO RESERVED
-AV_RESERVED=Anya Ordinary
+AV_RESERVED=Pandorabot Resident
 #AV_RESERVED=
 
 # STEP 11a - ALLOW AUTO LOGIN (YES/NO)
@@ -75,17 +78,7 @@ USE_LOCALCHAT=YES
 GROUP_ADMIN=NO
 
 # STEP 18 - OBJECT UUID
-# Nerenzo Bed
-OBJECTUUID=c5fc2101-a61a-63f2-ae90-52f3740c410f
-# Bathtub
-OBJECTUUID=c995b327-8247-826e-8366-39ad138b4ac3
-# Sink
-OBJECTUUID=2e074292-0840-1a04-1f08-1dd7cbbe42d9
-# Candle Lamp
-OBJECTUUID=7c4bfeca-a314-f315-d748-f9ca784aa7b9
-#Name=Dance Pole
-#OBJECTUUID=088d09ea-8303-3cb1-2ad9-cd5855d97416
-#Name=Couch
-#OBJECTUUID=ffbcd9c4-1a2d-7219-8622-69012bad57dc
-#Name=Bench
-#OBJECTUUID=665c5948-e5af-ffe9-d8ca-2fb8f8bfeb05
+# Lounge Chair right
+OBJECTUUID=0e92d6be-4526-8cb3-049f-ca13b3b95fb5
+# Lounge Chair left
+OBJECTUUID=43f9cfd4-9439-fbc6-f8fe-dc7e073ffeb6
