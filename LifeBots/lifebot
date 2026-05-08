@@ -269,12 +269,12 @@ get_details() {
     usage
   }
   if [ "${dryrun}" ]; then
-    echo "curl -s GET ${APIURL}/v1/bots/${LB_BOT_ID} \
+    echo "curl ${verb} GET ${APIURL}/v1/bots/${LB_BOT_ID} \
       -H \"Authorization: Bearer ${access_token}\" \
       -H \"Accept: application/json\" \
       -H \"Content-Type: application/json\""
   else
-    curl -s GET ${APIURL}/v1/bots/${LB_BOT_ID} \
+    curl ${verb} GET ${APIURL}/v1/bots/${LB_BOT_ID} \
       -H "Authorization: Bearer ${access_token}" \
       -H "Accept: application/json" \
       -H "Content-Type: application/json"
@@ -467,7 +467,7 @@ send_corrade_request() {
         fi
       fi
       [ "${cmd}" == "sit" ] || cmd="touch"
-      COMMAND="\"command\": \"${cmd}\", \"item\": \"${cuuid}\", \"range\": \"64\""
+      COMMAND="\"command\": \"${cmd}\", \"item\": \"${cuuid}\", \"range\": \"${CORRADE_RANGE}\""
       ;;
     stand)
       COMMAND="\"command\": \"stand\""
@@ -476,13 +476,9 @@ send_corrade_request() {
       COMMAND="\"command\": \"getmembersonline\""
       ;;
     teleport)
-      local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
-      local REGION=$(echo "${loc}" | awk -F '/' '{ print $1 }' | sed -e "s/%20/ /g")
-      local POS=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $2, $3, $4 }')
-      # local region=$(wasURLEscape "${REGION}")
-      # local position=$(wasURLEscape "<${POS}>")
-      local rgn="${REGION}"
+      local POS=$(get_coords "${LOCATION}")
       local pos="<${POS}>"
+      local rgn=$(echo "${LOCATION}" | awk -F '/' '{ print $(NF-3) }' | sed -e "s/%20/ /g")
       COMMAND="\"command\": \"teleport\", \"entity\": \"region\", \"region\": \"${rgn}\", \"position\": \"${pos}\""
       ;;
     walk*)
@@ -507,7 +503,7 @@ send_corrade_request() {
     usage brief
   }
   if [ "${dryrun}" ]; then
-    echo "curl -s -X POST ${CORRADE_BOT_URL} \
+    echo "curl ${verb} -X POST ${CORRADE_BOT_URL} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -520,7 +516,7 @@ send_corrade_request() {
         get_outfit*)
           local outfit_type="current"
           echo "${cmd}" | grep get_outfits >/dev/null && outfit_type="outfits"
-          curl -s -X POST ${CORRADE_BOT_URL} \
+          curl ${verb} -X POST ${CORRADE_BOT_URL} \
                -H "Accept: application/json" \
                -H "Content-Type: application/json" \
                -d "{
@@ -530,10 +526,17 @@ send_corrade_request() {
                     jq 'del(.outfits[] | select(.name == "LifeBotsCommandDummyPlaceholder"))'
           ;;
         *)
+          curl ${verb} -X POST ${CORRADE_BOT_URL} \
+               -H "Accept: application/json" \
+               -H "Content-Type: application/json" \
+               -d "{
+                 ${COMMON},
+                 ${COMMAND}
+               }" | jq -r .
           ;;
       esac
     else
-      curl -s -X POST ${CORRADE_BOT_URL} \
+      curl ${verb} -X POST ${CORRADE_BOT_URL} \
            -H "Accept: application/json" \
            -H "Content-Type: application/json" \
            -d "{
@@ -559,7 +562,7 @@ send_lifebot_request() {
     listinventory|sit|touch_attachment|touch_prim)
       if [ "${dryrun}" ]; then
         if [ "${UUID}" ]; then
-          echo "curl -s -X POST ${ENDPOINT} \
+          echo "curl ${verb} -X POST ${ENDPOINT} \
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
@@ -569,7 +572,7 @@ send_lifebot_request() {
             \"extended\": true
           }\""
         else
-          echo "curl -s -X POST ${ENDPOINT} \
+          echo "curl ${verb} -X POST ${ENDPOINT} \
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
@@ -579,7 +582,7 @@ send_lifebot_request() {
         fi
       else
         if [ "${UUID}" ]; then
-          curl -s -X POST ${ENDPOINT} \
+          curl ${verb} -X POST ${ENDPOINT} \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
@@ -589,7 +592,7 @@ send_lifebot_request() {
             \"extended\": true
           }"
         else
-          curl -s -X POST ${ENDPOINT} \
+          curl ${verb} -X POST ${ENDPOINT} \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
@@ -602,7 +605,7 @@ send_lifebot_request() {
     login|teleport)
       if [ "${LOGIN_SITON}" ] && [ "${act}" == "login" ]; then
         if [ "${dryrun}" ]; then
-          echo "curl -s -X POST ${ENDPOINT} \
+          echo "curl ${verb} -X POST ${ENDPOINT} \
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
@@ -611,7 +614,7 @@ send_lifebot_request() {
             \"location\": \"${LOCATION}\"
           }\""
         else
-          curl -s -X POST ${ENDPOINT} \
+          curl ${verb} -X POST ${ENDPOINT} \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
@@ -622,7 +625,7 @@ send_lifebot_request() {
         fi
       else
         if [ "${dryrun}" ]; then
-          echo "curl -s -X POST ${ENDPOINT} \
+          echo "curl ${verb} -X POST ${ENDPOINT} \
             -H \"Accept: application/json\" \
             -H \"Content-Type: application/json\" \
             -d \"{
@@ -630,7 +633,7 @@ send_lifebot_request() {
             \"location\": \"${LOCATION}\"
           }\""
         else
-          curl -s -X POST ${ENDPOINT} \
+          curl ${verb} -X POST ${ENDPOINT} \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{
@@ -642,7 +645,7 @@ send_lifebot_request() {
       ;;
     key2name)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -651,7 +654,7 @@ send_lifebot_request() {
           \"request_case\": \"1\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -663,7 +666,7 @@ send_lifebot_request() {
       ;;
     name2key)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -672,7 +675,7 @@ send_lifebot_request() {
           \"request_case\": \"1\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -684,7 +687,7 @@ send_lifebot_request() {
       ;;
     avatar_picks)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -692,7 +695,7 @@ send_lifebot_request() {
           \"avatar\": \"${AVATAR_UUID}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -703,7 +706,7 @@ send_lifebot_request() {
       ;;
     give_inventory)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -712,7 +715,7 @@ send_lifebot_request() {
           \"object\": \"${UUID}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -724,7 +727,7 @@ send_lifebot_request() {
       ;;
     give_money|give_money_object)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -734,7 +737,7 @@ send_lifebot_request() {
           \"amount\": ${AMOUNT}
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -747,7 +750,7 @@ send_lifebot_request() {
       ;;
     reply_dialog)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -757,7 +760,7 @@ send_lifebot_request() {
           \"object\": \"${UUID}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -772,7 +775,7 @@ send_lifebot_request() {
       msg_label="message"
       [ "${act}" == "send_notice" ] && msg_label="text"
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -785,7 +788,7 @@ send_lifebot_request() {
           \"autodelay\": \"1\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -801,7 +804,7 @@ send_lifebot_request() {
       ;;
     set_hoverheight)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -809,7 +812,7 @@ send_lifebot_request() {
           \"height\": \"${HEIGHT}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -820,7 +823,7 @@ send_lifebot_request() {
       ;;
     takeoff|wear)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -829,7 +832,7 @@ send_lifebot_request() {
           \"wear\": \"add\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -841,7 +844,7 @@ send_lifebot_request() {
       ;;
     wear_outfit)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -849,7 +852,7 @@ send_lifebot_request() {
           \"outfitname\": \"${OUTFIT_NAME}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -862,7 +865,7 @@ send_lifebot_request() {
       # LifeBots walkto API seems to require x/y/z even though x,y,z is documented
       LOCATION=$(set_lb_coords "${LOCATION}")
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -870,7 +873,7 @@ send_lifebot_request() {
           \"coords\": \"${LOCATION}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -881,7 +884,7 @@ send_lifebot_request() {
       ;;
     attachments)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
@@ -889,7 +892,7 @@ send_lifebot_request() {
           \"matchnames\": \"${FILTER}\"
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -900,14 +903,14 @@ send_lifebot_request() {
       ;;
     *)
       if [ "${dryrun}" ]; then
-        echo "curl -s -X POST ${ENDPOINT} \
+        echo "curl ${verb} -X POST ${ENDPOINT} \
           -H \"Accept: application/json\" \
           -H \"Content-Type: application/json\" \
           -d \"{
           ${COMMON}
         }\""
       else
-        curl -s -X POST ${ENDPOINT} \
+        curl ${verb} -X POST ${ENDPOINT} \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -d "{
@@ -940,8 +943,8 @@ CORRADE_BOT_ID= CORRADE_BOT_NAME= CORRADE_BOT_URL=
 # Use jq to format JSON return if it is available
 have_jq=$(type -p jq)
 
-command_line_secret= details= dryrun= nobold= corrade=
-while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
+command_line_secret= details= dryrun= nobold= corrade= verb="-s"
+while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:vz:Heh" flag; do
   case $flag in
     a)
       ACTION_STR="${OPTARG}"
@@ -999,6 +1002,9 @@ while getopts ":a:A:B:c:C:dijF:l:M:N:n:O:k:S:s:u:z:Heh" flag; do
       ;;
     u)
       UUID="${OPTARG}"
+      ;;
+    v)
+      verb=
       ;;
     z)
       HEIGHT="${OPTARG}"
@@ -1111,6 +1117,9 @@ fi
   echo "LB_API_KEY and LB_SECRET must be set in the environment. Exiting."
   exit 1
 }
+
+# Set the range limit for sit and touch objects in Corrade API if not set in ~/.lifebots
+[ "${CORRADE_RANGE}" ] || CORRADE_RANGE="64"
 
 [ "${details}" ] && {
   get_details
