@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+#
+# keys2names - convert a list of avatar UUIDs to a list of avatar names
+#
+# Reads a file with avatar UUIds, one per line, and outputs the avatar names
+#
+# Usage: keys2names [-n name] [-f /path/to/file ]
+#
+# Default Bot
+DEF_BOT="Easy"
+# Default Filename
+DEF_FILE="friends_ids"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: keys2names [-c|l] [-n name] [-f /path/to/file]"
+  printf "\nWhere:"
+  printf "\n\t-c indicates use Corrade API"
+  printf "\n\t-l indicates use LifeBots API"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]"
+  printf "\n\t-f file specifies the path to a file with UUIDs [default: ${DEF_FILE}]\n\n"
+  exit 1
+}
+
+BOT= FILE= CORRADE= LIFEBOT=
+while getopts ":cln:f:h" flag; do
+  case $flag in
+    c)
+      CORRADE=1
+      ;;
+    l)
+      LIFEBOT=1
+      ;;
+    n)
+      BOT="$OPTARG"
+      ;;
+    f)
+      FILE="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[ "${CORRADE}" ] && [ "${LIFEBOT}" ] && {
+  echo "Only one of -c and -l can be specified. Exiting."
+  exit 1
+}
+[ "${CORRADE}" ] || [ "${LIFEBOT}" ] || {
+  echo "One of -c or -l must be given in order to specify the API. Exiting."
+  exit 1
+}
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+[ "${FILE}" ] || FILE="${DEF_FILE}"
+
+# Check if Bot is online and if not, login
+[ "${LIFEBOT}" ] && {
+  lifebot -a status -n ${BOT} | jq -r '.status' | grep -i online >/dev/null || {
+    echo "Logging in ${BOT} ..."
+    lifebot -a login -n ${BOT}
+    sleep 10
+  }
+}
+
+if [ -r "${FILE}" ]; then
+  cat "${FILE}" | while read uuid
+  do
+    [ "${uuid}" ] && {
+      if [ "${LIFEBOT}" ]; then
+        lifebot -a key2name -n ${BOT} -u ${uuid} | jq -r .name
+      else
+        corrade -a key2name -c ${BOT} -u ${uuid} | jq -r '.data[1]'
+      fi
+    }
+  done
+else
+  echo "${FILE} does not exist or is not readable. Exiting."
+  usage
+fi

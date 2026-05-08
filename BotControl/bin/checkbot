@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+# checkbot - check the location of the bot and teleport to the set location if needed
+#
+# Bot, location, and uuid can be specified on the command line
+#
+# Set to the name of bot to check, full name or bot name alias
+DEF_BOT="Anya"
+# Set to the location the bot should be, slurl or slurl alias
+DEF_LOC="club"
+# Set to object UUID bot should sit on, UUID or UUID alias
+# Set to empty if no sit action is required
+DEF_UUID=
+# Set to the region your bot needs to be located
+DEF_REGION="Scylla"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+BOLD=$(tput bold 2> /dev/null)
+NORM=$(tput sgr0 2> /dev/null)
+LINE=$(tput smul 2> /dev/null)
+
+usage() {
+  printf "\n${BOLD}${LINE}Usage:${NORM} ${BOLD}checkbot [-f] [-l location] [-n name] [-r region] [-u uuid] [-h]${NORM}"
+  printf "\n${BOLD}${LINE}Where:${NORM}"
+  printf "\n\t${BOLD}${LINE}-f${NORM} indicates force teleport, skip region check"
+  printf "\n\t${BOLD}${LINE}-l location${NORM} specifies a location to teleport [default: ${DEF_LOC}]"
+  printf "\n\t${BOLD}${LINE}-n name${NORM} specifies a Bot name [default: ${DEF_BOT}]"
+  printf "\n\t${BOLD}${LINE}-r region${NORM} specifies the region to check [default: ${DEF_REGION}]"
+  printf "\n\t${BOLD}${LINE}-u uuid${NORM} specifies a UUID for use with sit [default: ${DEF_UUID}]"
+  printf "\n\t${BOLD}${LINE}-h${NORM} displays this usage message and exits\n"
+  exit 1
+}
+
+BOT= LOC= UUID= REGION=
+force=
+while getopts ":fl:n:r:u:h" flag; do
+  case $flag in
+    f)
+      force=1
+      ;;
+    l)
+      LOC="$OPTARG"
+      ;;
+    n)
+      BOT="$OPTARG"
+      ;;
+    r)
+      REGION="$OPTARG"
+      ;;
+    u)
+      UUID="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+[ "${LOC}" ] || LOC="${DEF_LOC}"
+[ "${REGION}" ] || REGION="${DEF_REGION}"
+[ "${UUID}" ] || UUID="${DEF_UUID}"
+
+# If bot is Anya and location is club then sit on dancepole
+echo "${BOT}" | grep Anya >/dev/null && {
+  [ "${UUID}" ] || {
+    [ "${LOC}" == "club" ] && UUID="lpole"
+  }
+}
+
+# Check if bot is online and if not, login
+botctrl -a status -n "${BOT}" | jq -r '.status' | grep -i online >/dev/null || {
+  botctrl -a login -n "${BOT}" -l "${LOC}"
+  sleep 20
+}
+
+# Check if bot is at the set location and if not, teleport and sit
+if [ "${force}" ]; then
+  botctrl -a teleport -n "${BOT}" -l "${LOC}"
+else
+  botctrl -a status -n "${BOT}" | jq -r '.location' | grep "${REGION}" >/dev/null || {
+    botctrl -a teleport -n "${BOT}" -l "${LOC}"
+  }
+fi
+[ "${UUID}" ] && {
+  sleep 10
+  botctrl -a sit -n "${BOT}" -u ${UUID}
+}

@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# bot2barstool - send a bot to the beach bar to sit on one of the bar stools
+#
+# Usage: bot2barstool <bot name>
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+[ "$1" ] || {
+  echo "Usage: bot2bar <bot name>"
+  exit 1
+}
+
+bot="$*"
+
+case "${bot}" in
+  Anya*|anya*)
+    # Check if Bot is online and if not, login
+    botctrl -a status -n Anya | jq -r '.status' | grep -i online >/dev/null || {
+      botctrl -a login -n Anya -l beach
+      sleep 10
+    }
+    botctrl -a stand -n Anya >/dev/null 2>&1
+    botctrl -a teleport -n Anya -l beach >/dev/null 2>&1
+    sleep 5
+    botctrl -a sit -n Anya -u slstool
+    ;;
+  Angel*|angel*)
+    # Check if online
+    botctrl -a status -c Easy | grep Angel >/dev/null || {
+      botctrl -a status -c Angel | grep Angel >/dev/null || {
+        echo "Angelus does not appear to be online"
+        exit 1
+      }
+    }
+    botctrl -a stand -c Angel >/dev/null 2>&1
+    sleep 1
+    botctrl -a teleport -c Angel -l beach >/dev/null 2>&1
+    sleep 5
+    botctrl -a sit -c Angel -u slstool
+    ;;
+  Easy*|easy*)
+    # Check if online
+    botctrl -a status -c Angel | grep Easy >/dev/null || {
+      botctrl -a status -c Easy | grep Easy >/dev/null || {
+        echo "Easy does not appear to be online"
+        exit 1
+      }
+    }
+    botctrl -a stand -c Easy >/dev/null 2>&1
+    sleep 1
+    botctrl -a teleport -c Easy -l beach >/dev/null 2>&1
+    sleep 5
+    botctrl -a sit -c Easy -u slstool
+    ;;
+esac

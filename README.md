@@ -14,11 +14,11 @@ the official product of either. The official `LifeBots` site can be found at
 
 - [Repository Contents](#repository-contents)
 - [LifeBots Control Panel](#lifebots-control-panel)
-- [LifeBots Command Line](#lifebots-command-line)
+- [BotControl Command Line](#botcontrol-command-line)
 - [Corrade](#corrade)
-- [Corrade Setup for use with the LifeBots Command Line tools](#corrade-setup-for-use-with-the-lifebots-command-line-tools)
+- [Corrade Setup for use with the BotControl Command Line tools](#corrade-setup-for-use-with-the-botcontrol-command-line-tools)
   - [Nginx Reverse Proxy](#nginx-reverse-proxy)
-  - [LifeBots Configuration for use with Corrade](#lifebots-configuration-for-use-with-corrade)
+  - [BotControl Configuration for use with Corrade](#botcontrol-configuration-for-use-with-corrade)
   - [Security Notes](#security-notes)
 - [Corrade HUD](#corrade-hud)
 
@@ -26,11 +26,12 @@ the official product of either. The official `LifeBots` site can be found at
 
 - `Avatars`: Specifications for free male and female avatars
 - `bin`: Convenience scripts to manage Corrade services on the server-side
+- `BotControl`: The BotControl command line management system for LifeBots and Corrade bots
 - `etc`: Corrade, Nginx, and Shoutcast configuration and systemd units
 - `Evade_Region_Restart`: Script and configuration notecard to evade region restarts
 - `Examples`: Some simple examples of how to use the Corrade system
 - `HUD`: The Corrade HUD, control bots in-world with this heads-up display
-- `LifeBots`: The lifebot command line management system for LifeBots and Corrade bots
+- `LifeBots`: Configuration, examples, and doc for use with the LifeBots system
 - `Masters`: Script and configuration notecard to extend some privileges to the Corrade bot owner
 - `Pay2Play`: WDC Tipjar settings examples
 - `Select_Dialog_Option`: A dialog menu selector for the Corrade bot
@@ -45,27 +46,27 @@ See the
 [LifeBots Control Panel repository](https://github.com/missyrestless/LifeBotsControlPanel)
 for details on the in-world LSL bridge for `LifeBots`.
 
-## LifeBots Command Line
+## BotControl Command Line
 
-**NEW** The `lifebot` command now supports management of both `LifeBots` and `Corrade` bots.
+**NEW** The `botctrl` command now supports management of both `LifeBots` and `Corrade` bots.
 To manage a `Corrade` bot simply replace the `-n <bot name or alias>` command line argument
 with `-c <bot name or alias>`.
 
-The `LifeBots Command Line` is a suite of tools that enable control and management of
+The `BotControl Command Line` is a suite of tools that enable control and management of
 [LifeBots](https://lifebots.cloud) and [Corrade](https://grimore.org/secondlife/scripted_agents/corrade)
 bots via the Unix/Linux command line. These tools are executed in a terminal using the Bash shell
 and standard Linux utilities.
 
-The primary command line tool is the `lifebot` Bash script which acts as a front-end
+The primary command line tool is the `botctrl` Bash script which acts as a front-end
 for `LifeBots` and `Corrade` API requests.
 
 For those power users who wish to automate their `LifeBots` or `Corrade` bots using
-the command line and tools such as `cron` and `jq` the `lifebot` command and associated
-utilities found here may provide additional power and flexibility. The `LifeBots` command
+the command line and tools such as `cron` and `jq` the `botctrl` command and associated
+utilities found here may provide additional power and flexibility. The `BotControl` command
 line management system is open source and free to download, deploy, modify, and distribute.
 
-See the [LifeBots README](https://github.com/missyrestless/Bots/tree/main/LifeBots#readme)
-for details on the LifeBots Command Line.
+See the [BotControl README](https://github.com/missyrestless/Bots/tree/main/BotControl#readme)
+for details on the BotControl Command Line.
 
 ## Corrade
 
@@ -90,9 +91,9 @@ license found at:
 
 https://grimore.org/secondlife/scripted_agents/corrade/projects/in_world
 
-## Corrade Setup for use with the LifeBots Command Line tools
+## Corrade Setup for use with the BotControl Command Line tools
 
-In order to use the `lifebot` command to manage your `Corrade` bot(s):
+In order to use the `botctrl` command to manage your `Corrade` bot(s):
 
 - The HTTP server must be enabled in the `Corrade` configuration
 - `ScriptLanguage` must be set to `JSON` in the `Corrade` configuration
@@ -145,10 +146,10 @@ Here is an example `Nginx` configuration snippet acting as a reverse proxy for 2
     }
 ```
 
-### LifeBots Configuration for use with Corrade
+### BotControl Configuration for use with Corrade
 
 ```bash
-# Corrade command control via LifeBots
+# Corrade command control via BotControl
 export CORRADE_GROUP="<your-corrade-bot-group-name>"
 export CORRADE_PASSW="<your-corrade-bot-group-password"
 export CORRADE_URL="<your-corrade-http-url>"
@@ -166,11 +167,11 @@ reverse proxy for your API requests. Without encryption you are sending the grou
 over the network in plain text. Anyone with your bot's group name and group password can
 control your bot via the API.
 
-The bot's group name and password is also configured in the LifeBots Command configuration
-file `~/.lifebots`. Protect this file by making it readable by owner only:
+The bot's group name and password is also configured in the BotControl Command configuration
+file `~/.botctrl`. Protect this file by making it readable by owner only:
 
 ```bash
-chmod 600 ~/.lifebots
+chmod 600 ~/.botctrl
 ```
 
 ## Corrade HUD

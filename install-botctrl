@@ -1,0 +1,99 @@
+#!/bin/bash
+
+if [[ $EUID -eq 0 ]]
+then
+  SUDO=
+else
+  SUDO=sudo
+fi
+
+SCRIPT_PATH="$(
+  cd "$(dirname "$0")"
+  pwd -P
+)"
+have_real=$(type -p realpath)
+[ "${have_real}" ] && SCRIPT_PATH="$(realpath $SCRIPT_PATH)"
+
+have_git=$(type -p git)
+
+cd "${SCRIPT_PATH}"
+[ -f BotControl/botctrl ] || {
+  if [ -d Bots ]; then
+    if [ -x Bots/install-botctrl ]; then
+      exec Bots/install-botctrl
+      exit 0
+    else
+      echo "ERROR: cannot locate BotControl/botctrl. Exiting."
+      exit 1
+    fi
+  else
+    if [ "${have_git}" ]; then
+      git clone https://github.com/missyrestless/Bots.git
+      exec Bots/install-botctrl
+      exit 0
+    else
+      echo "ERROR: cannot locate BotControl/botctrl or git. Exiting."
+      exit 1
+    fi
+  fi
+}
+
+[ -d /usr/local/bin ] || ${SUDO} mkdir -p /usr/local/bin
+
+${SUDO} cp BotControl/botctrl /usr/local/bin/botctrl
+${SUDO} chmod 755 /usr/local/bin/botctrl
+${SUDO} rm -f /usr/local/bin/lifebot
+${SUDO} ln -s /usr/local/bin/botctrl /usr/local/bin/lifebot
+${SUDO} rm -f /usr/local/bin/corrade
+${SUDO} ln -s /usr/local/bin/botctrl /usr/local/bin/corrade
+
+MANDIR="${HOME}/.local/share/man"
+for manpage in BotControl/man/*/*
+do
+  [ "${manpage}" == "BotControl/man/*/*" ] && continue
+  dtmp=$(dirname "${manpage}")
+  dirm=$(basename "${dtmp}")
+  [ -d "${MANDIR}/${dirm}" ] || mkdir -p "${MANDIR}/${dirm}"
+  cp ${manpage} "${MANDIR}/${dirm}"
+done
+[ -f "${MANDIR}/${dirm}/botctrl.1" ] && {
+  rm -f "${MANDIR}/${dirm}/lifebot.1"
+  ln -s "${MANDIR}/${dirm}/botctrl.1" "${MANDIR}/${dirm}/lifebot.1"
+  rm -f "${MANDIR}/${dirm}/corrade.1"
+  ln -s "${MANDIR}/${dirm}/botctrl.1" "${MANDIR}/${dirm}/corrade.1"
+}
+
+[ -d BotControl/bin ] || {
+  echo "ERROR: cannot locate BotControl/bin/"
+}
+
+user=$(id -u)
+group=$(id -g)
+[ -d /usr/local/BotControl/log ] || ${SUDO} mkdir -p /usr/local/BotControl/log
+${SUDO} touch /usr/local/BotControl/log/cron.log
+${SUDO} chown -R ${user}:${group} /usr/local/BotControl/log
+
+for lbb in BotControl/bin/*
+do
+  [ -d "${lbb}" ] && continue
+  [ "${lbb}" == "BotControl/bin/*" ] && continue
+  bas=$(basename "${lbb}")
+  ${SUDO} cp "${lbb}" /usr/local/BotControl
+  ${SUDO} chmod 755 /usr/local/BotControl/${bas}
+done
+for scr in /usr/local/BotControl/*
+do
+  [ -d "${scr}" ] && continue
+  [ "${scr}" == "/usr/local/BotControl/*" ] && continue
+  bas=$(basename "${scr}")
+  ${SUDO} rm -f /usr/local/bin/${bas}
+  ${SUDO} ln -s ${scr} /usr/local/bin/${bas}
+done
+
+printf "\n\nInstallation of the botctrl command and associated scripts is complete.\n"
+printf "\nAdd /usr/local/bin to your execution PATH if it is not already included.\n"
+printf "\nConfigure botctrl by adding and editing the file ${HOME}/.botctrl"
+printf "\n\tSee ${SCRIPT_PATH}/BotControl/example_dot_botctrl"
+printf "\n\tfor a template to use for this file.\n"
+printf "\nSee ${SCRIPT_PATH}/BotControl/crontab.in"
+printf "\nfor example crontab entries to schedule bot activities.\n\n"

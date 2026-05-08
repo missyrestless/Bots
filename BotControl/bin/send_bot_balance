@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+#
+# send_bot_balance - get the bot's balance and send it to myself
+#
+# Usage: send_bot_balance [-A] [-n bot_name] [-N recipient_name] [-u uuid]
+
+# Set this to your Second Life avatar name
+DEF_SL_NAME="Missy Restless"
+# Set this to your bot's name
+DEF_BOT_NAME="Easy"
+# Set this to all your bots names or their aliases, for use with -A
+ALL_LB_BOTS="Anya"
+ALL_CO_BOTS="Angel Easy"
+ALL_BOTS="${ALL_LB_BOTS} ${ALL_CO_BOTS}"
+CORRADE=
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: send_bot_balance [-A] [-d] [-n bot_name] [-N recipient_name]\n\n"
+  printf "\nWhere:"
+  printf "\n\t-A indicates all bots [All Bots: ${ALL_BOTS}]"
+  printf "\n\t-d indicates debug mode, no payment [default: false]"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT_NAME}]"
+  printf "\n\t-N recipient_name specifies the payment recipient [default: ${DEF_SL_NAME}]\n\n"
+  exit 1
+}
+
+send_balance() {
+  local bot_type="$1"
+  local bot_arg="-n"
+  local BALANCE=0
+
+  CORRADE=
+  if [ "${bot_type}" == "-c" ]; then
+    bot_arg="-c"
+    CORRADE=1
+  else
+    if [ "${bot_type}" == "-l" ]; then
+      bot_arg="-n"
+      CORRADE=
+    else
+      echo "${ALL_LB_BOTS}" | grep "${BOT_NAME}" >/dev/null || {
+        bot_arg="-c"
+        CORRADE=1
+        echo "${ALL_CO_BOTS}" | grep "${BOT_NAME}" >/dev/null || {
+          echo "Unable to determine bot type. Unknown bot."
+          exit 1
+        }
+      }
+    fi
+  fi
+  # Get the bot's balance
+  [ "${debug}" ] && {
+    echo "Getting bot balance with:"
+    if [ "${CORRADE}" ]; then
+      echo "botctrl -a balance ${bot_arg} \"${BOT_NAME}\" | jq -r '.data[0]'"
+    else
+      echo "botctrl -a balance ${bot_arg} \"${BOT_NAME}\" | jq -r '.balance'"
+    fi
+  }
+  if [ "${CORRADE}" ]; then
+    BALANCE=$(botctrl -a balance ${bot_arg} "${BOT_NAME}" | jq -r '.data[0]')
+  else
+    BALANCE=$(botctrl -a balance ${bot_arg} "${BOT_NAME}" | jq -r '.balance')
+  fi
+  [ "${BALANCE}" ] || {
+    echo "ERROR: cannot get bot ${BOT_NAME} balance"
+    exit 1
+  }
+
+  # Send balance if it is greater than 0
+  [ "${debug}" ] && echo "Balance = ${BALANCE}"
+  [ ${BALANCE} -gt 0 ] && {
+    [ "${debug}" ] && {
+      echo "Sending bot balance to ${SL_NAME} with:"
+      echo "botctrl -a give_money ${bot_arg} \"${BOT_NAME}\" -A \"${SL_UUID}\" -z ${BALANCE} ${debug}"
+    }
+    botctrl -a give_money ${bot_arg} "${BOT_NAME}" -A "${SL_UUID}" -z ${BALANCE} ${debug}
+  }
+}
+
+BOT_NAME= SL_NAME=
+allbots=
+debug=
+while getopts ":Adn:N:h" flag; do
+  case $flag in
+    A)
+      allbots=1
+      ;;
+    d)
+      debug="-d"
+      ;;
+    n)
+      BOT_NAME="$OPTARG"
+      ;;
+    N)
+      SL_NAME="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[ "${BOT_NAME}" ] || BOT_NAME="${DEF_BOT_NAME}"
+[ "${SL_NAME}" ] || SL_NAME="${DEF_SL_NAME}"
+
+CORRADE=
+echo "${ALL_LB_BOTS}" | grep "${BOT_NAME}" >/dev/null || {
+  CORRADE=1
+  echo "${ALL_CO_BOTS}" | grep "${BOT_NAME}" >/dev/null || {
+    echo "Unable to determine bot type. Unknown bot."
+    exit 1
+  }
+}
+
+if [ "${CORRADE}" ]; then
+  SL_UUID=$(botctrl -a name2key -c "${BOT_NAME}" -N "${SL_NAME}" | jq -r '.data[1]')
+else
+  SL_UUID=$(botctrl -a name2key -n "${BOT_NAME}" -N "${SL_NAME}" | jq -r '.key') 
+fi
+[ "${SL_UUID}" ] || {
+  echo "ERROR: cannot get UUID for Second Life avatar name ${SL_NAME}"
+  exit 1
+}
+
+if [ "${allbots}" ]; then
+  [ "${ALL_LB_BOTS}" ] && {
+    for bot in ${ALL_LB_BOTS}
+    do
+      BOT_NAME="${bot}"
+      [ "${BOT_NAME}" ] || {
+        echo "ERROR: empty bot name"
+        exit 1
+      }
+      send_balance -l
+    done
+  }
+  [ "${ALL_CO_BOTS}" ] && {
+    for bot in ${ALL_CO_BOTS}
+    do
+      BOT_NAME="${bot}"
+      [ "${BOT_NAME}" ] || {
+        echo "ERROR: empty bot name"
+        exit 1
+      }
+      send_balance -c
+    done
+  }
+else
+  [ "${BOT_NAME}" ] || {
+    echo "ERROR: empty bot name"
+    exit 1
+  }
+  send_balance
+fi

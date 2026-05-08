@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Bots are online and if not, login
+needsleep=
+#for bot in Angel Anya Easy
+for bot in Anya
+do
+  botctrl -a stand -n ${bot} >/dev/null 2>&1
+  sleep 1
+  botctrl -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
+    botctrl -a login -n ${bot} -l club
+    needsleep=1
+  }
+done
+[ "${needsleep}" ] && sleep 10
+
+# Send Angelus to his dance pole
+botctrl -a stand -c Angel >/dev/null 2>&1
+sleep 1
+botctrl -a teleport -c Angel -l club
+sleep 5
+botctrl -a sit -c Angel -u rpole
+
+# Send Anya to her dance pole
+botctrl -a teleport -n Anya -l club
+sleep 5
+botctrl -a sit -n Anya -u lpole
+
+# Send Easy to her dance pole
+botctrl -a stand -c Easy >/dev/null 2>&1
+sleep 1
+botctrl -a teleport -c Easy -l club
+sleep 5
+botctrl -a sit -c Easy -u dancepole

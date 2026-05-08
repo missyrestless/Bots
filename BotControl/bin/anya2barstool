@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Bot is online and if not, login
+botctrl -a status -n Anya | jq -r '.status' | grep -i online >/dev/null || {
+  botctrl -a login -n Anya -l beach
+  sleep 10
+}
+
+botctrl -a stand -n Anya >/dev/null 2>&1
+botctrl -a teleport -n Anya -l beach >/dev/null 2>&1
+sleep 5
+botctrl -a sit -n Anya -u slstool

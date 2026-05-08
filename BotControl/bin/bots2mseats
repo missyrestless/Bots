@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+# bots2mseats - send the bots to the media sphere and sit in theater seating
+#               without arguments send all bots
+#               arguments can specify which bots
+
+# Aliases for the bots that are going to sit
+CBOTS="Angel Easy"
+LBOTS="Anya"
+# Set to region where your bots need to be
+REGION="Brightbrook Isle"
+# Set to object UUID to touch or sit
+UUID="mseats"
+# Set to action, sit or touch object
+ACTION="sit"
+# Set to location, a Slurl or a Slurl alias
+LOC="media"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+# Check if Bots are online and if not, login
+needsleep=
+for bot in ${LBOTS}
+do
+  botctrl -a status -n ${bot} | jq -r '.status' | grep -i online >/dev/null || {
+    botctrl -a login -n ${bot} -l "${LOC}"
+    needsleep=1
+  }
+done
+[ "${needsleep}" ] && sleep 20
+
+# Send all Bots to the media sphere and sit
+needsleep=
+for bot in ${LBOTS}
+do
+  botctrl -a stand -n ${bot} >/dev/null 2>&1
+  sleep 1
+  botctrl -a status -n ${bot} | jq -r '.location' | grep "${REGION}" >/dev/null || {
+    botctrl -a teleport -n ${bot} -l "${LOC}"
+    needsleep=1
+  }
+done
+[ "${needsleep}" ] && sleep 10
+
+# Sit or Touch the object
+for bot in ${LBOTS}
+do
+  botctrl -a ${ACTION} -n ${bot} -u ${UUID}
+done
+
+for bot in ${CBOTS}
+do
+  # Check if online
+  if [ "${bot}" == "Angel" ]; then
+    use="Easy"
+  else
+    use="Angel"
+  fi
+  botctrl -a status -c ${use} | grep ${bot} >/dev/null || {
+    botctrl -a status -c ${bot} | grep ${bot} >/dev/null || {
+      echo "${bot} does not appear to be online"
+      continue
+    }
+  }
+
+  botctrl -a stand -c ${bot} >/dev/null 2>&1
+  sleep 1
+  botctrl -a teleport -c ${bot} -l "${LOC}" >/dev/null 2>&1
+  sleep 5
+  botctrl -a ${ACTION} -c ${bot} -u ${UUID}
+done

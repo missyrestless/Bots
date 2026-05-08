@@ -1,0 +1,51 @@
+Usage: botctrl [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k apikey] [-C channel]
+  [-c corrade] [-F filter] [-M message] [-N name] [-O name] [-S subject] [-s secret] [-T text] [-u uuid] [-z num]
+Where:
+	-a action specifies the API action (sit, teleport, login, ...)
+	-l location specifies a location for login and teleport actions
+		Default: Last location, teleport action requires a Slurl location
+	-n name specifies a Bot name, Default: Easy Islay
+	-k apikey specifies an API Key, use environment instead
+	-A avatar specifies an avatar UUID for use with giving money or objects
+	-C channel specifies the channel for a message [default: 0]
+	-c corrade specifies a Corrade bot name to act upon
+	-F filter specifies a filter to match when listing attachments
+	-M message specifies the message body for a group notice/im
+	-N name specifies the name of the recipient of an IM or landmark/notecard
+	-O name specifies an attachment object name or outfit name
+	-S subject specifies the subject for a group notice
+	-s secret specifies a Bot secret, use environment instead
+	-T text specifies the notecard text or dialog button text for reply to menus
+	-u uuid specifies a UUID for use with actions that require one (e.g. sit)
+	-z num specifies a hover height adjustment size [default: -0.05]
+		can also be used to specify a payment amount
+	-d indicates dryrun mode - tell me what you would do without doing anything
+	-e displays a list of supported commands and examples then exits
+	-i retrieves Bot details
+	-h displays this usage message and exits
+Environment:
+  Entries in ~/.botctrl can be LB_API_KEY, LB_SECRET, or entries
+  of the form LB_SECRET_BOT_NAME in order to support multiple bots
+  Entries can specify a Slurl alias. For example:
+    export SLURL_club='http://maps.secondlife.com/secondlife/Scylla/226/32/78'
+  A Slurl alias can be used with the -l command line argument, e.g. -l club
+  Entries can also specify a UUID alias. For example:
+    export UUID_Mover='xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb'
+  A UUID alias can be used with the -u command line argument, e.g. -u Mover
+Examples:
+  botctrl  # Displays the status of the default Bot
+  botctrl -a login -l Home # Default Bot login to Home location
+  botctrl -a touch_prim -n 'Jane Doe' -u Mover # Jane Doe bot touch object with aliased UUID
+  botctrl -a stand -n Jane -c John # Jane bot sends the stand command to Corrade bot John
+  botctrl -a teleport -l club  # Uses a 'club' location alias defined in .botctrl
+Supported Actions
+Supported LifeBots actions:
+  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, notecard_create,
+  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,
+  rebake, touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,
+  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object
+Supported Corrade actions:
+  attach, batchavatarkeytoname, batchavatarnametokey, changeappearance, createlandmark,
+  createnotecard, detach, fly, flyto, getattachments, getattachmentspath, getmembersonline,
+  inventory cwd, inventory list current outfit, inventory list outfits, pay avatar,
+  pay object, sit, stand, teleport, touch, unwear, walkto, wear

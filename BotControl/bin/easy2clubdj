@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+# Run with -l argument to control Easy Islay as a LifeBots Bot
+# Default operation is to treat her like a Corrade bot
+if [ "$1" == "-l" ]; then
+  have_jq=$(type -p jq)
+  [ "${have_jq}" ] || {
+    echo "ERROR: cannot locate jq in PATH"
+    exit 1
+  }
+
+  # Check if Bot is online and if not, login
+  botctrl -a status -n Easy | jq -r '.status' | grep -i online >/dev/null || {
+    botctrl -a login -n Easy -l club
+    sleep 10
+  }
+
+  botctrl -a stand -n Easy >/dev/null 2>&1
+  botctrl -a teleport -n Easy -l club
+  sleep 5
+  botctrl -a sit -n Easy -u clubdj
+else
+  # Check if online
+  botctrl -a status -c Angel | grep 'Easy Islay' >/dev/null || {
+    # Maybe Angel is not online
+    botctrl -a status -c Easy | grep 'Easy Islay' >/dev/null || {
+      echo "Easy Islay does not appear to be online"
+      exit 1
+    }
+  }
+
+  botctrl -a stand -c Easy >/dev/null 2>&1
+  botctrl -a teleport -c Easy -l club >/dev/null 2>&1
+  sleep 5
+  botctrl -a wear_outfit -c Easy -O '** Legacy Basic Purple Top & Jeans **' >/dev/null 2>&1
+  sleep 5
+  botctrl -a sit -c Easy -u clubdj
+fi

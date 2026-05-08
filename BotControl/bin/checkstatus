@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+#
+# checkstatus - get status of a Corrade and LifeBots bots
+#
+# Usage: checkstatus [-n name]
+
+# Default bot
+DEF_BOT="Anya"
+# All bots
+ALL_CO_BOTS="Angel Easy"
+ALL_LB_BOTS="Anya"
+ALL_BOTS="${ALL_CO_BOTS} ${ALL_LB_BOTS}"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+
+usage() {
+  printf "\nUsage: checkstatus [-A] [-c|l] [-n name]\n\n"
+  printf "\nWhere:"
+  printf "\n\t-A indicates check status of all bots [All Bots: ${ALL_BOTS}]"
+  printf "\n\t-c indicates use Corrade API to perform check"
+  printf "\n\t-l indicates use LifeBots API to perform check"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]\n\n"
+  exit 1
+}
+
+check_co_bot() {
+  local slbot="$1"
+  # Check for Name alias in ~/.botctrl
+  local SL_NAME="${slbot}"
+  local botname=$(echo "${slbot}" | sed -e "s/ /_/g")
+  local envname="BOT_NAME_${botname}"
+  [ "${!envname}" ] && SL_NAME="${!envname}"
+  if botctrl -a status -c "${SL_NAME}" 2>&1 | grep 'parse error' >/dev/null; then
+    STATUS="OFFLINE"
+  else
+    STATUS="ONLINE"
+  fi
+  if [ "${have_jq}" ]; then
+    printf "\n{\n  \"action\": \"status\",\n  \"status\": \"${STATUS}\",\n  \"slname\": \"${SL_NAME}\"\n}\n" | jq -r .
+  else
+    printf '\n{'
+    printf '\n  "action": "status",'
+    printf "\n  \"status\": \"${STATUS}\","
+    printf "\n  \"slname\": \"${SL_NAME}\""
+    printf '\n}\n'
+  fi
+  sleep 2
+}
+
+BOT= allbots=1 corrade= lifebot=
+while getopts ":Acln:h" flag; do
+  case $flag in
+    A)
+      allbots=1
+      ;;
+    c)
+      corrade=1
+      ;;
+    l)
+      lifebot=1
+      ;;
+    n)
+      BOT="$OPTARG"
+      allbots=
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[ "${corrade}" ] && [ "${lifebot}" ] && {
+  echo "Only one of -c and -l can be specified. Exiting."
+  exit 1
+}
+[ "${BOT}" ] && {
+  [ "${corrade}" ] || [ "${lifebot}" ] || {
+    echo "One of -c or -l must be given when specifying bot name with -n name. Exiting."
+    exit 1
+  }
+}
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+
+[ -f ${HOME}/.botctrl ] && source ${HOME}/.botctrl
+
+if [ "${allbots}" ]; then
+  [ "${ALL_LB_BOTS}" ] && {
+    for bot in ${ALL_LB_BOTS}
+    do
+      if [ "${have_jq}" ]; then
+        botctrl -a status -n ${bot} | jq -r '{action: .action, status: .status, slname: .slname}'
+      else
+        botctrl -a status -n ${bot}
+      fi
+      sleep 2
+    done
+  }
+  [ "${ALL_CO_BOTS}" ] && {
+    for bot in ${ALL_CO_BOTS}
+    do
+      check_co_bot "${bot}"
+    done
+  }
+else
+  if [ "${corrade}" ]; then
+    check_co_bot "${BOT}"
+  else
+    if [ "${have_jq}" ]; then
+      botctrl -a status -n ${BOT} | jq -r '{action: .action, status: .status, slname: .slname}'
+    else
+      botctrl -a status -n ${BOT}
+    fi
+  fi
+fi

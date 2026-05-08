@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+#
+# bot2dj - send bot to the club and sit on the DJ booth
+#
+# Usage: bot2dj [-n name] [-l location] [-u uuid]
+
+# Default DJ bot
+DEF_BOT="Easy"
+# Default location
+DEF_LOC="club"
+# Default sit uuid
+DEF_UUID="clubdj"
+
+export PATH="/usr/local/bin:${PATH}"
+[ -d /opt/homebrew/bin ] && {
+  export PATH="/opt/homebrew/bin:${PATH}"
+}
+
+have_lb=$(type -p botctrl)
+[ "${have_lb}" ] || {
+  echo "ERROR: cannot locate botctrl in PATH"
+  exit 1
+}
+
+have_jq=$(type -p jq)
+[ "${have_jq}" ] || {
+  echo "ERROR: cannot locate jq in PATH"
+  exit 1
+}
+
+usage() {
+  printf "\nUsage: bot2dj [-n name] [-l location] [-u uuid]"
+  printf "\nWhere:"
+  printf "\n\t-n name specifies the BOT name [default: ${DEF_BOT}]"
+  printf "\n\t-l location specifies the location to teleport [default: ${DEF_LOC}]"
+  printf "\n\t-u uuid specifies the UUID of object to sit on [default: ${DEF_UUID}]\n\n"
+  exit 1
+}
+
+BOT= LOC= UUID=
+while getopts ":n:l:u:h" flag; do
+  case $flag in
+    n)
+      BOT="$OPTARG"
+      ;;
+    l)
+      LOC="$OPTARG"
+      ;;
+    u)
+      UUID="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: $flag"
+      usage
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[ "${BOT}" ] || BOT="${DEF_BOT}"
+[ "${LOC}" ] || LOC="${DEF_LOC}"
+[ "${UUID}" ] || UUID="${DEF_UUID}"
+
+case "${BOT}" in
+  Anya*|anya*)
+    # Check if Bot is online and if not, login
+    botctrl -a status -n Anya | jq -r '.status' | grep -i online >/dev/null || {
+      botctrl -a login -n Anya -l ${LOC}
+      sleep 10
+    }
+    botctrl -a stand -n Anya >/dev/null 2>&1
+    botctrl -a teleport -n Anya -l ${LOC} >/dev/null 2>&1
+    sleep 5
+    botctrl -a sit -n Anya -u ${UUID}
+    ;;
+  Angel*|angel*)
+    # Check if online
+    botctrl -a status -c Easy | grep Angel >/dev/null || {
+      botctrl -a status -c Angel | grep Angel >/dev/null || {
+        echo "Angelus does not appear to be online"
+        exit 1
+      }
+    }
+    botctrl -a stand -c Angel >/dev/null 2>&1
+    sleep 1
+    botctrl -a teleport -c Angel -l ${LOC} >/dev/null 2>&1
+    sleep 5
+    botctrl -a sit -c Angel -u ${UUID}
+    ;;
+  Easy*|easy*)
+    # Check if online
+    botctrl -a status -c Angel | grep Easy >/dev/null || {
+      botctrl -a status -c Easy | grep Easy >/dev/null || {
+        echo "Easy does not appear to be online"
+        exit 1
+      }
+    }
+    botctrl -a stand -c Easy >/dev/null 2>&1
+    sleep 1
+    botctrl -a teleport -c Easy -l ${LOC} >/dev/null 2>&1
+    sleep 5
+    botctrl -a sit -c Easy -u ${UUID}
+    ;;
+esac

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [[ $EUID -eq 0 ]]
+then
+  SUDO=
+else
+  SUDO=sudo
+fi
+
+SCRIPT_PATH="$(
+  cd "$(dirname "$0")"
+  pwd -P
+)"
+have_real=$(type -p realpath)
+[ "${have_real}" ] && SCRIPT_PATH="$(realpath $SCRIPT_PATH)"
+
+${SUDO} rm -f /usr/local/bin/corrade
+${SUDO} rm -f /usr/local/bin/lifebot
+${SUDO} rm -f /usr/local/bin/botctrl
+
+MANDIR="${HOME}/.local/share/man"
+for manpage in corrade lifebot botctrl
+do
+  rm -f "${MANDIR}/${dirm}/${manpage}.1"
+done
+
+for scr in /usr/local/BotControl/*
+do
+  [ -d "${scr}" ] && continue
+  [ "${scr}" == "/usr/local/BotControl/*" ] && continue
+  bas=$(basename "${scr}")
+  ${SUDO} rm -f /usr/local/bin/${bas}
+done
+${SUDO} rm -rf /usr/local/BotControl
+
+printf "\n\nRemoval of the botctrl command and associated scripts is complete.\n\n"

@@ -1,0 +1,73 @@
+#!/bin/bash
+
+usage() {
+    printf "\nUsage: mkrelease [-c] [-d] [-p] [-u]"
+    printf "\nWhere:"
+    printf "\n\t-c indicates clean first"
+    printf "\n\t-d indicates create draft release"
+    printf "\n\t-p indicates skip package creation step"
+    printf "\n\t-u displays this usage message and exits\n"
+    exit 1
+}
+
+CLEAN=
+DRAFT=
+PACKAGE=1
+BRANCH="main"
+while getopts "b:cdpu" flag; do
+    case $flag in
+        b)
+            BRANCH="${OPTARG}"
+            ;;
+        c)
+            CLEAN=1
+            ;;
+        d)
+            DRAFT="--draft"
+            ;;
+        p)
+            PACKAGE=
+            ;;
+        u)
+            usage
+            ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+
+if [ -f BotControl/VERSION ]; then
+  source BotControl/VERSION
+else
+  echo "ERROR: missing BotControl/VERSION"
+  exit 1
+fi
+
+ANNO="BotControl release, version ${VERSION}"
+
+if [ -f ${HOME}/.mrprivate ]; then
+  source ${HOME}/.mrprivate
+else
+  echo "ERROR: Could not locate ${HOME}/.mrprivate"
+  exit 1
+fi
+
+tar cf - install-botctrl \
+         BotControl/bin \
+         BotControl/crontab.in \
+         BotControl/LICENSE \
+         BotControl/botctrl \
+         BotControl/man \
+         BotControl/markdown \
+         BotControl/usage.txt \
+         BotControl/viewman \
+         BotControl/VERSION | gzip -9 > botctrl-${VERSION}.tar.gz
+
+gh release create v${VERSION} ${DRAFT} \
+                  --title "${ANNO}" \
+                  --target "${BRANCH}" \
+                  --notes-file Release_Notes_Botctrl.md \
+                  install-botctrl \
+                  botctrl-${VERSION}.tar.gz
+
+git fetch --tags origin
+rm -f botctrl-${VERSION}.tar.gz

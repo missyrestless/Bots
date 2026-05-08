@@ -1,0 +1,62 @@
+# BotControl configuration file for use with the botctrl command line script
+#
+# Configure API credentials for each bot and copy the file to ${HOME}/.botctrl
+# For security make the file accessible by owner only:
+#   chmod 600 ${HOME}/.botctrl
+#
+# LifeBots Developer API Key
+export LB_API_KEY='your-api-key'
+export LB_SECRET='your-bot-secret'  # Also referred to in the doc as an access code
+
+# If you have more than one bot you can set each bot's secret like this
+export LB_SECRET_BOT1_NAME='your-first-bot-secret'
+export LB_SECRET_BOT2_NAME='your-second-bot-secret'
+export LB_SECRET_BOT3_NAME='your-third-bot-secret'
+# Replace spaces in the Bot's name with "_"
+# For example, if the Bot's name is "John Doe" then the entry would be:
+export LB_SECRET_John_Doe='john-doe-bot-secret'
+
+# Default Bot Name and ID
+export LB_BOT_NAME='your-default-bot-name'
+# LifeBots Bot ID
+export LB_BOT_ID_Bot_Name='lifebots-bot-id'
+# Second Life Bot ID
+export SL_BOT_ID_Bot_Name='secondlife-bot-id'
+# Login siton UUID
+export LOGIN_SITON_Bot_Name="uuid-of-siton-object"
+
+# OAuth Applications
+# If you have configured OAuth applications then the client id and secret can be set here
+export LB_CLIENT_ID_app_name='your-oauth-app-client-id'
+export LB_CLIENT_SECRET_app_name='your-oauth-app-client-secret'
+
+# The following optional convenience entries are supported to allow
+# specifying an alias on the command line rather than a SLURL or UUID
+# All configured aliases can be listed with the command "botctrl -a alias"
+#
+## Bot name aliases for use with the "-n name" command line option
+export BOT_NAME_bot1="Bot1 Name"
+export BOT_NAME_bot2="Bot2 Name"
+export BOT_NAME_bot3="Bot3 Name"
+
+## Slurl aliases for use with the "-l location" command line option
+# SLURL aliases can be set for use with the location option, -l location
+# For example, the following 2 SLURL aliases could be used with -l beach or -l club
+# to teleport the bot to the beach or the club specified in these SLURLs
+export SLURL_beach="http://maps.secondlife.com/secondlife/BEACH_REGION_NAME/X/Y/Z"
+# Urlencode spaces in the region name by using %20 instead of space
+export SLURL_club="http://maps.secondlife.com/secondlife/CLUB_REGION%20NAME/X/Y/Z"
+
+## UUID aliases for use with the "-u uuid" command line option
+# UUID aliases can be set for use with the UUID option, -u uuid
+# For example, the following UUID aliases could be used with -u dancepole
+# or -u couch to seat the bot on the specified object
+export UUID_dancepole="dance-pole-object-uuid"
+export UUID_couch="couch-object-uuid"
+
+# Corrade command control via BotControl
+export CORRADE_GROUP="<your-corrade-bot-group-name>"
+export CORRADE_PASSW="<your-corrade-bot-group-password>"
+export CORRADE_URL="https://your.corrade.server"
+export API_URL_bot1_name="${CORRADE_URL}/bot1/"
+export API_URL_bot2_name="${CORRADE_URL}/bot2/"
