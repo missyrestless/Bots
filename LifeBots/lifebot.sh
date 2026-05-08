@@ -128,6 +128,48 @@ get_details() {
   fi
 }
 
+#SLURL_club=http://maps.secondlife.com/secondlife/Scylla/226/32/78
+#UUID_mmover=f11781d0-763f-52f9-4e23-3a2b97759fa2
+list_aliases() {
+  printf "\n${BOLD}${LINE}Slurl Aliases${NORM}\n"
+  if env | grep ^SLURL_ >/dev/null; then
+    env | grep ^SLURL_ | while read slurl
+    do
+      [ "${slurl}" ] && {
+        alias=$(echo "${slurl}" | awk -F '=' '{ print $1 }' | sed -e "s/SLURL_//")
+        url=$(echo "${slurl}" | awk -F '=' '{ print $2 }')
+        alen=${#alias}
+        if [ ${alen} -lt 5 ]; then
+          printf "\n${BOLD}${LINE}-l %s${NORM}\t\talias for: ${BOLD}${LINE}-l %s${NORM}" "${alias}" "${url}"
+        else
+          printf "\n${BOLD}${LINE}-l %s${NORM}\talias for: ${BOLD}${LINE}-l %s${NORM}" "${alias}" "${url}"
+        fi
+      }
+    done
+  else
+    printf "\nNo Slurl aliases defined in ${HOME}/.lifebots"
+  fi
+  printf "\n\n${BOLD}${LINE}UUID Aliases${NORM}\n"
+  if env | grep ^UUID_ >/dev/null; then
+    env | grep ^UUID_ | while read uuid
+    do
+      [ "${uuid}" ] && {
+        alias=$(echo "${uuid}" | awk -F '=' '{ print $1 }' | sed -e "s/UUID_//")
+        uid=$(echo "${uuid}" | awk -F '=' '{ print $2 }')
+        alen=${#alias}
+        if [ ${alen} -lt 5 ]; then
+          printf "\n${BOLD}${LINE}-u %s${NORM}\t\talias for: ${BOLD}${LINE}-u %s${NORM}" "${alias}" "${uid}"
+        else
+          printf "\n${BOLD}${LINE}-u %s${NORM}\talias for: ${BOLD}${LINE}-u %s${NORM}" "${alias}" "${uid}"
+        fi
+      }
+    done
+  else
+    printf "\nNo UUID aliases defined in ${HOME}/.lifebots"
+  fi
+  echo ""
+}
+
 send_request() {
   local act="$1"
   [ "${act}" ] || {
@@ -394,6 +436,9 @@ case "${ACTION}" in
     ;;
   listinventory|Listinventory|inventory)
     send_request "listinventory"
+    ;;
+  listalias*|Listalias*|alias*|Alias*)
+    list_aliases
     ;;
   login|Login)
     send_request "login"
