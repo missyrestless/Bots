@@ -372,6 +372,9 @@ send_corrade_request() {
   cgroup=$(wasURLEscape "${CORRADE_GROUP}")
   cpassw=$(wasURLEscape "${CORRADE_PASSW}")
   case "${cmd}" in
+    listinventory)
+      COMMAND="command=inventory&group=${cgroup}&password=${cpassw}&action=ls"
+      ;;
     sit|touch*)
       if [ "${UUID}" ]; then
         cuuid=$(wasURLEscape "${UUID}")
@@ -399,6 +402,12 @@ send_corrade_request() {
       local region=$(wasURLEscape "${REGION}")
       local position=$(wasURLEscape "<${POS}>")
       COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&entity=region&region=${region}&position=${position}"
+      ;;
+    walk*)
+      local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
+      local POS=$(echo "${loc}" | awk -F '/' -v OFS=',' '{ print $2, $3, $4 }')
+      local position=$(wasURLEscape "<${POS}>")
+      COMMAND="command=teleport&group=${cgroup}&password=${cpassw}&position=${position}"
       ;;
     *)
       COMMAND=
