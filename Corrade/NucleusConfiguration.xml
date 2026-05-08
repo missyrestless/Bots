@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE NucleusConfiguration [
+<!ATTLIST NucleusConfiguration xmlns:xsi CDATA #IMPLIED xsi:noNamespaceSchemaLocation CDATA #IMPLIED>
+]>
+<NucleusConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:corrade-nucleus-schema">
+    <Prefix>http://+:54378/</Prefix>
+    <Enabled>1</Enabled>
+    <CodeWord>redacted</CodeWord>
+</NucleusConfiguration>
