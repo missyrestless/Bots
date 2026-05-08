@@ -30,3 +30,5 @@ SHELL=/bin/bash
 0 21 * * 6 /bin/bash -lc /usr/local/LifeBots/bots2home >> /usr/local/LifeBots/log/cron.log 2>&1
 # Check every hour if Easy bot is at the club greeting visitors
 # 0 * * * * /bin/bash -lc /usr/local/LifeBots/checkbot >> /usr/local/LifeBots/log/cron.log 2>&1
+# Send the Easy Islay bot's L$ balance to myself on the 1st of every month
+# 0 0 1 * * /bin/bash -lc /usr/local/LifeBots/send_easy_balance >> /usr/local/LifeBots/log/easy.log 2>&1
