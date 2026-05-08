@@ -384,6 +384,50 @@ send_corrade_request() {
   cgroup="${CORRADE_GROUP}"
   cpassw="${CORRADE_PASSW}"
   case "${cmd}" in
+    fly|nofly)
+      local action="start"
+      [ "${cmd}" == "nofly" ] && action="stop"
+      COMMAND="{ \
+          \"command\": \"fly\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"action\": \"${action}\" }"
+      ;;
+    flyto|fly_to)
+      local POS=$(get_coords "${LOCATION}")
+      local position="<${POS}>"
+      COMMAND="{ \
+          \"command\": \"flyto\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"fly\": \"False\", \
+          \"position\": \"${position} + <0,0,5>\" }"
+      ;;
+    getattachments*)
+      local comm="getattachments"
+      echo "${cmd}" | grep attachmentspath >/dev/null && comm="getattachmentspath"
+      COMMAND="{ \
+          \"command\": \"${comm}\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\" }"
+      ;;
+    getcwd|cwd)
+      COMMAND="{ \
+          \"command\": \"inventory\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"action\": \"cwd\" }"
+      ;;
+    get_outfit*)
+      local path="/My Inventory/Current Outfit"
+      echo "${cmd}" | grep get_outfits >/dev/null && path="/My Inventory/My Outfits"
+      COMMAND="{ \
+          \"command\": \"inventory\", \
+          \"group\": \"${cgroup}\", \
+          \"password\": \"${cpassw}\", \
+          \"path\": \"${path}\", \
+          \"action\": \"ls\" }"
+      ;;
     listinventory)
       # If the Corrade configuration specifies WAS ScriptLanguage:
       # COMMAND="command=inventory&group=${cgroup}&password=${cpassw}&action=ls"
@@ -448,11 +492,8 @@ send_corrade_request() {
           \"position\": \"${position}\" }"
       ;;
     walk*)
-      # local loc=$(echo "${LOCATION}" | sed -e "s%http://maps.secondlife.com/secondlife/%%")
       local POS=$(get_coords "${LOCATION}")
-      # local position=$(wasURLEscape "<${POS}>")
       local position="<${POS}>"
-      #COMMAND="command=walkto&group=${cgroup}&password=${cpassw}&position=${position}"
       COMMAND="{ \
           \"command\": \"walkto\", \
           \"group\": \"${cgroup}\", \
@@ -1016,7 +1057,7 @@ shift $(( OPTIND - 1 ))
       [ "${have_jq}" ] && {
         # Avatar name can be provided, convert name to key
         SL_NAME="${AVATAR_UUID}"
-        AVATAR_UUID=$(send_request "name2key" | jq -r '.key')
+        AVATAR_UUID=$(send_request -l "name2key" | jq -r '.key')
       }
     }
   }
@@ -1477,11 +1518,15 @@ case "${ACTION}" in
     fi
     ;;
   *)
-    echo "Action '${ACTION}' not yet supported"
-    echo "Currently supported actions:"
-    echo "  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,"
-    echo "  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
-    echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
-    echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
+    if [ "${corrade}" ]; then
+      send_request "${ACTION}"
+    else
+      echo "Action '${ACTION}' not yet supported"
+      echo "Currently supported actions:"
+      echo "  login, logout, status, bot_location, walkto, sit, stand, teleport, listalias, key2name, rebake,"
+      echo "  avatar_picks, name2key, listinventory, im, reply_dialog, send_notice, send_group_im, attachments,"
+      echo "  touch_attachment, touch_prim, activate_group, wear, takeoff, say_chat_channel, set_hoverheight,"
+      echo "  get_outfit, get_outfits, wear_outfit, get_balance, give_inventory, give_money, give_money_object"
+    fi
     ;;
 esac
