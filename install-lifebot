@@ -43,9 +43,18 @@ cd "${SCRIPT_PATH}"
 ${SUDO} cp LifeBots/lifebot /usr/local/bin/lifebot
 ${SUDO} chmod 755 /usr/local/bin/lifebot
 
+MANDIR="${HOME}/.local/share/man"
+for manpage in LifeBots/man/*/*
+do
+  [ "${manpage}" == "LifeBots/man/*/*" ] && continue
+  dtmp=$(dirname "${manpage}")
+  dirm=$(basename "${dtmp}")
+  [ -d "${MANDIR}/${dirm}" ] || mkdir -p "${MANDIR}/${dirm}"
+  cp ${manpage} "${MANDIR}/${dirm}"
+done
+
 [ -d LifeBots/bin ] || {
-  echo "ERROR: cannot locate LifeBots/bin/. Exiting."
-  exit 1
+  echo "ERROR: cannot locate LifeBots/bin/"
 }
 
 user=$(id -u)
