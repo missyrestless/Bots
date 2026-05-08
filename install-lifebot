@@ -54,10 +54,17 @@ group=$(id -g)
 ${SUDO} touch /usr/local/LifeBots/log/cron.log
 ${SUDO} chown -R ${user}:${group} /usr/local/LifeBots/log
 
-${SUDO} cp LifeBots/bin/* /usr/local/LifeBots
-${SUDO} chmod 755 /usr/local/LifeBots/*
+for lbb in LifeBots/bin/*
+do
+  [ -d "${lbb}" ] && continue
+  [ "${lbb}" == "LifeBots/bin/*" ] && continue
+  bas=$(basename "${lbb}")
+  ${SUDO} cp "${lbb}" /usr/local/LifeBots
+  ${SUDO} chmod 755 /usr/local/LifeBots/${bas}
+done
 for scr in /usr/local/LifeBots/*
 do
+  [ -d "${scr}" ] && continue
   [ "${scr}" == "/usr/local/LifeBots/*" ] && continue
   bas=$(basename "${scr}")
   ${SUDO} rm -f /usr/local/bin/${bas}
