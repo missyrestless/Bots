@@ -5,7 +5,8 @@
 #                  arguments can specify which bots
 
 # Aliases for the bots that are going to dance
-BOTS="Angel Anya Easy"
+#BOTS="Angel Anya Easy"
+BOTS="Anya"
 # Set to region where your bots need to be
 REGION="Scylla"
 # Set to object UUID to touch or sit for bots to dance

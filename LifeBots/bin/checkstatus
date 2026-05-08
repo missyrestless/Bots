@@ -5,9 +5,10 @@
 # Usage: checkstatus [-n name]
 
 # Default bot
-DEF_BOT="Easy"
+DEF_BOT="Anya"
 # All bots
-ALL_BOTS="Angel Anya Easy"
+#ALL_BOTS="Angel Anya Easy"
+ALL_BOTS="Anya"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {

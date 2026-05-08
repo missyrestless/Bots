@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Set the list of bots you want to check status
-BOTS="Angel Anya Easy"
+#BOTS="Angel Anya Easy"
+BOTS="Anya"
 
 export PATH="/usr/local/bin:${PATH}"
 [ -d /opt/homebrew/bin ] && {
