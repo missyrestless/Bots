@@ -153,6 +153,9 @@ list particle_names = [ ];
 list nearby_names = [ ];
 list COMMAND_NAMES = [];
 
+// 0 = debug off, 1 = debug on
+integer DEBUG = 0;
+
 integer SHOW_BOT_MENU = TRUE;
 integer OWNER_BOT_MENU = FALSE;
 integer INVISIBLE = FALSE; // Enable making the bot invisible
@@ -728,6 +731,11 @@ Prep_Restart() {
 // Send LifeBots HTTP API commands
 LifeBotsAPI(string command, list params) {
 
+  if (DEBUG == 1) {
+    llOwnerSay("API_KEY = " + API_KEY);
+    llOwnerSay("BOT_NAME = " + BOT_NAME);
+    llOwnerSay("BOT_SECRET = " + BOT_SECRET);
+  }
   // Populate the query data
   list query = [
     "action="  + command,
@@ -735,6 +743,11 @@ LifeBotsAPI(string command, list params) {
     "botname=" + llEscapeURL(BOT_NAME),
     "secret="  + llEscapeURL(BOT_SECRET)
   ];
+  if (DEBUG == 1) {
+    llOwnerSay("API_KEY = " + API_KEY);
+    llOwnerSay("BOT_NAME = " + BOT_NAME);
+    llOwnerSay("BOT_SECRET = " + BOT_SECRET);
+  }
 
   integer i;
   for(i = 0; i<llGetListLength(params); i += 2) {
@@ -742,6 +755,11 @@ LifeBotsAPI(string command, list params) {
   }
 
   string queryString = llDumpList2String(query, "&");
+
+  if (DEBUG == 1) {
+    llOwnerSay("API_URL = " + API_URL);
+    llOwnerSay("queryString = " + queryString);
+  }
  
   llHTTPRequest(API_URL, [HTTP_METHOD,"POST"], queryString);
 }
