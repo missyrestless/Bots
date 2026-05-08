@@ -1,0 +1,112 @@
+<h1 id="how-to-setup-login-location-and-sit-object">How to Setup Login
+Location and Sit Object</h1>
+<p><strong>LifeBots</strong> bots (Lite &amp; Full types) can be
+configured to login to a specified location and, after successful login,
+sit on a specified object. This article describes the steps to configure
+a <strong>LifeBots</strong> bot to login to Second Life at a specific
+location and sit on an object.</p>
+<h2 id="login-location">Login Location</h2>
+<p>To configure the bot’s login location:</p>
+<ul>
+<li>Visit your <strong>LifeBots Dashboard</strong> at <a
+href="https://lifebots.cloud/dashboard">https://lifebots.cloud/dashboard</a></li>
+<li>Click on the bot you wish to configure
+<ul>
+<li>This will open a <strong>Manage Bot</strong> panel for the bot</li>
+</ul></li>
+<li>Click on the <strong>Location Config</strong> pane
+<ul>
+<li>This will open a <strong>Login Location Settings</strong>
+window</li>
+</ul></li>
+<li>Click the <strong>Login To</strong> dropdown to <strong>Select
+Location</strong>
+<ul>
+<li>A dropdown menu will appear with locations to select from</li>
+</ul></li>
+<li>Click on <strong>Last Location</strong>, <strong>Home
+Location</strong>, or <strong>Base Location</strong> to select a login
+location
+<ul>
+<li>Selecting <strong>Last Location</strong> will use the last location
+of the bot as the login location</li>
+<li>Selecting <strong>Home Location</strong> will use the configured
+<strong>Home</strong> of the bot as the login location</li>
+<li>Selecting <strong>Base Location</strong> will add a <strong>Base
+Location</strong> field in which you can enter a Slurl</li>
+</ul></li>
+<li>Click the <strong>Save</strong> button in the bottom right corner of
+the window to save your bot’s login location</li>
+</ul>
+<h3 id="last-location-setup">Last Location Setup</h3>
+<p>Selecting <strong>Last Location</strong> from the <strong>Login
+To</strong> dropdown menu will cause your bot to login to its last known
+location in Second Life. If the bot moves or teleports while logged in
+then the next login will use the new location.</p>
+<h3 id="home-location-setup">Home Location Setup</h3>
+<p>Selecting <strong>Home Location</strong> from the <strong>Login
+To</strong> dropdown menu will cause your bot to login to its configured
+<strong>Home</strong> location in Second Life. Subsequent logins will
+always use the same login location regardless of bot movement. To change
+the bot’s login location with this setting you must reconfigure the
+bot’s <strong>Home</strong> location.</p>
+<h3 id="base-location-setup">Base Location Setup</h3>
+<p>If you select <strong>Base Location</strong> from the <strong>Login
+To</strong> dropdown menu, a <strong>Base Location</strong> field is
+added to the <strong>Login Location Settings</strong> window. Enter a
+valid Second Life Slurl of the form
+<strong>http://maps.secondlife.com/secondlife/Region_Name/X/Y/Z</strong>
+in the <strong>Base Location</strong> field. Replace
+<strong>Region_Name</strong> with the name of the region where you want
+your bot to login and replace the <strong>X/Y/Z</strong> with the
+coordinates in that region. For example, a valid Second Life Slurl is
+<strong>http://maps.secondlife.com/secondlife/Goa/18/45/3599</strong></p>
+<p><strong>[Note:]</strong> Your bot must have access to the location
+configured in the <strong>Base Location</strong> field. If your bot does
+not have access to this location then it will be teleported to another
+location.</p>
+<h2 id="sit-on-object">Sit On Object</h2>
+<p>Your bot can be configured to sit on a specified object after logging
+into Second Life. The steps are similar to those described above for the
+bot’s login location and can be performed at the same time as the login
+location is configured.</p>
+<p>To configure the object to sit on:</p>
+<ul>
+<li>Visit your <strong>LifeBots Dashboard</strong> at <a
+href="https://lifebots.cloud/dashboard">https://lifebots.cloud/dashboard</a></li>
+<li>Click on the bot you wish to configure
+<ul>
+<li>This will open a <strong>Manage Bot</strong> panel for the bot</li>
+</ul></li>
+<li>Click on the <strong>Location Config</strong> pane
+<ul>
+<li>This will open a <strong>Login Location Settings</strong>
+window</li>
+</ul></li>
+<li>Enter an <strong>Object UUID</strong> in the <strong>Sit On
+Object</strong> field
+<ul>
+<li>In your Second Life viewer, right click the object you want your bot
+to sit on</li>
+<li>Select <strong>Edit</strong></li>
+<li>In the <strong>General</strong> tab click the <strong>Copy
+Keys</strong> button</li>
+<li>Paste the copied UUID into the <strong>Sit On Object</strong>
+field</li>
+</ul></li>
+<li>Click the <strong>Save</strong> button in the bottom right corner of
+the window to save your bot’s login location</li>
+</ul>
+<p><strong>[Note:]</strong> The object to sit on must be within range of
+the bot’s login location. You cannot specify a sit on object that is in
+another region or one that cannot be accessed from the bot’s login
+location.</p>
+<h2 id="return-to-login-location">Return to Login Location</h2>
+<p>Near the bottom of the <strong>Login Location Settings</strong>
+window is an <strong>Always return to Login Location?</strong> field.
+This can be used to force the bot to return to its configured login
+location after completing all activities.</p>
+<p>To configure this option click the <strong>Select Option</strong>
+dropdown and select either <strong>Yes</strong> or <strong>No</strong>.
+Click the <strong>Save</strong> button in the bottom right corner of the
+window to save your bot’s return to login location configuration.</p>
