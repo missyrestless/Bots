@@ -16,6 +16,17 @@
 #
 # TODO: get bot details not working yet, need to generate an access token
 #
+# TODO: add commands to send chat commands to Corrade bots, for example:
+# llInstantMessage(CORRADE,
+#   wasKeyValueEncode(
+#       [
+#           "command", "stand",
+#           "group", wasURLEscape(GROUP),
+#           "password", wasURLEscape(PASSWORD)
+#       ]
+#   )
+# );
+#
 # ----------------- $HOME/.lifebots Format ----------------------
 # Entries in ~/.lifebots can be LB_API_KEY, LB_SECRET, or entries
 # of the form LB_SECRET_BOT_NAME in order to support multiple bots
