@@ -66,7 +66,7 @@ gh release create v${VERSION} ${DRAFT} \
                   --title "${ANNO}" \
                   --target "${BRANCH}" \
                   --notes-file Release_Notes_Lifebot.md \
-		  install-lifebot \
+                  install-lifebot \
                   lifebot-${VERSION}.tar.gz
 
 git fetch --tags origin

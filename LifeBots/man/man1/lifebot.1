@@ -22,22 +22,34 @@
 lifebot - Manage LifeBots Second Life bots from the command line
 .SS SYNOPSIS
 .PP
-lifebot [-deih] [-a action] [-l location] [-n name] [-k apikey] [-B
-text] [-C channel] [-F filter] [-M message] [-N name] [-O name] [-S
-subject] [-s secret] [-u uuid] [-z num]
+lifebot [-deih] [-a action] [-A avatar] [-l location] [-n name] [-k
+apikey] [-B text] [-C channel] [-c corrade] [-F filter] [-M message] [-N
+name] [-O name] [-S subject] [-s secret] [-u uuid] [-z num]
 .PP
 See the Bots Github repository
 README (https://github.com/missyrestless/Bots) article for additional
 information on the \f[V]lifebot\f[R] command and associated tools.
 .SS DESCRIPTION
 .PP
-A command line management system for \f[V]LifeBots\f[R] Second Life
-scripted agents (bots).
+A command line management system for \f[V]LifeBots\f[R] and
+\f[V]Corrade\f[R] Second Life scripted agents (bots).
 The \f[V]lifebot\f[R] command can be used to manage either
-\f[V]Lite\f[R] or \f[V]Full\f[R] bots from \f[V]LifeBots\f[R].
+\f[V]Lite\f[R] or \f[V]Full\f[R] bots from \f[V]LifeBots\f[R] as well as
+\f[V]Corrade\f[R] bots configured with the built-in Corrade HTTP service
+enabled.
+.PP
+\f[B]NEW\f[R] The \f[V]lifebot\f[R] command now supports management of
+both \f[V]LifeBots\f[R] and \f[V]Corrade\f[R] bots.
+To manage a \f[V]Corrade\f[R] bot simply replace the
+\f[V]-n <bot name or alias>\f[R] command line argument with
+\f[V]-c <bot name or alias>\f[R].
 .PP
 See <https://lifebots.cloud> (https://lifebots.cloud) for more
 information on \f[V]LifeBots\f[R].
+.PP
+See
+<https://grimore.org/secondlife/scripted_agents/corrade> (https://grimore.org/secondlife/scripted_agents/corrade)
+for more information on \f[V]Corrade\f[R].
 .SS CONFIGURATION
 .PP
 The \f[V]lifebot\f[R] command is installed in \f[V]/usr/local/bin\f[R]
@@ -135,6 +147,13 @@ export SLURL_club=\[dq]http://maps.secondlife.com/secondlife/CLUB_REGION%20NAME/
 # or -u couch to seat the bot on the specified object
 export UUID_dancepole=\[dq]dance-pole-object-uuid\[dq]
 export UUID_couch=\[dq]couch-object-uuid\[dq]
+
+# Corrade command control via LifeBots
+export CORRADE_GROUP=\[dq]<your-corrade-bot-group-name>\[dq]
+export CORRADE_PASSW=\[dq]<your-corrade-bot-group-password>\[dq]
+export CORRADE_URL=\[dq]https://your.corrade.server\[dq]
+export API_URL_bot1_name=\[dq]${CORRADE_URL}/bot1/\[dq]
+export API_URL_bot2_name=\[dq]${CORRADE_URL}/bot2/\[dq]
 \f[R]
 .fi
 .SS OPTIONS
@@ -158,7 +177,10 @@ Supported actions:
 \f[V]-l location\f[R] : specifies a location for login and teleport
 actions
 .PP
-\f[V]-n name\f[R] : specifies a Bot name, Default: Easy Islay
+\f[V]-n name\f[R] : specifies a LifeBots Bot name, Default: Anya
+Ordinary
+.PP
+\f[V]-c name\f[R] : specifies a Corrade Bot name, Default: Easy Islay
 .PP
 \f[V]-k apikey\f[R] : specifies an API Key, use environment instead
 .PP
