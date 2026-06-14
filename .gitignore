@@ -8,6 +8,9 @@ tmp/
 # Corrade release archives
 Dist/
 
+# Reference repo for Corrade AI
+Free-Corrade-AI/
+
 # LifeBots scripts and doc
 LifeBots/Doc/Doc-Start.txt
 LifeBots/Doc/Neal-IM.txt
